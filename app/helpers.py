@@ -1,7 +1,7 @@
 from flask import flash, url_for
 from flask import current_app as app
 from itsdangerous import URLSafeSerializer
-from .utils import send_email
+from .utils import send_email, test
 
 def flash_errors(form):
     """Flashes form errors"""
