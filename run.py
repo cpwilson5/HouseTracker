@@ -9,7 +9,6 @@ if __name__ == '__main__':
     app.run()
 
 """
-test 3
 cd housetracker
 export FLASK_CONFIG=development
 export FLASK_APP=run.py
