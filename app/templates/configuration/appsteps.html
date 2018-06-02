@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block header %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+  <h1 class="display-4">App Settings</h1>
+  <p class="lead">Adjust the steps that are automatically created for any new user accounts</p>
+</div>
+{% endblock %}
+
+{% block body %}
+<!-- Custom styles for this template -->
+
+<a class="btn btn-primary btn-lg mb-4 float-right" href="{{ url_for('configuration.add_app_step') }}">+ Add Step</a>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th scope="col">Handle</th>
+    </tr>
+  </thead>
+  {% for app_step in app_steps %}
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>{{ app_step.name }}</td>
+      <td><a href="{{ url_for('configuration.edit_app_step', id=app_step._id) }}" class="card-link">Edit</a></td>
+      <td><a href="{{ url_for('configuration.delete_app_step', id=app_step._id) }}" class="card-link">Delete</a></td>
+    </tr>
+  </tbody>
+  {% endfor %}
+</table>
+</div>
+
+{% endblock %}

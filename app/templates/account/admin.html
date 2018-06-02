@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block body %}
+
+<div class="col-md-8 offset-md-2">
+
+    <!-- form user info -->
+    <div class="card card-outline-secondary">
+        <div class="card-header">
+            <h3 class="mb-0">Add Team Member</h3>
+        </div>
+        <div class="card-body">
+            <form action="" method="POST" name="form" class="form" role="form" autocomplete="off">
+              {{ form.hidden_tag() }}
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label">First name</label>
+                    <div class="col-lg-9">
+                      {{ form.first_name(class_="form-control") }}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label">Last name</label>
+                    <div class="col-lg-9">
+                        {{ form.last_name(class_="form-control") }}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label">Email</label>
+                    <div class="col-lg-9">
+                        {{ form.email(class_="form-control") }}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label"></label>
+                    <div class="col-lg-9 text-right">
+                        <input type="submit" class="btn btn-primary" value="Send Invitation">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- /form user info -->
+
+{% endblock %}

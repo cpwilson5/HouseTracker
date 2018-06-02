@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block header %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+  <h1 class="display-4">Listings</h1>
+</div>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container">
+  <div class="row">
+    <div class="col">
+      <a class="btn btn-primary btn-md mb-4" href="{{ url_for('listing.add_listing') }}">+ Add</a>
+    </div>
+    <div class="col">
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Status
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#">Active</a>
+          <a class="dropdown-item" href="#">Inactive</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle mr-2 float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Sort
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#">Recently updated</a>
+          <a class="dropdown-item" href="#">Completing soon</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-deck">
+  {% for listing in listings %}
+    <div class="card mb-4">
+      <a href="{{ url_for('listing.listing_steps', id=listing._id) }}" class="card-block clearfix">
+        <h5 class="card-header">{{ listing.name }}</h5>
+        <div class="progress">
+          {% set complete = listing.steps | selectattr("complete_date") | list | count %}
+          {% set incomplete = listing.steps | selectattr("active") | rejectattr("complete_date") | list | count %}
+          {% set percent = (complete/(incomplete+complete)) * 100|round|int if (incomplete + complete) > 0 else 0  %}
+          <div class="progress-bar" role="progressbar"
+            style="width: {{ percent }}%"
+            aria-valuenow="{{ percent }}"
+            aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <div class="card-body">
+          <p class="card-text">
+            {{ listing.name }}<br>
+            {{ listing.address1 }}<br>
+            {{ listing.address2 }}<br>
+            {{ listing.city }}, {{ listing.state }} {{ listing.zip }}
+          </p>
+        </div>
+        <ul class="list-group list-group-flush">
+          {% if listing.steps | selectattr("active") | rejectattr("complete_date") | first | count > 1 %}
+            <li class="list-group-item">Next Step: {{ (listing.steps | selectattr("active") | rejectattr("complete_date") | first).name }}</li>
+          {% else %}
+            <li class="list-group-item d-flex justify-content-between">No more steps!  <a href="{{ url_for('listing.complete_listing', id=listing._id) }}">Archive?</a></li>
+          {% endif %}
+        </ul>
+        <div class="card-footer">
+          <small class="text-muted">Updated on {{ listing.update_date | pretty_date }}</small>
+        </div>
+      </a>
+    </div>
+  {% endfor %}
+  </div>
+</div>
+
+{% endblock %}

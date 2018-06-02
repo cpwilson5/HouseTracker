@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../../../favicon.ico">
+
+    <title>House Status</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href= "{{ url_for('static',filename='css/custom.css') }}" rel="stylesheet">
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom box-shadow">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        {% if current_user.is_authenticated %}
+        <h5 class="my-0 mr-md-auto font-weight-normal"><a class="nav-link p-1 text-dark" href="{{ url_for('home.dashboard') }}">Dashboard</a></h5>
+        {% else %}
+        <h5 class="my-0 mr-md-auto font-weight-normal"><a class="nav-link p-1 text-dark" href="{{ url_for('home.homepage') }}">House Status</a></h5>
+        {% endif %}
+        <ul class="navbar-nav ml-md-auto">
+          {% if current_user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link p-2 text-dark" href="{{ url_for('listing.listings') }}">Listings</a>
+          </li>
+          <li class="nav-item dropdown ml-2 mr-2">
+            <a class="nav-link dropdown-toggle p-2 text-dark" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('account.admins') }}">Team Members</a>
+              <a class="dropdown-item" href="{{ url_for('account.steps') }}">Setup Process</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('account.user') }}">My Account</a>
+              {% if current_user.is_superuser %}
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" href="{{ url_for('configuration.app_steps') }}">App Settings</a>
+              {% endif %}
+            </div>
+          </li>
+          <li class="nav-item ml-2 mr-2">
+            <a class="btn btn-outline-primary" href="{{ url_for('account.logout') }}">Log out</a>
+          </li>
+          {% else %}
+          <li class="nav-item ml-2 mr-2">
+            <a class="nav-link p-2 text-dark" href="{{ url_for('home.features') }}">Features</a>
+          </li>
+          <li class="nav-item ml-2 mr-2">
+            <a class="nav-link p-2 text-dark" href="{{ url_for('home.pricing') }}">Pricing</a>
+          </li>
+          <li>
+            <a class="mr-2 btn btn-outline-primary ml-2 mr-2" href="{{ url_for('account.register') }}">Sign up</a>
+          </li>
+          <li>
+            <a class="btn btn-outline-primary ml-2 mr-2" href="{{ url_for('account.login') }}">Log in</a>
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible text-center" role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <!-- <strong>Title</strong> --> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+  {% block header %}
+  {% endblock %}
+
+
+
+  {% block body %}
+  {% endblock %}
+
+  <div class="container pt-5">
+    <footer class="pt-4 my-md-5 pt-md-5 border-top">
+      <div class="row">
+        <div class="col-12 col-md">
+          <small class="d-block mb-3 text-muted">&copy; 2017-2018</small>
+        </div>
+        <div class="col-6 col-md">
+          <h5>Features</h5>
+          <ul class="list-unstyled text-small">
+            <li><a class="text-muted" href="#">Cool stuff</a></li>
+            <li><a class="text-muted" href="#">Random feature</a></li>
+            <li><a class="text-muted" href="#">Team feature</a></li>
+            <li><a class="text-muted" href="#">Stuff for developers</a></li>
+            <li><a class="text-muted" href="#">Another one</a></li>
+            <li><a class="text-muted" href="#">Last time</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-md">
+          <h5>Resources</h5>
+          <ul class="list-unstyled text-small">
+            <li><a class="text-muted" href="#">Resource</a></li>
+            <li><a class="text-muted" href="#">Resource name</a></li>
+            <li><a class="text-muted" href="#">Another resource</a></li>
+            <li><a class="text-muted" href="#">Final resource</a></li>
+          </ul>
+        </div>
+        <div class="col-6 col-md">
+          <h5>About</h5>
+          <ul class="list-unstyled text-small">
+            <li><a class="text-muted" href="#">Team</a></li>
+            <li><a class="text-muted" href="#">Locations</a></li>
+            <li><a class="text-muted" href="#">Privacy</a></li>
+            <li><a class="text-muted" href="#">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+
+  <!-- Bootstrap core JavaScript
+  ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.9.4/holder.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/custom.js') }}"></script>
+</body>
