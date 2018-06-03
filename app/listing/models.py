@@ -93,6 +93,9 @@ class ListingStep(object):
         else:
             due_date = datetime.datetime.combine(self.due_date, datetime.time.min)
 
+        listing = Listing.get(self.listing_id)
+        next_order = listing['order'] if 'order' in listing else 1
+
         return mongo.db.listings.update_one({
             '_id': ObjectId(self.listing_id)
         },{
@@ -107,6 +110,7 @@ class ListingStep(object):
                     'attachment': self.attachment,
                     'duedate': due_date,
                     'active': True,
+                    'order': next_order,
                     'create_date': datetime.datetime.now().isoformat(),
                     'update_date': datetime.datetime.now().isoformat()
                 }
