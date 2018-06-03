@@ -96,7 +96,8 @@ def add_listing_step(id):
             s3_filepath = None
 
         listing_step = ListingStep(listing_id=id, name=form.name.data, \
-        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data)
+        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data, \
+        color = form.color.data)
         listing_step.add()
         #send_sms('+15407466097', 'Step Added:  Details go here')
 
@@ -117,6 +118,7 @@ def edit_listing_step(id, step_id):
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
         form.due_date.data = listing_step['steps'][0]['duedate']
+        form.color.data = listing_step['steps'][0]['color'] if 'color' in listing_step['steps'][0] else 'Green'
         attachment = listing_step['steps'][0]['attachment']
 
         return render_template('listing/listingstep.html', form=form, attachment=attachment, id=id, step_id=step_id)
@@ -128,7 +130,8 @@ def edit_listing_step(id, step_id):
             s3_filepath = None
 
         ListingStep.update(id=id, step_id=step_id, name=form.name.data, \
-        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data)
+        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data, \
+        color=form.color.data)
 
         return redirect(url_for('listing.listing_steps', id=id))
     else:

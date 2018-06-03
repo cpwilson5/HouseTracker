@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField
+from wtforms import StringField, SelectField
 from wtforms.fields.html5 import DateField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
+from wtforms.widgets import TextArea
 from werkzeug.utils import secure_filename
 from wtforms.validators import DataRequired
 
@@ -15,6 +16,7 @@ class ListingForm(FlaskForm):
 
 class ListingStepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    notes = StringField('Notes')
+    notes = StringField('Notes',widget=TextArea())
     due_date = DateField('Due Date', format='%Y-%m-%d')
+    color = SelectField('Color', choices=[('Green','Green'),('Yellow','Yellow'),('Red','Red')])
     attachment = FileField('Attachment', validators=[FileAllowed(['jpg', 'png', 'pdf'], 'Must be JPG, PNG or PDF')])

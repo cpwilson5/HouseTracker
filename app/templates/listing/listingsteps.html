@@ -23,7 +23,7 @@
   <div class="row">
     <div id="sortable" class="col-md-8">
       {% for listing_step in listing_steps %}
-      <div id="{{ listing_step.steps._id }}" class="card mb-4">
+      <div id="{{ listing_step.steps._id }}" class="card mb-4" style="border-width:3px; border-color: {{ listing_step.steps.color if listing_step.steps.color else 'Green' }}">
         <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
           <h5 class="card-header">{{ listing_step.steps.name }}</h5>
           <div class="card-body">
