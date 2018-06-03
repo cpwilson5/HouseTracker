@@ -52,7 +52,9 @@
           <p class="card-text">
             {{ listing.name }}<br>
             {{ listing.address1 }}<br>
-            {{ listing.address2 }}<br>
+            {% if listing.address2 %}
+              {{ listing.address2 }}<br>
+            {% endif %}
             {{ listing.city }}, {{ listing.state }} {{ listing.zip }}
           </p>
         </div>
