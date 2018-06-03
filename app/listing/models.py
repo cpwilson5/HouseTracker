@@ -79,12 +79,11 @@ class Listing(object):
 
 
 class ListingStep(object):
-    def __init__(self, listing_id, name, notes, attachment=None, link=None, due_date=None, order=0):
+    def __init__(self, listing_id, name, notes, attachment=None, due_date=None, order=0):
         self.listing_id = listing_id
         self.name = name
         self.notes = notes
         self.attachment = attachment
-        self.link = link
         self.due_date = due_date
 
     def add(self):
@@ -106,7 +105,6 @@ class ListingStep(object):
                     'name': self.name,
                     'notes': self.notes,
                     'attachment': self.attachment,
-                    'link': self.link,
                     'duedate': due_date,
                     'active': True,
                     'create_date': datetime.datetime.now().isoformat(),
@@ -145,7 +143,7 @@ class ListingStep(object):
         ])
 
     @staticmethod
-    def update(id, step_id, name, notes, attachment, link, due_date):
+    def update(id, step_id, name, notes, attachment, due_date):
         if attachment is None:
             attachment = ListingStep.get(id, step_id)['steps'][0]['attachment']
 
@@ -157,7 +155,6 @@ class ListingStep(object):
                 'steps.$.name': name,
                 'steps.$.notes': notes,
                 'steps.$.attachment': attachment,
-                'steps.$.link': link,
                 'steps.$.duedate': datetime.datetime.combine(due_date, datetime.time.min),
                 'steps.$.update_date': datetime.datetime.now().isoformat(),
                 'update_date': datetime.datetime.now().isoformat()
