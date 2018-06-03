@@ -27,7 +27,7 @@
         {% for listing_step in listing_steps %}
         <div id="{{ listing_step.steps._id }}" class="card mb-4">
           <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
-            <h5 class="card-header">{{ listing_step.steps.name }} <span class="dot float-right" style="background-color: {{ listing_step.steps.color if listing_step.steps.color else 'Green' }};"></span></h5>
+            <h5 class="card-header" style="background-color: {{ listing_step.steps.color if listing_step.steps.color else 'Green' }};">{{ listing_step.steps.name }}</h5>
             <div class="card-body">
               <p class="card-text">{{ listing_step.steps.notes }}</p>
             </div>

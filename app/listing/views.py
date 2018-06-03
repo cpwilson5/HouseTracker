@@ -55,7 +55,7 @@ def edit_listing(id):
         form.city.data = listing['city']
         form.state.data = listing['state']
         form.zip.data = listing['zip']
-        form.close_date.data = listing['close_date'] if 'close_date' in listing else None
+        form.close_date.data = datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') if 'close_date' in listing else None
 
     if request.method == 'POST' and form.validate_on_submit():
         Listing.update(id, form.name.data, form.address1.data, \
@@ -117,13 +117,11 @@ def edit_listing_step(id, step_id):
 
     if request.method == 'GET':
         listing_step = ListingStep.get(id, step_id)
-
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
         form.due_date.data = listing_step['steps'][0]['duedate']
         form.color.data = listing_step['steps'][0]['color'] if 'color' in listing_step['steps'][0] else 'Green'
         attachment = listing_step['steps'][0]['attachment']
-
         return render_template('listing/listingstep.html', form=form, attachment=attachment, id=id, step_id=step_id)
 
     if request.method == 'POST' and form.validate_on_submit():
