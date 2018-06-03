@@ -1,6 +1,7 @@
 from ..database import mongo
 from flask_login import login_required, current_user
 from bson import ObjectId
+from pymongo import UpdateOne
 import datetime
 
 class Listing(object):
@@ -94,7 +95,7 @@ class ListingStep(object):
             due_date = datetime.datetime.combine(self.due_date, datetime.time.min)
 
         listing = Listing.get(self.listing_id)
-        next_order = listing['order'] if 'order' in listing else 1
+        next_order = listing['order'] + 1 if 'order' in listing else 1
 
         return mongo.db.listings.update_one({
             '_id': ObjectId(self.listing_id)
@@ -143,7 +144,8 @@ class ListingStep(object):
                 'steps.active': active,
                 'steps.complete_date' : { '$exists': complete }
                 }
-            }
+            },
+            { '$sort' : { 'steps.order' : 1 } }
         ])
 
     @staticmethod
@@ -190,3 +192,23 @@ class ListingStep(object):
                 'update_date': datetime.datetime.now().isoformat()
             }
         }, upsert=False)
+
+    @staticmethod
+    def sort(id, step_ids):
+        steps = step_ids.split(',')
+        operations = []
+        order = 1
+
+        for step_id in steps:
+            operations.append(UpdateOne({
+                    '_id': ObjectId(id),
+                    'steps._id': ObjectId(step_id)
+                },{
+                    '$set': {
+                        'steps.$.order': order
+                    }
+                }, upsert=False))
+
+            order += 1
+
+        return mongo.db.listings.bulk_write(operations)

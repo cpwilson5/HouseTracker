@@ -156,8 +156,8 @@ def complete_listing_step(id, step_id):
 @listing.route('/listings/<string:id>/steps/sort', methods=['POST'])
 @login_required
 def sort_listing_step(id):
-    print request.form['order']
-    return json.dumps({'status':'Successfully sorted'});
+    ListingStep.sort(id, request.form['order'])
+    return json.dumps({'status':'Successfully sorted'})
 
 ### adding a listing user/client ###
 @listing.route('/listings/<string:id>/clients/invite', methods=['GET', 'POST'])
