@@ -13,6 +13,7 @@ class ListingForm(FlaskForm):
     city = StringField('City', validators=[DataRequired()])
     state = StringField('State', validators=[DataRequired()])
     zip = StringField('Zip', validators=[DataRequired()])
+    close_date = DateField('Closing Date', format='%Y-%m-%d', validators=[DataRequired()])
 
 class ListingStepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])

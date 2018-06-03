@@ -26,7 +26,8 @@ def add_listing():
     form = ListingForm()
     if request.method == 'POST' and form.validate_on_submit():
         listing = Listing(form.name.data, form.address1.data, \
-        form.address2.data, form.city.data, form.state.data, form.zip.data)
+        form.address2.data, form.city.data, form.state.data, form.zip.data, \
+        form.close_date.data)
         listing_id = listing.add()
 
         # Add user's steps to new listing
@@ -54,10 +55,12 @@ def edit_listing(id):
         form.city.data = listing['city']
         form.state.data = listing['state']
         form.zip.data = listing['zip']
+        form.close_date.data = listing['close_date'] if 'close_date' in listing else None
 
     if request.method == 'POST' and form.validate_on_submit():
         Listing.update(id, form.name.data, form.address1.data, \
-        form.address2.data, form.city.data, form.state.data, form.zip.data)
+        form.address2.data, form.city.data, form.state.data, form.zip.data, \
+        form.close_date.data)
         return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)

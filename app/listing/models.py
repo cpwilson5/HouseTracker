@@ -5,13 +5,14 @@ from pymongo import UpdateOne
 import datetime
 
 class Listing(object):
-    def __init__(self, name, address1, address2, city, state, zip):
+    def __init__(self, name, address1, address2, city, state, zip, close_date):
         self.name = name
         self.address1 = address1
         self.address2 = address2
         self.city = city
         self.state = state
         self.zip = zip
+        self.close_date = close_date
 
     def add(self):
         return mongo.db.listings.insert({
@@ -21,6 +22,7 @@ class Listing(object):
             'city': self.city,
             'state': self.state,
             'zip': self.zip,
+            'close_date': datetime.datetime.combine(self.close_date, datetime.time.min).isoformat(),
             'user': current_user.get_id(),
             'account': current_user.get_account(),
             'active': True,
@@ -44,7 +46,7 @@ class Listing(object):
         })
 
     @staticmethod
-    def update(id, name, address1, address2, city, state, zip):
+    def update(id, name, address1, address2, city, state, zip, close_date):
         return mongo.db.listings.update_one(
             {'_id': ObjectId(id)},
             {'$set': {
@@ -54,6 +56,7 @@ class Listing(object):
                 'city': city,
                 'state': state,
                 'zip': zip,
+                'close_date': datetime.datetime.combine(close_date, datetime.time.min).isoformat(),
                 'update_date': datetime.datetime.now().isoformat()
                 }
         }, upsert=False)
