@@ -21,8 +21,8 @@
           Status
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" href="#">Active</a>
-          <a class="dropdown-item" href="#">Inactive</a>
+          <a class="dropdown-item" href="{{ url_for('listing.add_listing') }}">Active</a>
+          <a class="dropdown-item" href="{{ url_for('listing.add_listing') }}">Inactive</a>
         </div>
       </div>
       <div class="dropdown">
@@ -30,8 +30,10 @@
           Sort
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" href="#">Recently updated</a>
-          <a class="dropdown-item" href="#">Completing soon</a>
+          <a class="dropdown-item" href="?sort=closing">Closing date</a>
+          <a class="dropdown-item" href="?sort=inactive">Oldest update</a>
+          <a class="dropdown-item" href="?sort=created">Recently created</a>
+          <a class="dropdown-item" href="?sort=updated">Recently updated</a>
         </div>
       </div>
     </div>
@@ -52,6 +54,9 @@
             aria-valuemin="0" aria-valuemax="100"></div>
         </div>
         <div class="card-body">
+          <p class="card-text">
+            <b>Closing: {{ listing.close_date | pretty_date("%A, %B %-d")}}</b>
+          </p>
           <p class="card-text">
             {{ listing.address1 }}<br>
             {% if listing.address2 %}

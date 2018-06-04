@@ -38,12 +38,13 @@ class Listing(object):
         })
 
     @staticmethod
-    def all(active=True, complete=False):
+    def all(active=True, complete=False, sort='create_date', order=-1):
+        print sort
         return mongo.db.listings.find({
             'account': current_user.get_account(),
             'active': active,
             'complete_date' : { '$exists': complete }
-        })
+        }).sort(sort,order)
 
     @staticmethod
     def update(id, name, address1, address2, city, state, zip, close_date):

@@ -17,7 +17,22 @@ from . import listing
 @listing.route('/listings')
 @login_required
 def listings():
-    listings = Listing.all(active=True, complete=False)
+
+    if request.args.get('sort') == 'closing':
+        sort = 'close_date'
+        order = -1
+    elif request.args.get('sort') == 'updated':
+        sort = 'update_date'
+        order = -1
+    elif request.args.get('sort') == 'inactive':
+        sort = 'update_date'
+        order = 1
+    else:
+        sort = 'create_date'
+        order = -1
+
+    listings = Listing.all(active=True, complete=False, sort=sort, order=order)
+
     return render_template('listing/listings.html', listings=listings, title="Welcome")
 
 @listing.route('/listings/add', methods=['GET', 'POST'])
