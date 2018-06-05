@@ -71,9 +71,11 @@
             {% if listing.address2 %}
               {{ listing.address2 }}<br>
             {% endif %}
-            {{ listing.city }}, {{ listing.state }} {{ listing.zip }}<br><br>
-            <b>Closing: {{ listing.close_date | pretty_date("%A, %B %-d") }}</b>
+            {{ listing.city }}, {{ listing.state }} {{ listing.zip }}
           </p>
+          <div class="row align-items-center justify-content-center">
+            <span class="badge badge-pill badge-success">Expected close: {{ listing.close_date | pretty_date("%A, %B %-d")}}</span>
+          </div>
         </div>
       </div>
 
