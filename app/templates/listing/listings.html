@@ -41,9 +41,9 @@
 
   <div class="card-deck">
   {% for listing in listings %}
-    <div class="card mb-4">
+    <div class="card mb-4 inline-block">
       <a href="{{ url_for('listing.listing_steps', id=listing._id) }}" class="card-block clearfix">
-        <h5 class="card-header">{{ listing.name }}</h5>
+        <h5 class="card-header">{{ listing.name }} <span class="badge badge-pill badge-success float-right">{{ listing.close_date | pretty_date("%B %-d")}}</span></h5>
         <div class="progress">
           {% set complete = listing.steps | selectattr("complete_date") | list | count %}
           {% set incomplete = listing.steps | selectattr("active") | rejectattr("complete_date") | list | count %}
@@ -55,9 +55,6 @@
         </div>
         <div class="card-body">
           <p class="card-text">
-            <b>Closing: {{ listing.close_date | pretty_date("%A, %B %-d")}}</b>
-          </p>
-          <p class="card-text">
             {{ listing.address1 }}<br>
             {% if listing.address2 %}
               {{ listing.address2 }}<br>
@@ -67,7 +64,7 @@
         </div>
         <ul class="list-group list-group-flush">
           {% if listing.steps | selectattr("active") | rejectattr("complete_date") | first | count > 1 %}
-            <li class="list-group-item">Next Step: {{ (listing.steps | selectattr("active") | rejectattr("complete_date") | first).name }}</li>
+            <li class="list-group-item"><b>Next Step:</b> {{ (listing.steps | selectattr("active") | rejectattr("complete_date") | first).name }}</li>
           {% else %}
             <li class="list-group-item d-flex justify-content-between">No more steps!  <a href="{{ url_for('listing.complete_listing', id=listing._id) }}">Archive?</a></li>
           {% endif %}

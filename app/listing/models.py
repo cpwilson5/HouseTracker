@@ -39,7 +39,6 @@ class Listing(object):
 
     @staticmethod
     def all(active=True, complete=False, sort='create_date', order=-1):
-        print sort
         return mongo.db.listings.find({
             'account': current_user.get_account(),
             'active': active,
@@ -95,7 +94,7 @@ class ListingStep(object):
     def add(self):
         ### Enables app steps (no dates) to be added when listing is created ###
         if self.due_date is None:
-            due_date = datetime.datetime.now()
+            due_date = ''
         else:
             due_date = datetime.datetime.combine(self.due_date, datetime.time.min)
 
@@ -156,6 +155,11 @@ class ListingStep(object):
 
     @staticmethod
     def update(id, step_id, name, notes, attachment, due_date, color):
+        if due_date is None:
+            due_date = ''
+        else:
+            due_date = datetime.datetime.combine(due_date, datetime.time.min)
+
         if attachment is None:
             attachment = ListingStep.get(id, step_id)['steps'][0]['attachment']
 
@@ -167,7 +171,7 @@ class ListingStep(object):
                 'steps.$.name': name,
                 'steps.$.notes': notes,
                 'steps.$.attachment': attachment,
-                'steps.$.duedate': datetime.datetime.combine(due_date, datetime.time.min),
+                'steps.$.duedate': due_date,
                 'steps.$.color': color,
                 'steps.$.update_date': datetime.datetime.now().isoformat(),
                 'update_date': datetime.datetime.now().isoformat()
