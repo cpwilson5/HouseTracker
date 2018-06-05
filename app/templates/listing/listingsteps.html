@@ -3,7 +3,7 @@
 
 {% block header %}
 <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="display-4">Listing Steps</h1>
+  <h1 class="display-4">{{ listing.name}}</h1>
 </div>
 
 <div class="container">
@@ -20,21 +20,37 @@
 
 {% block body %}
 <div class="container">
+
   <div class="row">
-    <div id="sortable" class="col-md-8">
-      {% for listing_step in listing_steps %}
-      <div id="{{ listing_step.steps._id }}" class="card mb-4">
-        <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
-          <h5 class="card-header">{{ listing_step.steps.name }}</h5>
+    <div class="col-md-8">
+      <div id="sortable">
+        {% for listing_step in listing_steps %}
+        <div id="{{ listing_step.steps._id }}" class="card mb-4">
+          <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
+            <h5 class="card-header" style="background-color: {{ listing_step.steps.color if listing_step.steps.color else 'Green' }};">{{ listing_step.steps.name }}</h5>
+            <div class="card-body">
+              <p class="card-text">{{ listing_step.steps.notes }}</p>
+            </div>
+            <div class="card-footer">
+              <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date }}</small>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+
+      <div id="closing" class="card mb-4">
+        <a href="{{ url_for('listing.edit_listing', id=id) }}" class="card-block clearfix">
+          <h5 class="card-header">Closing</h5>
           <div class="card-body">
-            <p class="card-text">{{ listing_step.steps.notes }}</p>
+            <p class="card-text">You're expected closing date is {{ listing.close_date | pretty_date("%A, %B %-d") }}</p>
           </div>
           <div class="card-footer">
-            <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date }}</small>
+            <small class="text-muted">Last updated {{ listing.update_date | pretty_date }}</small>
           </div>
         </a>
       </div>
-      {% endfor %}
+
     </div>
 
     <div class="col-sm">
@@ -50,12 +66,13 @@
             </div>
           </div>
           <p class="card-text">
-            {{ listing.name }}<br>
+            <b>{{ listing.name }}</b><br>
             {{ listing.address1 }}<br>
             {% if listing.address2 %}
               {{ listing.address2 }}<br>
             {% endif %}
-            {{ listing.city }}, {{ listing.state }} {{ listing.zip }}
+            {{ listing.city }}, {{ listing.state }} {{ listing.zip }}<br><br>
+            <b>Closing: {{ listing.close_date | pretty_date("%A, %B %-d") }}</b>
           </p>
         </div>
       </div>

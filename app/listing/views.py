@@ -17,7 +17,22 @@ from . import listing
 @listing.route('/listings')
 @login_required
 def listings():
-    listings = Listing.all(active=True, complete=False)
+
+    if request.args.get('sort') == 'closing':
+        sort = 'close_date'
+        order = -1
+    elif request.args.get('sort') == 'updated':
+        sort = 'update_date'
+        order = -1
+    elif request.args.get('sort') == 'inactive':
+        sort = 'update_date'
+        order = 1
+    else:
+        sort = 'create_date'
+        order = -1
+
+    listings = Listing.all(active=True, complete=False, sort=sort, order=order)
+
     return render_template('listing/listings.html', listings=listings, title="Welcome")
 
 @listing.route('/listings/add', methods=['GET', 'POST'])
@@ -26,7 +41,8 @@ def add_listing():
     form = ListingForm()
     if request.method == 'POST' and form.validate_on_submit():
         listing = Listing(form.name.data, form.address1.data, \
-        form.address2.data, form.city.data, form.state.data, form.zip.data)
+        form.address2.data, form.city.data, form.state.data, form.zip.data, \
+        form.close_date.data)
         listing_id = listing.add()
 
         # Add user's steps to new listing
@@ -54,10 +70,12 @@ def edit_listing(id):
         form.city.data = listing['city']
         form.state.data = listing['state']
         form.zip.data = listing['zip']
+        form.close_date.data = datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') if 'close_date' in listing else None
 
     if request.method == 'POST' and form.validate_on_submit():
         Listing.update(id, form.name.data, form.address1.data, \
-        form.address2.data, form.city.data, form.state.data, form.zip.data)
+        form.address2.data, form.city.data, form.state.data, form.zip.data, \
+        form.close_date.data)
         return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)
@@ -96,7 +114,8 @@ def add_listing_step(id):
             s3_filepath = None
 
         listing_step = ListingStep(listing_id=id, name=form.name.data, \
-        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data)
+        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data, \
+        color = form.color.data)
         listing_step.add()
         #send_sms('+15407466097', 'Step Added:  Details go here')
 
@@ -113,12 +132,11 @@ def edit_listing_step(id, step_id):
 
     if request.method == 'GET':
         listing_step = ListingStep.get(id, step_id)
-
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
         form.due_date.data = listing_step['steps'][0]['duedate']
+        form.color.data = listing_step['steps'][0]['color'] if 'color' in listing_step['steps'][0] else 'Green'
         attachment = listing_step['steps'][0]['attachment']
-
         return render_template('listing/listingstep.html', form=form, attachment=attachment, id=id, step_id=step_id)
 
     if request.method == 'POST' and form.validate_on_submit():
@@ -128,7 +146,8 @@ def edit_listing_step(id, step_id):
             s3_filepath = None
 
         ListingStep.update(id=id, step_id=step_id, name=form.name.data, \
-        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data)
+        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data, \
+        color=form.color.data)
 
         return redirect(url_for('listing.listing_steps', id=id))
     else:

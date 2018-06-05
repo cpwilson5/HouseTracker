@@ -5,13 +5,14 @@ from pymongo import UpdateOne
 import datetime
 
 class Listing(object):
-    def __init__(self, name, address1, address2, city, state, zip):
+    def __init__(self, name, address1, address2, city, state, zip, close_date):
         self.name = name
         self.address1 = address1
         self.address2 = address2
         self.city = city
         self.state = state
         self.zip = zip
+        self.close_date = close_date
 
     def add(self):
         return mongo.db.listings.insert({
@@ -21,6 +22,7 @@ class Listing(object):
             'city': self.city,
             'state': self.state,
             'zip': self.zip,
+            'close_date': datetime.datetime.combine(self.close_date, datetime.time.min).isoformat(),
             'user': current_user.get_id(),
             'account': current_user.get_account(),
             'active': True,
@@ -36,15 +38,15 @@ class Listing(object):
         })
 
     @staticmethod
-    def all(active=True, complete=False):
+    def all(active=True, complete=False, sort='create_date', order=-1):
         return mongo.db.listings.find({
             'account': current_user.get_account(),
             'active': active,
             'complete_date' : { '$exists': complete }
-        })
+        }).sort(sort,order)
 
     @staticmethod
-    def update(id, name, address1, address2, city, state, zip):
+    def update(id, name, address1, address2, city, state, zip, close_date):
         return mongo.db.listings.update_one(
             {'_id': ObjectId(id)},
             {'$set': {
@@ -54,6 +56,7 @@ class Listing(object):
                 'city': city,
                 'state': state,
                 'zip': zip,
+                'close_date': datetime.datetime.combine(close_date, datetime.time.min).isoformat(),
                 'update_date': datetime.datetime.now().isoformat()
                 }
         }, upsert=False)
@@ -80,17 +83,18 @@ class Listing(object):
 
 
 class ListingStep(object):
-    def __init__(self, listing_id, name, notes, attachment=None, due_date=None, order=0):
+    def __init__(self, listing_id, name, notes, attachment=None, due_date=None, order=0, color=None):
         self.listing_id = listing_id
         self.name = name
         self.notes = notes
         self.attachment = attachment
         self.due_date = due_date
+        self.color = color
 
     def add(self):
         ### Enables app steps (no dates) to be added when listing is created ###
         if self.due_date is None:
-            due_date = datetime.datetime.now()
+            due_date = ''
         else:
             due_date = datetime.datetime.combine(self.due_date, datetime.time.min)
 
@@ -110,6 +114,7 @@ class ListingStep(object):
                     'notes': self.notes,
                     'attachment': self.attachment,
                     'duedate': due_date,
+                    'color': self.color,
                     'active': True,
                     'order': next_order,
                     'create_date': datetime.datetime.now().isoformat(),
@@ -149,7 +154,12 @@ class ListingStep(object):
         ])
 
     @staticmethod
-    def update(id, step_id, name, notes, attachment, due_date):
+    def update(id, step_id, name, notes, attachment, due_date, color):
+        if due_date is None:
+            due_date = ''
+        else:
+            due_date = datetime.datetime.combine(due_date, datetime.time.min)
+
         if attachment is None:
             attachment = ListingStep.get(id, step_id)['steps'][0]['attachment']
 
@@ -161,7 +171,8 @@ class ListingStep(object):
                 'steps.$.name': name,
                 'steps.$.notes': notes,
                 'steps.$.attachment': attachment,
-                'steps.$.duedate': datetime.datetime.combine(due_date, datetime.time.min),
+                'steps.$.duedate': due_date,
+                'steps.$.color': color,
                 'steps.$.update_date': datetime.datetime.now().isoformat(),
                 'update_date': datetime.datetime.now().isoformat()
             }

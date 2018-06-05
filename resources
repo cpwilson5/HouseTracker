@@ -2,3 +2,10 @@ registration and login
 - https://github.com/sagaragarwal94/flask-registration
 - https://runningcodes.net/flask-login-and-mongodb/
 - https://medium.com/@dmitryrastorguev/basic-user-authentication-login-for-flask-using-mongoengine-and-wtforms-922e64ef87fe
+
+missing fields in dict or mongodb
+- https://www.geeksforgeeks.org/handling-missing-keys-python-dictionaries/
+- https://powerfulpython.com/blog/checking-dict-keys/
+
+make sure the last card(s) aren't really wide with a card deck
+- https://github.com/twbs/bootstrap/issues/20321 comment on feb 6 that i then converted on codepen from scss to compiled css
