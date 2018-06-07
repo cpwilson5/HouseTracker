@@ -120,8 +120,8 @@ def user():
         form.email.data = user['email']
         form.cell.data = user['cell']
         form.password.data = user['password']
-        form.email_alert.data = user['email_alert'] if 'email_alert' in user else False
-        form.text_alert.data = user['text_alert'] if 'text_alert' in user else False
+        form.email_alert.data = user['email_alert'] if 'email_alert' in user else True
+        form.text_alert.data = user['text_alert'] if 'text_alert' in user else True
 
     if request.method == 'POST' and form.validate_on_submit():
         id = current_user.get_id()
@@ -221,8 +221,8 @@ def register_admin(token):
         e = form.email.data
         c = form.cell.data
         p = form.password.data
-        ea = form.email_alert.data
-        ta = form.text_alert.data
+        ea = True if user['role'] == 'client' else False
+        ta = True if user['role'] == 'client' else False
 
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, confirmed=True, \
             email_alert=ea, text_alert=ta)

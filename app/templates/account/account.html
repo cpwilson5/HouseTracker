@@ -34,7 +34,7 @@
                     <div class="col-lg">
                         {{ form.email(class_="form-control") }}
                     </div>
-                    {% if role == 'realtor' %}
+                    {% if role == 'client' %}
                     <div class="col-lg-2">
                         <span class='float-right'>{{ form.email_alert(class_="form-check-input") }} Alerts</span>
                     </div>
@@ -45,7 +45,7 @@
                     <div class="col-lg">
                         {{ form.cell(class_="form-control") }}
                     </div>
-                    {% if role == 'realtor' %}
+                    {% if role == 'client' %}
                     <div class="col-lg-2">
                         <span class='float-right'>{{ form.text_alert(class_="form-check-input") }} Alerts</span>
                     </div>

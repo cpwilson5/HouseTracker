@@ -18,8 +18,8 @@ class RegForm(FlaskForm):
     cell = StringField('Cell', validators=[DataRequired(), Regexp('^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$', message="Cell must be 10 digits")])
     password = PasswordField('Password', validators=[DataRequired(), EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm Password', validators=[DataRequired()])
-    email_alert = BooleanField('Email alert', default=True)
-    text_alert = BooleanField('Text alert', default=True)
+    email_alert = BooleanField('Email alert')
+    text_alert = BooleanField('Text alert')
 
 class StepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
@@ -34,8 +34,8 @@ class UserForm(FlaskForm):
     cell = StringField('Cell', validators=[DataRequired(), Regexp('^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$', message="Cell must be 10 digits")])
     password = PasswordField('Password', validators=[DataRequired(), EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm Password', validators=[DataRequired()])
-    email_alert = BooleanField('Email alert', default=True)
-    text_alert = BooleanField('Text alert', default=True)
+    email_alert = BooleanField('Email alert')
+    text_alert = BooleanField('Text alert')
 
 class InviteForm(FlaskForm):
     """Login form to access writing and settings pages"""
