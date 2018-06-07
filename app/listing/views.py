@@ -20,7 +20,7 @@ def listings():
 
     if request.args.get('sort') == 'closing':
         sort = 'close_date'
-        order = -1
+        order = 1
     elif request.args.get('sort') == 'updated':
         sort = 'update_date'
         order = -1
