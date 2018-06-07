@@ -36,7 +36,8 @@ class User(UserMixin):
         return self.superuser
 
     @staticmethod
-    def add(first_name, last_name, email, account_id, role, cell=None, password=None, invited_by=None, confirmed=True, listing='All'):
+    def add(first_name, last_name, email, account_id, role, cell=None, password=None, \
+        invited_by=None, confirmed=True, listing='All', email_alert=False, text_alert=False):
         return mongo.db.users.insert({
             'firstname': first_name,
             'lastname': last_name,
@@ -45,6 +46,8 @@ class User(UserMixin):
             'role': role,
             'account': account_id,
             'password': generate_password_hash(password, method='sha256'),
+            'email_alert': email_alert,
+            'text_alert': text_alert,
             'create_date': datetime.datetime.now().isoformat(),
             'authenticated': False,
             'superuser': False,
@@ -81,7 +84,8 @@ class User(UserMixin):
             })
 
     @staticmethod
-    def update(id, first_name, last_name, email, cell=None, password=None, confirmed=False):
+    def update(id, first_name, last_name, email, cell=None, password=None, confirmed=False, \
+    email_alert=False, text_alert=False):
         return mongo.db.users.update_one({
             '_id': ObjectId(id)},{
             '$set': {
@@ -91,6 +95,8 @@ class User(UserMixin):
                     'cell': cell,
                     'confirmed':confirmed,
                     'password': generate_password_hash(password, method='sha256'),
+                    'email_alert': email_alert,
+                    'text_alert': text_alert,
                     'update_date': datetime.datetime.now().isoformat()
                 }
         }, upsert=False)

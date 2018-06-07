@@ -111,14 +111,17 @@ def delete_step(id):
 @account.route('/user', methods=['GET', 'POST'])
 def user():
     form = UserForm()
+    user = User.get(current_user.get_id())
+    role = user['role']
 
     if request.method == 'GET':
-        user = User.get(current_user.get_id())
         form.first_name.data = user['firstname']
         form.last_name.data = user['lastname']
         form.email.data = user['email']
         form.cell.data = user['cell']
         form.password.data = user['password']
+        form.email_alert.data = user['email_alert'] if 'email_alert' in user else False
+        form.text_alert.data = user['text_alert'] if 'text_alert' in user else False
 
     if request.method == 'POST' and form.validate_on_submit():
         id = current_user.get_id()
@@ -127,12 +130,16 @@ def user():
         e = form.email.data
         c = form.cell.data
         p = form.password.data
-        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p)
+        ea = form.email_alert.data
+        ta = form.text_alert.data
+        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
+            email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
         return redirect(url_for('home.dashboard'))
     else:
         flash_errors(form)
-    return render_template('account/account.html', form=form)
+
+    return render_template('account/account.html', form=form, role=role)
 
 ### Team admins ###
 
@@ -214,8 +221,11 @@ def register_admin(token):
         e = form.email.data
         c = form.cell.data
         p = form.password.data
+        ea = form.email_alert.data
+        ta = form.text_alert.data
 
-        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, confirmed=True)
+        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, confirmed=True, \
+            email_alert=ea, text_alert=ta)
         login_user(User(str(id),form.email.data,account_id,superuser=False, active=True))
         flash("Updated successfully", category='success')
         return redirect(url_for('home.dashboard'))
