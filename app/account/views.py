@@ -1,7 +1,7 @@
 from flask import render_template
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app
-from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm
+from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm
 from models import User, Account, Step
 from ..configuration.models import AppStep
 from ..helpers import flash_errors, confirm_token, send_invitation
@@ -115,11 +115,10 @@ def user():
     role = user['role']
 
     if request.method == 'GET':
-        form.first_name.data = user['firstname']
-        form.last_name.data = user['lastname']
+        form.first_name.data = user['first_name']
+        form.last_name.data = user['last_name']
         form.email.data = user['email']
         form.cell.data = user['cell']
-        form.password.data = user['password']
         form.email_alert.data = user['email_alert'] if 'email_alert' in user else True
         form.text_alert.data = user['text_alert'] if 'text_alert' in user else True
 
@@ -129,7 +128,7 @@ def user():
         ln = form.last_name.data
         e = form.email.data
         c = form.cell.data
-        p = form.password.data
+        p = None # don't want to set the password as we don't have it; model handles
         ea = form.email_alert.data
         ta = form.text_alert.data
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
@@ -140,6 +139,33 @@ def user():
         flash_errors(form)
 
     return render_template('account/account.html', form=form, role=role)
+
+@account.route('/password', methods=['GET', 'POST'])
+def password():
+    form = PasswordForm()
+    user = User.get(current_user.get_id())
+    role = user['role']
+
+    if request.method == 'GET':
+        form.password.data = user['password']
+
+    if request.method == 'POST' and form.validate_on_submit():
+        id = current_user.get_id()
+        fn = user['first_name']
+        ln = user['last_name']
+        e = user['email']
+        c = user['cell']
+        p = form.password.data
+        ea = user['email_alert']
+        ta = user['text_alert']
+        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
+            email_alert=ea, text_alert=ta)
+        flash("Updated successfully", category='success')
+        return redirect(url_for('home.dashboard'))
+    else:
+        flash_errors(form)
+
+    return render_template('account/password.html', form=form)
 
 ### Team admins ###
 
@@ -239,8 +265,8 @@ def edit_admin(id):
 
     if request.method == 'GET':
         user = User.get(id)
-        form.first_name.data = user['firstname']
-        form.last_name.data = user['lastname']
+        form.first_name.data = user['first_name']
+        form.last_name.data = user['last_name']
         form.email.data = user['email']
 
     if request.method == 'POST' and form.validate_on_submit():

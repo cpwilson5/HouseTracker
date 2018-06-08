@@ -39,8 +39,8 @@ class User(UserMixin):
     def add(first_name, last_name, email, account_id, role, cell=None, password=None, \
         invited_by=None, confirmed=True, listing='All', email_alert=False, text_alert=False):
         return mongo.db.users.insert({
-            'firstname': first_name,
-            'lastname': last_name,
+            'first_name': first_name,
+            'last_name': last_name,
             'email': email,
             'cell': cell,
             'role': role,
@@ -86,19 +86,23 @@ class User(UserMixin):
     @staticmethod
     def update(id, first_name, last_name, email, cell=None, password=None, confirmed=False, \
     email_alert=False, text_alert=False):
+        set = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'cell': cell,
+            'confirmed':confirmed,
+            'email_alert': email_alert,
+            'text_alert': text_alert,
+            'update_date': datetime.datetime.now().isoformat()
+        }
+
+        if password:
+            set['password'] = generate_password_hash(password, method='sha256')
+
         return mongo.db.users.update_one({
             '_id': ObjectId(id)},{
-            '$set': {
-                    'firstname': first_name,
-                    'lastname': last_name,
-                    'email': email,
-                    'cell': cell,
-                    'confirmed':confirmed,
-                    'password': generate_password_hash(password, method='sha256'),
-                    'email_alert': email_alert,
-                    'text_alert': text_alert,
-                    'update_date': datetime.datetime.now().isoformat()
-                }
+            '$set': set
         }, upsert=False)
 
     @staticmethod

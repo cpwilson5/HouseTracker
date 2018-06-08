@@ -32,10 +32,14 @@ class UserForm(FlaskForm):
     last_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     cell = StringField('Cell', validators=[DataRequired(), Regexp('^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$', message="Cell must be 10 digits")])
-    password = PasswordField('Password', validators=[DataRequired(), EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Confirm Password', validators=[DataRequired()])
     email_alert = BooleanField('Email alert')
     text_alert = BooleanField('Text alert')
+
+class PasswordForm(FlaskForm):
+    """Login form to access writing and settings pages"""
+
+    password = PasswordField('Password', validators=[DataRequired(), EqualTo('confirm', message='Passwords must match')])
+    confirm = PasswordField('Confirm Password', validators=[DataRequired()])
 
 class InviteForm(FlaskForm):
     """Login form to access writing and settings pages"""

@@ -30,8 +30,8 @@
     <tbody>
       <tr>
         <th scope="row">1</th>
-        <td>{{ user.firstname }}</td>
-        <td>{{ user.lastname }}</td>
+        <td>{{ user.first_name }}</td>
+        <td>{{ user.last_name }}</td>
         <td>{{ user.email }}</td>
         {% if not user['confirmed'] %}
         <td><a href="{{ url_for('account.retry_invite_admin', email=user.email) }}" class="card-link">Resend</a></td>
