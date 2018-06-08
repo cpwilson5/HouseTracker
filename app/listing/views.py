@@ -134,7 +134,7 @@ def edit_listing_step(id, step_id):
         listing_step = ListingStep.get(id, step_id)
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
-        form.due_date.data = listing_step['steps'][0]['duedate']
+        form.due_date.data = listing_step['steps'][0]['due_date']
         form.color.data = listing_step['steps'][0]['color'] if 'color' in listing_step['steps'][0] else 'Green'
         attachment = listing_step['steps'][0]['attachment']
         return render_template('listing/listingstep.html', form=form, attachment=attachment, id=id, step_id=step_id)

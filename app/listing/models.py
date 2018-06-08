@@ -113,7 +113,7 @@ class ListingStep(object):
                     'name': self.name,
                     'notes': self.notes,
                     'attachment': self.attachment,
-                    'duedate': due_date,
+                    'due_date': due_date,
                     'color': self.color,
                     'active': True,
                     'order': next_order,
@@ -171,7 +171,7 @@ class ListingStep(object):
                 'steps.$.name': name,
                 'steps.$.notes': notes,
                 'steps.$.attachment': attachment,
-                'steps.$.duedate': due_date,
+                'steps.$.due_date': due_date,
                 'steps.$.color': color,
                 'steps.$.update_date': datetime.datetime.now().isoformat(),
                 'update_date': datetime.datetime.now().isoformat()

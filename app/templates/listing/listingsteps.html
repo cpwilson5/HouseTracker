@@ -27,7 +27,13 @@
         {% for listing_step in listing_steps %}
         <div id="{{ listing_step.steps._id }}" class="card mb-4">
           <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
-            <h5 class="card-header" style="background-color: {{ listing_step.steps.color if listing_step.steps.color else 'Green' }};">{{ listing_step.steps.name }}</h5>
+            <h5 class="card-header" style="background-color: {{ listing_step.steps.color if listing_step.steps.color else 'Green' }};">{{ listing_step.steps.name }}
+              {% if listing_step.steps.due_date %}
+              <span class="badge badge-pill badge-light float-right">{{ listing_step.steps.due_date | pretty_date("%A, %B %-d") }}</span>
+              {% else %}
+              <span class="badge badge-pill badge-dark float-right">No Due Date</span>
+              {% endif %}
+            </h5>
             <div class="card-body">
               <p class="card-text">{{ listing_step.steps.notes }}</p>
             </div>
