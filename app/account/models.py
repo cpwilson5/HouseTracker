@@ -62,26 +62,26 @@ class User(UserMixin):
     @staticmethod
     def get(id=None, email=None):
         if id:
-            return mongo.db.users.find_one({
-                '_id': ObjectId(id)
-            })
+            find_by = {'_id': ObjectId(id)}
         else:
-            return mongo.db.users.find_one({
-                'email': email
-            })
+            find_by = {'email': email}
+
+        return mongo.db.users.find_one(find_by)
 
     @staticmethod
-    def all(account=None, listing=None):
+    def all(account=None, listing=None, email_alert=None, text_alert=None):
         if account:
-            return mongo.db.users.find({
-                'account': account,
-                'active': True
-            })
+            find_by = {'account': account, 'active': True}
         else:
-            return mongo.db.users.find({
-                'listing': listing,
-                'active': True
-            })
+            find_by = {'listing': listing, 'active': True}
+
+        if email_alert:
+            find_by['email_alert'] = True
+
+        if text_alert:
+            find_by['text_alert'] = True
+
+        return mongo.db.users.find(find_by)
 
     @staticmethod
     def update(id, first_name, last_name, email, cell=None, password=None, confirmed=False, \

@@ -7,10 +7,11 @@ from ..account.forms import InviteForm
 from models import Listing, ListingStep
 from ..account.models import User, Step
 from bson import ObjectId
-from ..utils import s3_upload, s3_retrieve, send_sms
+from ..utils import s3_upload, s3_retrieve, send_sms, send_email
 from ..helpers import flash_errors, confirm_token, send_invitation
 from datetime import datetime
 import json
+import re
 
 from . import listing
 
@@ -129,9 +130,9 @@ def add_listing_step(id):
 @login_required
 def edit_listing_step(id, step_id):
     form = ListingStepForm()
+    listing_step = ListingStep.get(id, step_id)
 
     if request.method == 'GET':
-        listing_step = ListingStep.get(id, step_id)
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
         form.due_date.data = listing_step['steps'][0]['due_date']
@@ -145,9 +146,63 @@ def edit_listing_step(id, step_id):
         else:
             s3_filepath = None
 
+        # update listing step
         ListingStep.update(id=id, step_id=step_id, name=form.name.data, \
         notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data, \
         color=form.color.data)
+
+        # compare changes to provide details in text/email
+        name_changed = False if form.name.data == listing_step['steps'][0]['name'] else True
+        notes_changed = False if form.notes.data == listing_step['steps'][0]['notes'] else True
+        due_date_changed = False if form.due_date.data == listing_step['steps'][0]['due_date'].date() else True
+        color_changed = False if form.color.data == listing_step['steps'][0]['color'] else True
+        attachment_changed = False if not s3_filepath else True
+
+        # build body of email/text based on what changed
+        if notes_changed or due_date_changed or color_changed or attachment_changed:
+            if name_changed:
+                email_body = "You're listing step \'" + listing_step['steps'][0]['name'] + \
+                    "\' has been updated to '" + form.name.data + "\'.<br><br>"
+                text_body = "You're listing step \'" + listing_step['steps'][0]['name'] + \
+                    "\' has been updated to '" + form.name.data + "\'."
+            else:
+                email_body = "You're listing step " + form.name.data + "has been updated.<br><br>"
+                text_body = "You're listing step " + form.name.data + "has been updated."
+
+            email_body = email_body + " The following changes were updated: <br>"
+
+            if notes_changed:
+                email_body = email_body + "Notes: " + form.notes.data + "<br>"
+                text_body = text_body + " You're notes were updated.%0a"
+            if due_date_changed:
+                email_body = email_body + "Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "<br>"
+                text_body = text_body + " Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "%0a"
+            if color_changed:
+                email_body = email_body + "Status: " + form.color.data.capitalize() + "<br>"
+                text_body = text_body + " Status: " + form.color.data.capitalize() + "%0a"
+            if attachment_changed:
+                email_body = email_body + "Attachment: Added<br>"
+                text_body = text_body + " Attachment: Added%0a"
+
+            email_body = email_body + "<br>Login for more details: " + url_for('account.login', _external=True)
+            text_body = text_body + " Login for more details: " + url_for('account.login', _external=True)
+
+            # then send email updates only if there are changes
+            email_distro = []
+            email_users = User.all(listing=id, email_alert=True)
+            for email_user in email_users:
+                email_distro.append(email_user['email'])
+                send_email(email_distro, "You're listing has been updated", email_body)
+
+            # send text update
+            text_distro = []
+            text_users = User.all(listing=id, text_alert=True)
+            for text_user in text_users:
+                cell = text_user['cell'].encode("utf-8") #convert unicode to string
+                cell_number = re.sub('[^0-9]', '', cell) #strip out non-numerics
+                text_distro.append(cell_number)
+            send_sms(text_distro, text_body)
+        # otherwise don't send an email or text if nothing changed
 
         return redirect(url_for('listing.listing_steps', id=id))
     else:
@@ -215,8 +270,8 @@ def edit_client(id, client_id):
 
     if request.method == 'GET':
         user = User.get(id=client_id)
-        form.first_name.data = user['firstname']
-        form.last_name.data = user['lastname']
+        form.first_name.data = user['first_name']
+        form.last_name.data = user['last_name']
         form.email.data = user['email']
 
         return render_template('listing/client.html', id=id, user=user, form=form)

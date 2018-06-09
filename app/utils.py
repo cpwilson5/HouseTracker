@@ -47,13 +47,14 @@ def s3_retrieve(key, upload_dir=None, acl='public-read'):
 def send_email(recipients, subject, body):
     msg = Message(subject)
     msg.sender = "info@housestatus.com"
-    msg.recipients = [recipients]
+    msg.recipients = recipients
     msg.html = body
     mail.send(msg)
 
-def send_sms(to_number, body):
+def send_sms(to_numbers, body):
     account_sid = app.config['TWILIO_ACCOUNT_SID']
     auth_token = app.config['TWILIO_AUTH_TOKEN']
     twilio_number = app.config['TWILIO_NUMBER']
     client = TwilioRestClient(account_sid, auth_token)
-    client.messages.create(to=to_number,from_=twilio_number,body=body)
+    for to_number in to_numbers:
+        client.messages.create(to=to_number,from_=twilio_number,body=body)

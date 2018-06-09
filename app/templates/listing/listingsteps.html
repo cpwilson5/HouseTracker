@@ -25,13 +25,22 @@
     <div class="col-md-8">
       <div id="sortable">
         {% for listing_step in listing_steps %}
-        <div id="{{ listing_step.steps._id }}" class="card mb-4">
+
+        {% if listing_step.steps.color == 'red' %}
+            {% set border_color = 'danger' %}
+          {% elif listing_step.steps.color == 'yellow' %}
+            {% set border_color = 'warning' %}
+          {% else %}
+            {% set border_color = 'success '%}
+          {% endif %}
+
+        <div id="{{ listing_step.steps._id }}" class="card mb-4 border-{{border_color}}" style="border-left-width:5px;">
           <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
-            <h5 class="card-header" style="background-color: {{ listing_step.steps.color if listing_step.steps.color else 'Green' }};">{{ listing_step.steps.name }}
+            <h5 class="card-header">{{ listing_step.steps.name }}
               {% if listing_step.steps.due_date %}
-              <span class="badge badge-pill badge-light float-right">{{ listing_step.steps.due_date | pretty_date("%A, %B %-d") }}</span>
+              <span class="badge badge-pill badge-dark float-right">{{ listing_step.steps.due_date | pretty_date("%A, %B %-d") }}</span>
               {% else %}
-              <span class="badge badge-pill badge-dark float-right">No Due Date</span>
+              <span class="badge badge-pill badge-light float-right">No Due Date</span>
               {% endif %}
             </h5>
             <div class="card-body">
@@ -39,15 +48,20 @@
             </div>
             <div class="card-footer">
               <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date }}</small>
+              {% if listing_step.steps.attachment %}
+                <span class="oi oi-paperclip float-right"></span>
+              {% endif %}
             </div>
           </a>
         </div>
         {% endfor %}
       </div>
 
-      <div id="closing" class="card mb-4">
+      <div id="closing" class="card mb-4 border-success" style="border-left-width:5px;">
         <a href="{{ url_for('listing.edit_listing', id=id) }}" class="card-block clearfix">
-          <h5 class="card-header">Closing</h5>
+          <h5 class="card-header">Closing
+            <span class="badge badge-pill badge-dark float-right">{{ listing.close_date | pretty_date("%A, %B %-d") }}</span>
+          </h5>
           <div class="card-body">
             <p class="card-text">You're expected closing date is {{ listing.close_date | pretty_date("%A, %B %-d") }}</p>
           </div>
@@ -98,7 +112,17 @@
           <div class="list-group mt-2">
             {% for user in users %}
               {% if user['role'] == 'client' %}
-                <a href="{{ url_for('listing.edit_client', id=id, client_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.firstname }} {{ user.lastname }}</a>
+                <a href="{{ url_for('listing.edit_client', id=id, client_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.first_name }} {{ user.last_name }}
+
+                {% if user['email_alert'] == True %}
+                  <span class="oi oi-envelope-closed ml-2 float-right" title="email alerts"></span>
+                {% endif %}
+
+                {% if user['text_alert'] == True %}
+                  <span class="oi oi-phone ml-2 float-right" title="text alerts"></span>
+                {% endif %}
+
+                </a>
               {% endif %}
             {% endfor %}
           </div>

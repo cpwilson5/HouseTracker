@@ -128,7 +128,7 @@ def user():
         ln = form.last_name.data
         e = form.email.data
         c = form.cell.data
-        p = None # don't want to set the password as we don't have it; model handles
+        p = None # don't want to set the password as we don't have it on page; model handles
         ea = form.email_alert.data
         ta = form.text_alert.data
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
