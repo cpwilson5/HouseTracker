@@ -83,13 +83,13 @@ class Listing(object):
 
 
 class ListingStep(object):
-    def __init__(self, listing_id, name, notes, attachment=None, due_date=None, order=0, color=None):
+    def __init__(self, listing_id, name, notes, attachment=None, due_date=None, order=0, status=None):
         self.listing_id = listing_id
         self.name = name
         self.notes = notes
         self.attachment = attachment
         self.due_date = due_date
-        self.color = color
+        self.status = status
 
     def add(self):
         ### Enables app steps (no dates) to be added when listing is created ###
@@ -114,7 +114,7 @@ class ListingStep(object):
                     'notes': self.notes,
                     'attachment': self.attachment,
                     'due_date': due_date,
-                    'color': self.color,
+                    'status': self.status,
                     'active': True,
                     'order': next_order,
                     'create_date': datetime.datetime.now().isoformat(),
@@ -154,7 +154,7 @@ class ListingStep(object):
         ])
 
     @staticmethod
-    def update(id, step_id, name, notes, attachment, due_date, color):
+    def update(id, step_id, name, notes, attachment, due_date, status):
         if due_date is None:
             due_date = ''
         else:
@@ -172,7 +172,7 @@ class ListingStep(object):
                 'steps.$.notes': notes,
                 'steps.$.attachment': attachment,
                 'steps.$.due_date': due_date,
-                'steps.$.color': color,
+                'steps.$.status': status,
                 'steps.$.update_date': datetime.datetime.now().isoformat(),
                 'update_date': datetime.datetime.now().isoformat()
             }

@@ -26,9 +26,9 @@
       <div id="sortable">
         {% for listing_step in listing_steps %}
 
-        {% if listing_step.steps.color == 'red' %}
+        {% if listing_step.steps.status == 'red' %}
             {% set border_color = 'danger' %}
-          {% elif listing_step.steps.color == 'yellow' %}
+          {% elif listing_step.steps.status == 'yellow' %}
             {% set border_color = 'warning' %}
           {% else %}
             {% set border_color = 'success '%}
