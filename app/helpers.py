@@ -2,6 +2,7 @@ from flask import flash, url_for
 from flask import current_app as app
 from itsdangerous import URLSafeSerializer
 from .utils import send_email
+import re
 
 def flash_errors(form):
     """Flashes form errors"""
@@ -38,3 +39,17 @@ def confirm_token(token):
     return email
 
 # def pretty_date(value): --> see listing init.py file
+
+def distro(users, type):
+    distro = []
+
+    for user in users:
+        if type == 'cell':
+            cell_number = user[type].encode("utf-8") #convert unicode to string
+            value = re.sub('[^0-9]', '', cell_number) #strip out non-numerics
+        else:
+            value = user[type]
+
+        distro.append(value)
+
+    return distro

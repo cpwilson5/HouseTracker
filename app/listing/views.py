@@ -8,10 +8,9 @@ from models import Listing, ListingStep
 from ..account.models import User, Step
 from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
-from ..helpers import flash_errors, confirm_token, send_invitation
+from ..helpers import flash_errors, confirm_token, send_invitation, distro
 from datetime import datetime
 import json
-import re
 
 from . import listing
 
@@ -62,9 +61,9 @@ def add_listing():
 @login_required
 def edit_listing(id):
     form = ListingForm()
+    listing = Listing.get(id)
 
     if request.method == 'GET':
-        listing = Listing.get(id)
         form.name.data = listing['name']
         form.address1.data = listing['address1']
         form.address2.data = listing['address2']
@@ -77,6 +76,27 @@ def edit_listing(id):
         Listing.update(id, form.name.data, form.address1.data, \
         form.address2.data, form.city.data, form.state.data, form.zip.data, \
         form.close_date.data)
+
+        # compare changes to provide details in text/email
+        if form.close_date.data <> datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S').date():
+            # build body of email/text based on what changed and email/text only if changes
+            email_body = "You're closing date has been updated to " + form.close_date.data.strftime('%m/%d/%Y') + "<br><br>"
+            text_body = "You're closing date has been updated to " + form.close_date.data.strftime('%m/%d/%Y') + ".\n\n"
+
+            email_body = email_body + "<br>Login for more details: " + url_for('account.login', _external=True)
+            text_body = text_body + "\nLogin here: " + url_for('account.login', _external=True)
+
+            # then send email updates only if there are changes
+            email_users = User.all(listing=id, email_alert=True)
+            email_distro = distro(email_users, 'email')
+            send_email(email_distro, "You're listing has been updated", email_body)
+
+            # send text update
+            text_users = User.all(listing=id, text_alert=True)
+            text_distro = distro(text_users, 'cell')
+            send_sms(text_distro, text_body)
+        # otherwise don't send an email or text if closing date didn't change
+
         return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)
@@ -118,7 +138,33 @@ def add_listing_step(id):
         notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data, \
         status = form.status.data)
         listing_step.add()
-        #send_sms('+15407466097', 'Step Added:  Details go here')
+
+        # build body of email/text
+        email_body = "A listing step '" + form.name.data + "' has been added.<br><br>"
+        text_body = "A listing step '" + form.name.data + "' has been added.\n\n"
+
+        if form.due_date.data:
+            email_body = email_body + "Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "<br>"
+            text_body = text_body + "Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "\n"
+        if form.status.data:
+            email_body = email_body + "Status: " + form.status.data.capitalize() + "<br>"
+            text_body = text_body + "Status: " + form.status.data.capitalize() + "\n"
+        if s3_filepath:
+            email_body = email_body + "Attachment: Added<br>"
+            text_body = text_body + "Attachment: Added\n"
+
+        email_body = email_body + "<br>Login for more details: " + url_for('account.login', _external=True)
+        text_body = text_body + "\nLogin here: " + url_for('account.login', _external=True)
+
+        # then send email updates only if there are changes
+        email_users = User.all(listing=id, email_alert=True)
+        email_distro = distro(email_users, 'email')
+        send_email(email_distro, "You're listing has been updated", email_body)
+
+        # send text update
+        text_users = User.all(listing=id, text_alert=True)
+        text_distro = distro(text_users, 'cell')
+        send_sms(text_distro, text_body)
 
         flash("Successfully added listing step", category='success')
         return redirect(url_for('listing.listing_steps', id=id))
@@ -163,10 +209,10 @@ def edit_listing_step(id, step_id):
             if name_changed:
                 email_body = "You're listing step \'" + listing_step['steps'][0]['name'] + \
                     "\' has been updated to '" + form.name.data + "\'.<br><br>"
-                text_body = "A listing step " + form.name.data + " has been updated.\n\n"
+                text_body = "A listing step '" + form.name.data + "' has been updated.\n\n"
             else:
-                email_body = "You're listing step " + form.name.data + " has been updated.<br><br>"
-                text_body = "A listing step " + form.name.data + " has been updated.\n\n"
+                email_body = "You're listing step '" + form.name.data + "' has been updated.<br><br>"
+                text_body = "A listing step '" + form.name.data + "' has been updated.\n\n"
 
             email_body = email_body + " The following changes were updated: <br>"
 
@@ -187,19 +233,13 @@ def edit_listing_step(id, step_id):
             text_body = text_body + "\nLogin here: " + url_for('account.login', _external=True)
 
             # then send email updates only if there are changes
-            email_distro = []
             email_users = User.all(listing=id, email_alert=True)
-            for email_user in email_users:
-                email_distro.append(email_user['email'])
+            email_distro = distro(email_users, 'email')
             send_email(email_distro, "You're listing has been updated", email_body)
 
             # send text update
-            text_distro = []
             text_users = User.all(listing=id, text_alert=True)
-            for text_user in text_users:
-                cell = text_user['cell'].encode("utf-8") #convert unicode to string
-                cell_number = re.sub('[^0-9]', '', cell) #strip out non-numerics
-                text_distro.append(cell_number)
+            text_distro = distro(text_users, 'cell')
             send_sms(text_distro, text_body)
         # otherwise don't send an email or text if nothing changed
 
