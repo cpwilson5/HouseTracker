@@ -18,7 +18,7 @@ def flash_errors(form):
 
 def send_invitation(email):
     token = generate_confirmation_token(email)
-    confirm_url = url_for('account.register_admin', token=token, _external=True)
+    confirm_url = url_for('account.register_with_token', token=token, _external=True)
     html = "Join by clicking here: " + confirm_url
     subject = "You're invited to join House Tracker"
     send_email([email], subject, html)

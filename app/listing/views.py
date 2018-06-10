@@ -312,12 +312,13 @@ def edit_client(id, client_id):
         form.first_name.data = user['first_name']
         form.last_name.data = user['last_name']
         form.email.data = user['email']
+        form.cell.data = user['cell']
 
         return render_template('listing/client.html', id=id, user=user, form=form)
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
-            User.update(client_id, form.first_name.data, form.last_name.data, form.email.data)
+            User.update(client_id, form.first_name.data, form.last_name.data, form.email.data, form.cell.data)
             send_invitation(form.email.data)
             flash("Invitation resent", category='success')
         except:

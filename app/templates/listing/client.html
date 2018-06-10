@@ -6,7 +6,7 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0">Add Client</h3>
+            <h3 class="mb-0">Add/Edit Client</h3>
         </div>
         <div class="card-body">
             <form action="" method="POST" name="form" class="form" role="form" autocomplete="off">
@@ -41,6 +41,14 @@
                         {% endif %}
                     </div>
                 </div>
+                {% if user['confirmed'] %}
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label">Cell</label>
+                    <div class="col-lg-9">
+                      {{ form.cell(class_="form-control", disabled=True) }}
+                    </div>
+                </div>
+                {% endif %}
                 <div class="form-group row">
                     <div class="col-lg-12">
                       <!-- Don't show delete because it's a new user -->

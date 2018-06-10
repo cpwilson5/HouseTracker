@@ -219,7 +219,7 @@ def retry_invite_admin(email):
 
 ###### page user visits to confirm the link from their email ######
 @account.route('/register/<token>', methods=['GET', 'POST'])
-def register_admin(token):
+def register_with_token(token):
     form = RegForm()
 
     if request.method == 'GET':
