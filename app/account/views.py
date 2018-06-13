@@ -26,7 +26,8 @@ def register():
             app_steps = AppStep.all()
             app_steps_count = app_steps.count(True)
             for app_step in app_steps:
-                step = Step(app_step['name'], app_step['notes'], account_id)
+                days_before_close = app_step['days_before_close'] if 'days_before_close' in app_step else None
+                step = Step(app_step['name'], app_step['notes'], days_before_close, account_id)
                 step.add()
             flash("Welcome and we added %s steps to get you started" % (app_steps_count), category='success')
             return redirect(url_for('home.dashboard'))
@@ -73,7 +74,7 @@ def steps():
 def add_step():
     form = StepForm()
     if request.method == 'POST' and form.validate_on_submit():
-        step = Step(form.name.data, form.notes.data, current_user.get_account())
+        step = Step(form.name.data, form.notes.data, form.days_before_close.data, current_user.get_account())
         step.add()
         return redirect(url_for('account.steps'))
     else:
@@ -90,9 +91,10 @@ def edit_step(id):
         step = Step.get(id)
         form.name.data = step['name']
         form.notes.data = step['notes']
+        form.days_before_close.data = step['days_before_close'] if 'days_before_close' in step else None
 
     if request.method == 'POST' and form.validate_on_submit():
-        Step.update(id, form.name.data, form.notes.data)
+        Step.update(id, form.name.data, form.notes.data, form.days_before_close.data)
         return redirect(url_for('account.steps'))
     else:
         flash_errors(form)

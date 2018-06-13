@@ -9,7 +9,7 @@ from ..account.models import User, Step
 from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
 from ..helpers import flash_errors, confirm_token, send_invitation, distro
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 
 from . import listing
@@ -49,7 +49,13 @@ def add_listing():
         steps = Step.all(current_user.get_account())
         steps_count = steps.count(True)
         for step in steps:
-            listing_step = ListingStep(listing_id, step['name'], step['notes'])
+            if 'days_before_close' in step:
+                days_before_close = step['days_before_close']
+                due_date = form.close_date.data - timedelta(days=days_before_close) if days_before_close else None
+            else:
+                due_date = None
+
+            listing_step = ListingStep(listing_id, step['name'], step['notes'], due_date=due_date)
             listing_step.add()
         flash("Successfully created %s with %s steps" % (form.name.data, steps_count), category='success')
         return redirect(url_for('listing.listings'))

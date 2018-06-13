@@ -19,20 +19,23 @@
         <tr>
           <th scope="col">First</th>
           <th scope="col">Last</th>
-          <th scope="col">Edit</th>
-          <th scope="col">Delete</th>
+          <th scope="col">Actions</th>
         </tr>
       </thead>
       {% for user in users %}
         {% if user['role'] == 'admin' %}
         <tbody>
           <tr>
-            <td>{{ user.first_name }}</td>
-            <td>{{ user.last_name }}</td>
-            {% if not user['confirmed'] %}
-            <td><a href="{{ url_for('account.edit_admin', id=user._id) }}" class="card-link oi oi-pencil"></a></td>
-            {% endif %}
-            <td><a href="{{ url_for('account.delete_admin', id=user._id) }}" class="card-link oi oi-trash"></a></td>
+            <a href="{{ url_for('account.edit_admin', id=user._id) }}">
+              <td>{{ user.first_name }}</a></td>
+              <td>{{ user.last_name }}</td>
+              <td>
+                {% if not user['confirmed'] %}
+                <a href="{{ url_for('account.edit_admin', id=user._id) }}" class="card-link oi oi-pencil"></a>
+                {% endif %}
+                <a href="{{ url_for('account.delete_admin', id=user._id) }}" class="card-link oi oi-trash"></a>
+              </td>
+            </a>
           </tr>
         </tbody>
         {% endif %}

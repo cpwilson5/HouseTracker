@@ -167,15 +167,17 @@ class Account(object):
 
 
 class Step(object):
-    def __init__(self, name, notes, account):
+    def __init__(self, name, notes, days_before_close, account):
         self.name = name
         self.notes = notes
+        self.days_before_close = days_before_close
         self.account = account
 
     def add(self):
         return mongo.db.steps.insert({
             'name': self.name,
             'notes': self.notes,
+            'days_before_close': self.days_before_close,
             'account': self.account,
             'active': 'true',
             'create_date': datetime.datetime.now().isoformat(),
@@ -196,12 +198,13 @@ class Step(object):
         })
 
     @staticmethod
-    def update(id, name, notes):
+    def update(id, name, notes, days_before_close):
         return mongo.db.steps.update_one(
             {'_id': ObjectId(id)},
             {'$set': {
                 'name': name,
                 'notes': notes,
+                'days_before_close': days_before_close,
                 'update_date': datetime.datetime.now().isoformat()
                 }
         }, upsert=False)
