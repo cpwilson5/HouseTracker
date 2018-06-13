@@ -21,7 +21,7 @@ def app_steps():
 def add_app_step():
     form = AppStepForm()
     if request.method == 'POST' and form.validate_on_submit():
-        app_step = AppStep(form.name.data, form.notes.data)
+        app_step = AppStep(form.name.data, form.notes.data, form.days_before_close.data)
         app_step.add()
         return redirect(url_for('configuration.app_steps'))
     else:
@@ -37,9 +37,10 @@ def edit_app_step(id):
         step = AppStep.get(id)
         form.name.data = step['name']
         form.notes.data = step['notes']
+        form.days_before_close.data = step['days_before_close'] if 'days_before_close' in step else None
 
     if request.method == 'POST' and form.validate_on_submit():
-        AppStep.update(id, form.name.data, form.notes.data)
+        AppStep.update(id, form.name.data, form.notes.data, form.days_before_close.data)
         return redirect(url_for('configuration.app_steps'))
     else:
         flash_errors(form)

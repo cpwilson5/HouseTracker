@@ -2,6 +2,7 @@ from flask import flash, url_for
 from flask import current_app as app
 from itsdangerous import URLSafeSerializer
 from .utils import send_email
+import re
 
 def flash_errors(form):
     """Flashes form errors"""
@@ -17,10 +18,10 @@ def flash_errors(form):
 
 def send_invitation(email):
     token = generate_confirmation_token(email)
-    confirm_url = url_for('account.register_admin', token=token, _external=True)
+    confirm_url = url_for('account.register_with_token', token=token, _external=True)
     html = "Join by clicking here: " + confirm_url
     subject = "You're invited to join House Tracker"
-    send_email(email, subject, html)
+    send_email([email], subject, html)
 
 def generate_confirmation_token(email):
     serializer = URLSafeSerializer(app.config['SECRET_KEY'])
@@ -38,3 +39,17 @@ def confirm_token(token):
     return email
 
 # def pretty_date(value): --> see listing init.py file
+
+def distro(users, type):
+    distro = []
+
+    for user in users:
+        if type == 'cell':
+            cell_number = user[type].encode("utf-8") #convert unicode to string
+            value = re.sub('[^0-9]', '', cell_number) #strip out non-numerics
+        else:
+            value = user[type]
+
+        distro.append(value)
+
+    return distro

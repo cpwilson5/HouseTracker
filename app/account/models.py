@@ -39,8 +39,8 @@ class User(UserMixin):
     def add(first_name, last_name, email, account_id, role, cell=None, password=None, \
         invited_by=None, confirmed=True, listing='All', email_alert=False, text_alert=False):
         return mongo.db.users.insert({
-            'firstname': first_name,
-            'lastname': last_name,
+            'first_name': first_name,
+            'last_name': last_name,
             'email': email,
             'cell': cell,
             'role': role,
@@ -62,43 +62,47 @@ class User(UserMixin):
     @staticmethod
     def get(id=None, email=None):
         if id:
-            return mongo.db.users.find_one({
-                '_id': ObjectId(id)
-            })
+            find_by = {'_id': ObjectId(id)}
         else:
-            return mongo.db.users.find_one({
-                'email': email
-            })
+            find_by = {'email': email}
+
+        return mongo.db.users.find_one(find_by)
 
     @staticmethod
-    def all(account=None, listing=None):
+    def all(account=None, listing=None, email_alert=None, text_alert=None):
         if account:
-            return mongo.db.users.find({
-                'account': account,
-                'active': True
-            })
+            find_by = {'account': account, 'active': True}
         else:
-            return mongo.db.users.find({
-                'listing': listing,
-                'active': True
-            })
+            find_by = {'listing': listing, 'active': True}
+
+        if email_alert:
+            find_by['email_alert'] = True
+
+        if text_alert:
+            find_by['text_alert'] = True
+
+        return mongo.db.users.find(find_by)
 
     @staticmethod
     def update(id, first_name, last_name, email, cell=None, password=None, confirmed=False, \
     email_alert=False, text_alert=False):
+        set = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'cell': cell,
+            'confirmed':confirmed,
+            'email_alert': email_alert,
+            'text_alert': text_alert,
+            'update_date': datetime.datetime.now().isoformat()
+        }
+
+        if password:
+            set['password'] = generate_password_hash(password, method='sha256')
+
         return mongo.db.users.update_one({
             '_id': ObjectId(id)},{
-            '$set': {
-                    'firstname': first_name,
-                    'lastname': last_name,
-                    'email': email,
-                    'cell': cell,
-                    'confirmed':confirmed,
-                    'password': generate_password_hash(password, method='sha256'),
-                    'email_alert': email_alert,
-                    'text_alert': text_alert,
-                    'update_date': datetime.datetime.now().isoformat()
-                }
+            '$set': set
         }, upsert=False)
 
     @staticmethod
@@ -163,15 +167,17 @@ class Account(object):
 
 
 class Step(object):
-    def __init__(self, name, notes, account):
+    def __init__(self, name, notes, days_before_close, account):
         self.name = name
         self.notes = notes
+        self.days_before_close = days_before_close
         self.account = account
 
     def add(self):
         return mongo.db.steps.insert({
             'name': self.name,
             'notes': self.notes,
+            'days_before_close': self.days_before_close,
             'account': self.account,
             'active': 'true',
             'create_date': datetime.datetime.now().isoformat(),
@@ -192,12 +198,13 @@ class Step(object):
         })
 
     @staticmethod
-    def update(id, name, notes):
+    def update(id, name, notes, days_before_close):
         return mongo.db.steps.update_one(
             {'_id': ObjectId(id)},
             {'$set': {
                 'name': name,
                 'notes': notes,
+                'days_before_close': days_before_close,
                 'update_date': datetime.datetime.now().isoformat()
                 }
         }, upsert=False)

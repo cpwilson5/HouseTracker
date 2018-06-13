@@ -1,7 +1,7 @@
 from flask import render_template
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app
-from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm
+from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm
 from models import User, Account, Step
 from ..configuration.models import AppStep
 from ..helpers import flash_errors, confirm_token, send_invitation
@@ -26,7 +26,8 @@ def register():
             app_steps = AppStep.all()
             app_steps_count = app_steps.count(True)
             for app_step in app_steps:
-                step = Step(app_step['name'], app_step['notes'], account_id)
+                days_before_close = app_step['days_before_close'] if 'days_before_close' in app_step else None
+                step = Step(app_step['name'], app_step['notes'], days_before_close, account_id)
                 step.add()
             flash("Welcome and we added %s steps to get you started" % (app_steps_count), category='success')
             return redirect(url_for('home.dashboard'))
@@ -73,7 +74,7 @@ def steps():
 def add_step():
     form = StepForm()
     if request.method == 'POST' and form.validate_on_submit():
-        step = Step(form.name.data, form.notes.data, current_user.get_account())
+        step = Step(form.name.data, form.notes.data, form.days_before_close.data, current_user.get_account())
         step.add()
         return redirect(url_for('account.steps'))
     else:
@@ -90,9 +91,10 @@ def edit_step(id):
         step = Step.get(id)
         form.name.data = step['name']
         form.notes.data = step['notes']
+        form.days_before_close.data = step['days_before_close'] if 'days_before_close' in step else None
 
     if request.method == 'POST' and form.validate_on_submit():
-        Step.update(id, form.name.data, form.notes.data)
+        Step.update(id, form.name.data, form.notes.data, form.days_before_close.data)
         return redirect(url_for('account.steps'))
     else:
         flash_errors(form)
@@ -115,13 +117,12 @@ def user():
     role = user['role']
 
     if request.method == 'GET':
-        form.first_name.data = user['firstname']
-        form.last_name.data = user['lastname']
+        form.first_name.data = user['first_name']
+        form.last_name.data = user['last_name']
         form.email.data = user['email']
         form.cell.data = user['cell']
-        form.password.data = user['password']
-        form.email_alert.data = user['email_alert'] if 'email_alert' in user else False
-        form.text_alert.data = user['text_alert'] if 'text_alert' in user else False
+        form.email_alert.data = user['email_alert'] if 'email_alert' in user else True
+        form.text_alert.data = user['text_alert'] if 'text_alert' in user else True
 
     if request.method == 'POST' and form.validate_on_submit():
         id = current_user.get_id()
@@ -129,7 +130,7 @@ def user():
         ln = form.last_name.data
         e = form.email.data
         c = form.cell.data
-        p = form.password.data
+        p = None # don't want to set the password as we don't have it on page; model handles
         ea = form.email_alert.data
         ta = form.text_alert.data
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
@@ -140,6 +141,33 @@ def user():
         flash_errors(form)
 
     return render_template('account/account.html', form=form, role=role)
+
+@account.route('/password', methods=['GET', 'POST'])
+def password():
+    form = PasswordForm()
+    user = User.get(current_user.get_id())
+    role = user['role']
+
+    if request.method == 'GET':
+        form.password.data = user['password']
+
+    if request.method == 'POST' and form.validate_on_submit():
+        id = current_user.get_id()
+        fn = user['first_name']
+        ln = user['last_name']
+        e = user['email']
+        c = user['cell']
+        p = form.password.data
+        ea = user['email_alert']
+        ta = user['text_alert']
+        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
+            email_alert=ea, text_alert=ta)
+        flash("Updated successfully", category='success')
+        return redirect(url_for('home.dashboard'))
+    else:
+        flash_errors(form)
+
+    return render_template('account/password.html', form=form)
 
 ### Team admins ###
 
@@ -179,8 +207,8 @@ def invite_admin():
     else:
         flash_errors(form)
 
-### resend invite ###
-@account.route('/admins/invite/retry/<string:email>', methods=['GET'])
+### resend invite - don't need any longer ###
+'''@account.route('/admins/invite/retry/<string:email>', methods=['GET'])
 @login_required
 def retry_invite_admin(email):
     try:
@@ -189,11 +217,11 @@ def retry_invite_admin(email):
     except:
         flash("Error attempting to resend invite", category='danger')
         return render_template('account/admin.html', form=form)
-    return redirect(url_for('account.admins'))
+    return redirect(url_for('account.admins'))'''
 
 ###### page user visits to confirm the link from their email ######
 @account.route('/register/<token>', methods=['GET', 'POST'])
-def register_admin(token):
+def register_with_token(token):
     form = RegForm()
 
     if request.method == 'GET':
@@ -221,8 +249,8 @@ def register_admin(token):
         e = form.email.data
         c = form.cell.data
         p = form.password.data
-        ea = form.email_alert.data
-        ta = form.text_alert.data
+        ea = True if user['role'] == 'client' else False
+        ta = True if user['role'] == 'client' else False
 
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, confirmed=True, \
             email_alert=ea, text_alert=ta)
@@ -239,8 +267,8 @@ def edit_admin(id):
 
     if request.method == 'GET':
         user = User.get(id)
-        form.first_name.data = user['firstname']
-        form.last_name.data = user['lastname']
+        form.first_name.data = user['first_name']
+        form.last_name.data = user['last_name']
         form.email.data = user['email']
 
     if request.method == 'POST' and form.validate_on_submit():

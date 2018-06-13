@@ -22,5 +22,5 @@ class ListingStepForm(FlaskForm):
     notes = StringField('Notes',widget=TextArea())
     due_date = DateField('Due Date', format='%Y-%m-%d', \
         default=datetime.today(), validators=[Optional()])
-    color = SelectField('Color', choices=[('Green','Green'),('Yellow','Yellow'),('Red','Red')])
+    status = SelectField('Status', choices=[('green','Green'),('yellow','Yellow'),('red','Red')])
     attachment = FileField('Attachment', validators=[FileAllowed(['jpg', 'png', 'pdf'], 'Must be JPG, PNG or PDF')])

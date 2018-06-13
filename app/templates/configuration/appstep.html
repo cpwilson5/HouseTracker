@@ -2,23 +2,41 @@
 {% block title %}Home{% endblock %}
 
 {% block header %}
-<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="display-4">Add App Step</h1>
-  <p class="lead">Quickly build an effective pricing table for your potential customers with this Bootstrap example. It's built with default Bootstrap components and utilities with little customization.</p>
-</div>
 {% endblock %}
 
 {% block body %}
 
-<form action="" method="POST" name="form">
-{{ form.hidden_tag() }}
-  <div class="form-group">
-    {{ form.name (class_="form-control",placeholder="Name")}}
-  <div>
-  <div class="form-group">
-    {{ form.notes (class_="form-control",placeholder="Notes")}}
-  <div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+<div class="col-md-8 offset-md-2 pt-5">
+  <!-- form card login with validation feedback -->
+  <div class="card card-outline-secondary">
+      <div class="card-header">
+          <h3 class="mb-0">Add Step</h3>
+      </div>
+      <div class="card-body">
+          <form class="form" role="form" autocomplete="off" id="loginForm" novalidate="" method="POST">
+              {{ form.hidden_tag() }}
+              <div class="form-row mb-3">
+                <div class="col">
+                  <label for="inputName">Name</label>
+                  {{ form.name (class_="form-control")}}
+                </div>
+                <div class="col-xs">
+                  <label for="inputDays">Days Before Close</label>
+                  {{ form.days_before_close (class_="form-control")}}
+                </div>
+              </div>
+              <div class="form-row mb-3">
+                <div class="col">
+                  <label for="inputNotes">Notes</label>
+                  {{ form.notes (class_="form-control")}}
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary float-right" id="btnLogin">Add</button>
+          </form>
+      </div>
+      <!--/card-body-->
+  </div>
+  <!-- /form card login -->
+</div>
 
 {% endblock %}

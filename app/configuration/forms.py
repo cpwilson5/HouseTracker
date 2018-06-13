@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms import StringField, TextAreaField, IntegerField
+from wtforms.validators import DataRequired, Optional
 
 class AppStepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     notes = TextAreaField('Notes', validators=[DataRequired()])
+    days_before_close = IntegerField('Days Before Close', validators=[Optional()])
