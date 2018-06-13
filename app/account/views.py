@@ -205,8 +205,8 @@ def invite_admin():
     else:
         flash_errors(form)
 
-### resend invite ###
-@account.route('/admins/invite/retry/<string:email>', methods=['GET'])
+### resend invite - don't need any longer ###
+'''@account.route('/admins/invite/retry/<string:email>', methods=['GET'])
 @login_required
 def retry_invite_admin(email):
     try:
@@ -215,7 +215,7 @@ def retry_invite_admin(email):
     except:
         flash("Error attempting to resend invite", category='danger')
         return render_template('account/admin.html', form=form)
-    return redirect(url_for('account.admins'))
+    return redirect(url_for('account.admins'))'''
 
 ###### page user visits to confirm the link from their email ######
 @account.route('/register/<token>', methods=['GET', 'POST'])
