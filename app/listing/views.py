@@ -95,12 +95,14 @@ def edit_listing(id):
             # then send email updates only if there are changes
             email_users = User.all(listing=id, email_alert=True)
             email_distro = distro(email_users, 'email')
-            send_email(email_distro, "You're listing has been updated", email_body)
+            if email_distro:
+                send_email(email_distro, "You're listing has been updated", email_body)
 
             # send text update
             text_users = User.all(listing=id, text_alert=True)
             text_distro = distro(text_users, 'cell')
-            send_sms(text_distro, text_body)
+            if text_distro:
+                send_sms(text_distro, text_body)
         # otherwise don't send an email or text if closing date didn't change
 
         return redirect(url_for('listing.listings'))
@@ -165,12 +167,14 @@ def add_listing_step(id):
         # then send email updates only if there are changes
         email_users = User.all(listing=id, email_alert=True)
         email_distro = distro(email_users, 'email')
-        send_email(email_distro, "You're listing has been updated", email_body)
+        if email_distro:
+            send_email(email_distro, "You're listing has been updated", email_body)
 
         # send text update
         text_users = User.all(listing=id, text_alert=True)
         text_distro = distro(text_users, 'cell')
-        send_sms(text_distro, text_body)
+        if text_distro:
+            send_sms(text_distro, text_body)
 
         flash("Successfully added listing step", category='success')
         return redirect(url_for('listing.listing_steps', id=id))
@@ -241,12 +245,14 @@ def edit_listing_step(id, step_id):
             # then send email updates only if there are changes
             email_users = User.all(listing=id, email_alert=True)
             email_distro = distro(email_users, 'email')
-            send_email(email_distro, "You're listing has been updated", email_body)
+            if email_distro:
+                send_email(email_distro, "You're listing has been updated", email_body)
 
             # send text update
             text_users = User.all(listing=id, text_alert=True)
             text_distro = distro(text_users, 'cell')
-            send_sms(text_distro, text_body)
+            if text_distro:
+                send_sms(text_distro, text_body)
         # otherwise don't send an email or text if nothing changed
 
         return redirect(url_for('listing.listing_steps', id=id))

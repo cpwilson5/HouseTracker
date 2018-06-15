@@ -40,7 +40,7 @@
                   {% if attachment %}
                   <div class="col-md-9 mb-3">
                     <label class="form-control-label">Attachment</label>
-                    <a class="badge badge-pill badge-primary oi oi-paperclip ml-2" href="{{ url_for('listing.get_attachment', attachment=attachment) }}">View</a>
+                    <a class="badge badge-pill badge-primary oi ml-2" href="{{ url_for('listing.get_attachment', attachment=attachment) }}">View</a>
                     {{ form.attachment(class_="form-control") }}
                   </div>
                   {% else %}
