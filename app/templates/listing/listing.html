@@ -6,7 +6,7 @@
 
 {% block body %}
 
-<div class="col-md-8 offset-md-2 pt-5">
+<div class="col-md-6 offset-md-3 pt-5">
 
     <!-- form user info -->
     <div class="card card-outline-secondary">
@@ -16,47 +16,37 @@
         <div class="card-body">
             <form action="" method="POST" name="form" class="form" role="form" autocomplete="off">
               {{ form.hidden_tag() }}
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Name *</label>
-                    <div class="col-lg-9">
-                      {{ form.name (class_="form-control",placeholder="Name")}}
-                    </div>
+                <div class="form-row">
+                  <div class="col-md-7 mb-3">
+                    <label class="form-control-label">Name *</label>
+                    {{ form.name (class_="form-control")}}
+                  </div>
+                  <div class="col-md-5 mb-3">
+                    <label class="form-control-label">Closing Date *</label>
+                    {{ form.close_date (class_="form-control")}}
+                  </div>
                 </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Address Line 1 *</label>
-                    <div class="col-lg-9">
-                      {{ form.address1 (class_="form-control",placeholder="Address Line 1")}}
-                    </div>
+                <div class="form-group">
+                  <label class="form-control-label">Address *</label>
+                  {{ form.address1 (class_="form-control")}}
                 </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Address Line 2</label>
-                    <div class="col-lg-9">
-                        {{ form.address2 (class_="form-control",placeholder="Address Line 2")}}
-                    </div>
+                <div class="form-group">
+                  <label class="form-control-label">Address Line 2</label>
+                  {{ form.address2 (class_="form-control")}}
                 </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">City *</label>
-                    <div class="col-lg-9">
-                        {{ form.city (class_="form-control",placeholder="City")}}
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">State *</label>
-                    <div class="col-lg-9">
-                        {{ form.state (class_="form-control",placeholder="State")}}
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Zip *</label>
-                    <div class="col-lg-9">
-                        {{ form.zip (class_="form-control",placeholder="Zip")}}
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Closing Date *</label>
-                    <div class="col-lg-9">
-                        {{ form.close_date (class_="form-control")}}
-                    </div>
+                <div class="form-row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-control-label">City *</label>
+                    {{ form.city (class_="form-control")}}
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-control-label">State *</label>
+                    {{ form.state (class_="form-control")}}
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label class="form-control-label">Zip *</label>
+                    {{ form.zip (class_="form-control")}}
+                  </div>
                 </div>
                 <div class="form-group row"></div>
                 <div class="form-group row">
