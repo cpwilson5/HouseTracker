@@ -44,7 +44,7 @@ def edit_app_step(id):
         return redirect(url_for('configuration.app_steps'))
     else:
         flash_errors(form)
-    return render_template('configuration/appstep.html', form=form)
+    return render_template('configuration/appstep.html', id=id, form=form)
 
 @configuration.route('/appsteps/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
