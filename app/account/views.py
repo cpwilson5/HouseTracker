@@ -193,7 +193,7 @@ def invite_admin():
     form = InviteForm()
 
     if request.method == 'GET':
-        return render_template('account/admin.html', form=form)
+        return render_template('account/admin.html', user=[], form=form)
 
     if request.method == 'POST' and form.validate_on_submit():
         existing_user = User.get(email=form.email.data)
@@ -278,6 +278,8 @@ def edit_admin(id):
         form.last_name.data = user['last_name']
         form.email.data = user['email']
 
+        return render_template('account/admin.html', id=id, user=user, form=form)
+
     if request.method == 'POST' and form.validate_on_submit():
         try:
             User.update(id, form.first_name.data, form.last_name.data, form.email.data)
@@ -290,7 +292,7 @@ def edit_admin(id):
         return redirect(url_for('account.admins'))
     else:
         flash_errors(form)
-    return render_template('account/admin.html', form=form)
+
 
 @account.route('/admins/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
