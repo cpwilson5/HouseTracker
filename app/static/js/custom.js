@@ -25,13 +25,27 @@ $(document).ready(function(){
 
   $('#saveorder').on('click',function(){
     var sortedItems = $sortables.sortable("toArray");
-    var listing_id = window.location.pathname.split( '/' )[2];
+    var sortUrl;
+
+    if (window.location.pathname.split( '/' )[1] == 'appsteps') {
+      sortUrl = "/appsteps/sort";
+    }
+
+    if (window.location.pathname.split( '/' )[1] == 'steps') {
+      sortUrl = "/steps/sort";
+    }
+
+    if (window.location.pathname.split( '/' )[1] == 'listings') {
+      var listing_id = window.location.pathname.split( '/' )[2];
+      sortUrl = "/listings/" + listing_id + "/steps/sort";
+    }
+
     $("#sortable").sortable('disable');
     $('#sortorder').show();
     $('#saveorder').hide();
     $.ajax({
       type: "POST",
-      url: "/listings/" + listing_id + "/steps/sort",
+      url: sortUrl,
       data: 'order=' + sortedItems,
       cache: false,
       success: function (data) { console.log(data); }

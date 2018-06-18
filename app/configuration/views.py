@@ -7,6 +7,7 @@ from ..account.models import User
 from models import AppStep
 from bson import ObjectId
 from ..helpers import flash_errors
+import json
 
 from . import configuration
 
@@ -51,3 +52,9 @@ def edit_app_step(id):
 def delete_app_step(id):
         AppStep.delete(id)
         return redirect(url_for('configuration.app_steps'))
+
+@configuration.route('/appsteps/sort', methods=['POST'])
+@login_required
+def sort_app_step():
+    AppStep.sort(request.form['order'])
+    return json.dumps({'status':'Successfully sorted'})

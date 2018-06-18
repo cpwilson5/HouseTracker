@@ -98,6 +98,8 @@ class ListingStep(object):
         else:
             due_date = datetime.datetime.combine(self.due_date, datetime.time.min)
 
+        # because there is an array of objects (aka hard to get to what we need) and we need to ensure we
+        # add the next step to the end, we stored a listing step count on the listing itself
         listing = Listing.get(self.listing_id)
         next_order = listing['order'] + 1 if 'order' in listing else 1
 
@@ -105,7 +107,7 @@ class ListingStep(object):
             '_id': ObjectId(self.listing_id)
         },{
             '$set': { 'update_date': datetime.datetime.now().isoformat() },
-            '$inc': {'order': 1},
+            '$inc': {'order': 1}, #increment the listing order count to keep track of # of listing steps
             '$push': {
                 'steps':
                 {
@@ -116,7 +118,7 @@ class ListingStep(object):
                     'due_date': due_date,
                     'status': self.status,
                     'active': True,
-                    'order': next_order,
+                    'order': next_order, #set the new listing step to the next number
                     'create_date': datetime.datetime.now().isoformat(),
                     'update_date': datetime.datetime.now().isoformat()
                 }
