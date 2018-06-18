@@ -7,6 +7,7 @@ from ..account.models import User
 from models import AppStep
 from bson import ObjectId
 from ..helpers import flash_errors
+import json
 
 from . import configuration
 
@@ -44,10 +45,16 @@ def edit_app_step(id):
         return redirect(url_for('configuration.app_steps'))
     else:
         flash_errors(form)
-    return render_template('configuration/appstep.html', form=form)
+    return render_template('configuration/appstep.html', id=id, form=form)
 
 @configuration.route('/appsteps/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
 def delete_app_step(id):
         AppStep.delete(id)
         return redirect(url_for('configuration.app_steps'))
+
+@configuration.route('/appsteps/sort', methods=['POST'])
+@login_required
+def sort_app_step():
+    AppStep.sort(request.form['order'])
+    return json.dumps({'status':'Successfully sorted'})

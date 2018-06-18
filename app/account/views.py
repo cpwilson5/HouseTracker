@@ -5,6 +5,7 @@ from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordF
 from models import User, Account, Step
 from ..configuration.models import AppStep
 from ..helpers import flash_errors, confirm_token, send_invitation
+import json
 
 from . import account
 
@@ -98,7 +99,7 @@ def edit_step(id):
         return redirect(url_for('account.steps'))
     else:
         flash_errors(form)
-    return render_template('account/step.html', form=form)
+    return render_template('account/step.html', id=id, form=form)
 
 
 @account.route('/steps/delete/<string:id>', methods=['GET', 'POST'])
@@ -107,6 +108,12 @@ def delete_step(id):
     Step.delete(id)
     flash("Step removed succesfully", category='success')
     return redirect(url_for('account.steps'))
+
+@account.route('/steps/sort', methods=['POST'])
+@login_required
+def sort_step():
+    Step.sort(current_user.get_account(), request.form['order'])
+    return json.dumps({'status':'Successfully sorted'})
 
 ### My Account ###
 
@@ -186,7 +193,7 @@ def invite_admin():
     form = InviteForm()
 
     if request.method == 'GET':
-        return render_template('account/admin.html', form=form)
+        return render_template('account/admin.html', user=[], form=form)
 
     if request.method == 'POST' and form.validate_on_submit():
         existing_user = User.get(email=form.email.data)
@@ -271,6 +278,8 @@ def edit_admin(id):
         form.last_name.data = user['last_name']
         form.email.data = user['email']
 
+        return render_template('account/admin.html', id=id, user=user, form=form)
+
     if request.method == 'POST' and form.validate_on_submit():
         try:
             User.update(id, form.first_name.data, form.last_name.data, form.email.data)
@@ -283,7 +292,7 @@ def edit_admin(id):
         return redirect(url_for('account.admins'))
     else:
         flash_errors(form)
-    return render_template('account/admin.html', form=form)
+
 
 @account.route('/admins/delete/<string:id>', methods=['GET', 'POST'])
 @login_required

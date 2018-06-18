@@ -3,6 +3,7 @@ from flask_login import UserMixin, login_required, current_user
 from app import login_manager
 from ..database import mongo
 from bson import ObjectId
+from pymongo import UpdateOne
 import datetime
 
 '''https://code.luasoftware.com/tutorials/flask/how-to-configure-flask-login/'''
@@ -174,12 +175,18 @@ class Step(object):
         self.account = account
 
     def add(self):
+        next_order = mongo.db.steps.count({
+            'account': self.account,
+            'active': 'true'
+        })
+
         return mongo.db.steps.insert({
             'name': self.name,
             'notes': self.notes,
             'days_before_close': self.days_before_close,
             'account': self.account,
             'active': 'true',
+            'order': next_order + 1,
             'create_date': datetime.datetime.now().isoformat(),
             'update_date': datetime.datetime.now().isoformat()
         })
@@ -195,7 +202,7 @@ class Step(object):
         return mongo.db.steps.find({
             'account': account,
             'active': 'true'
-        })
+        }).sort('order', 1)
 
     @staticmethod
     def update(id, name, notes, days_before_close):
@@ -215,3 +222,24 @@ class Step(object):
             {'_id': ObjectId(id)},
             {'$set': {'active': 'false'}
         }, upsert=False)
+
+    @staticmethod
+    def sort(account_id, step_ids):
+        steps = step_ids.split(',')
+        operations = []
+        order = 1
+
+        for step_id in steps:
+            operations.append(UpdateOne({
+                    '_id': ObjectId(step_id),
+                    'account': ObjectId(account_id)
+                },{
+                    '$set': {
+                        'order': order
+                    }
+                }, upsert=False))
+
+            order += 1
+
+        print operations
+        return mongo.db.steps.bulk_write(operations)

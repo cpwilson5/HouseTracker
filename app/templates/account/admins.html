@@ -5,42 +5,34 @@
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
   <h1 class="display-4">Team Members</h1>
 </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <a class="btn btn-primary btn-md mb-4 float-right" href="{{ url_for('account.invite_admin') }}">+ Add</a>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block body %}
 <!-- Custom styles for this template -->
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
 
-<div class="container pt-5">
-  <a class="btn btn-primary btn-lg mb-4 float-right" href="{{ url_for('account.invite_admin') }}">+ Add User</a>
-  <div class="container">
-
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th scope="col">First</th>
-          <th scope="col">Last</th>
-          <th scope="col">Actions</th>
-        </tr>
-      </thead>
       {% for user in users %}
         {% if user['role'] == 'admin' %}
-        <tbody>
-          <tr>
-            <a href="{{ url_for('account.edit_admin', id=user._id) }}">
-              <td>{{ user.first_name }}</a></td>
-              <td>{{ user.last_name }}</td>
-              <td>
-                {% if not user['confirmed'] %}
-                <a href="{{ url_for('account.edit_admin', id=user._id) }}" class="card-link oi oi-pencil"></a>
-                {% endif %}
-                <a href="{{ url_for('account.delete_admin', id=user._id) }}" class="card-link oi oi-trash"></a>
-              </td>
-            </a>
-          </tr>
-        </tbody>
+        <div class="card mb-4">
+          <a href="{{ url_for('account.edit_admin', id=user._id) }}" class="card-block clearfix">
+            <div class="card-body">
+              {{ user.first_name }} {{ user.last_name }}
+            </div>
+          </a>
+        </div>
         {% endif %}
       {% endfor %}
-    </table>
+    </div>
   </div>
 </div>
 
