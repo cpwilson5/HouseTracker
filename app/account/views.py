@@ -98,7 +98,7 @@ def edit_step(id):
         return redirect(url_for('account.steps'))
     else:
         flash_errors(form)
-    return render_template('account/step.html', form=form)
+    return render_template('account/step.html', id=id, form=form)
 
 
 @account.route('/steps/delete/<string:id>', methods=['GET', 'POST'])
