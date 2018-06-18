@@ -5,6 +5,7 @@ from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordF
 from models import User, Account, Step
 from ..configuration.models import AppStep
 from ..helpers import flash_errors, confirm_token, send_invitation
+import json
 
 from . import account
 
@@ -107,6 +108,12 @@ def delete_step(id):
     Step.delete(id)
     flash("Step removed succesfully", category='success')
     return redirect(url_for('account.steps'))
+
+@account.route('/steps/sort', methods=['POST'])
+@login_required
+def sort_step():
+    Step.sort(current_user.get_account(), request.form['order'])
+    return json.dumps({'status':'Successfully sorted'})
 
 ### My Account ###
 

@@ -23,7 +23,7 @@ class RegForm(FlaskForm):
 
 class StepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
-    notes = TextAreaField('Notes', validators=[DataRequired()])
+    notes = TextAreaField('Notes', validators=[Optional()])
     days_before_close = IntegerField('Days Before Close', validators=[Optional()])
 
 class UserForm(FlaskForm):
