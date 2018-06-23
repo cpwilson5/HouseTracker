@@ -17,15 +17,6 @@
     </div>
     <div class="col">
       <div class="dropdown">
-        <button class="btn btn-outline-secondary dropdown-toggle float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Status
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" href="{{ url_for('listing.add_listing') }}">Active</a>
-          <a class="dropdown-item" href="{{ url_for('listing.add_listing') }}">Inactive</a>
-        </div>
-      </div>
-      <div class="dropdown">
         <button class="btn btn-outline-secondary dropdown-toggle mr-2 float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Sort
         </button>
@@ -44,7 +35,7 @@
     <div class="card mb-4 inline-block">
       <a href="{{ url_for('listing.listing_steps', id=listing._id) }}" class="card-block clearfix">
         <h5 class="card-header">{{ listing.name }} <span class="badge badge-pill badge-success float-right">{{ listing.close_date | pretty_date("%B %-d")}}</span></h5>
-        <div class="progress">
+        <div class="progress mb-3">
           {% set complete = listing.steps | selectattr("complete_date") | list | count %}
           {% set incomplete = listing.steps | selectattr("active") | rejectattr("complete_date") | list | count %}
           {% set percent = (complete/(incomplete+complete)) * 100|round|int if (incomplete + complete) > 0 else 0  %}
@@ -53,6 +44,11 @@
             aria-valuenow="{{ percent }}"
             aria-valuemin="0" aria-valuemax="100"></div>
         </div>
+        {% if listing.photo %}
+          <img src="{{ url_for('listing.get_photo', photo=listing.photo) }}" style="height:250px;" class="w-100 mx-auto d-block">
+        {% else %}
+          <img src="{{ url_for('listing.get_photo', photo="placeholder.jpg") }}" style="height:250px;" class="w-100 mx-auto d-block">
+        {% endif %}
         <div class="card-body">
           <p class="card-text">
             {{ listing.address1 }}<br>
@@ -60,6 +56,9 @@
               {{ listing.address2 }}<br>
             {% endif %}
             {{ listing.city }}, {{ listing.state }} {{ listing.zip }}
+            {% if not listing.address2 %}
+              <br><br>
+            {% endif %}
           </p>
         </div>
         <ul class="list-group list-group-flush">
