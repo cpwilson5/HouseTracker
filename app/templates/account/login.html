@@ -11,7 +11,8 @@
   <!-- form card login with validation feedback -->
   <div class="card card-outline-secondary">
       <div class="card-header">
-          <h3 class="mb-0">Login</h3>
+          <h3 class="mb-0 d-inline">Login</h3>
+          <span class="float-right mt-1"><a href="{{ url_for('account.forgot_password') }}">Forgot Password?</a></span>
       </div>
       <div class="card-body">
           <form class="form" role="form" autocomplete="off" id="loginForm" novalidate="" method="POST">

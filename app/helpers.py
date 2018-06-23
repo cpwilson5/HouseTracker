@@ -23,6 +23,13 @@ def send_invitation(email):
     subject = "You're invited to join House Tracker"
     send_email([email], subject, html)
 
+def send_reset(email):
+    token = generate_confirmation_token(email)
+    confirm_url = url_for('account.reset_password', token=token, _external=True)
+    html = "Reset your password: " + confirm_url
+    subject = "Reset your password"
+    send_email([email], subject, html)
+
 def generate_confirmation_token(email):
     serializer = URLSafeSerializer(app.config['SECRET_KEY'])
     return serializer.dumps(email, salt=app.config['SECURITY_PASSWORD_SALT'])
