@@ -28,14 +28,14 @@
         {% for listing_step in listing_steps %}
 
         {% if listing_step.steps.status == 'red' %}
-            {% set border_color = 'danger' %}
+            {% set border_color = 'indianred' %}
           {% elif listing_step.steps.status == 'yellow' %}
-            {% set border_color = 'warning' %}
+            {% set border_color = 'khaki' %}
           {% else %}
-            {% set border_color = 'success '%}
+            {% set border_color = 'seagreen '%}
           {% endif %}
 
-        <div id="{{ listing_step.steps._id }}" class="card mb-4 border-{{border_color}}" style="border-left-width:5px;">
+        <div id="{{ listing_step.steps._id }}" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
           <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
             <h5 class="card-header">{{ listing_step.steps.name }}
               {% if listing_step.steps.due_date %}
@@ -58,7 +58,7 @@
         {% endfor %}
       </div>
 
-      <div id="closing" class="card mb-4 border-success" style="border-left-width:5px;">
+      <div id="closing" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray seagreen;">
         <a href="{{ url_for('listing.edit_listing', id=id) }}" class="card-block clearfix">
           <h5 class="card-header">Closing
             <span class="badge badge-pill badge-dark float-right">{{ listing.close_date | pretty_date("%A, %B %-d") }}</span>

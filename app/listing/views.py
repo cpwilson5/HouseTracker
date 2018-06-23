@@ -54,13 +54,14 @@ def add_listing():
         steps = Step.all(current_user.get_account())
         steps_count = steps.count(True)
         for step in steps:
+            # takes the account steps and dervies the new date based on the close date
             if 'days_before_close' in step:
                 days_before_close = step['days_before_close']
                 due_date = form.close_date.data - timedelta(days=days_before_close) if days_before_close else None
             else:
                 due_date = None
 
-            listing_step = ListingStep(listing_id, step['name'], step['notes'], due_date=due_date)
+            listing_step = ListingStep(listing_id, step['name'], step['notes'], due_date=due_date, status='green')
             listing_step.add()
         flash("Successfully created %s with %s steps" % (form.name.data, steps_count), category='success')
         return redirect(url_for('listing.listing_steps', id=listing_id))
@@ -233,7 +234,48 @@ def edit_listing_step(id, step_id):
         # compare changes to provide details in text/email
         name_changed = False if form.name.data == listing_step['steps'][0]['name'] else True
         notes_changed = False if form.notes.data == listing_step['steps'][0]['notes'] else True
-        due_date_changed = False if form.due_date.data == listing_step['steps'][0]['due_date'].date() else True
+
+        # 5 scenarios for dates
+            #1 same date to same date - don't send
+            #2 date existed to new date - send
+            #3 date existed to no date - don't send
+            #4 no date to new date - send
+            #5 no date to no date - don't send
+
+        # check if an old date existed
+        # setting to variable makes it cleaner to read
+        if listing_step['steps'][0]['due_date']:
+            old_date = True
+        else:
+            old_date = False
+
+        # check if a new date exists to tell us if we should text/email
+        if form.due_date.data:
+            new_date = True
+        else:
+            new_date = False
+
+        due_date_changed = False
+
+        # if there was a date and there is a new date
+        if old_date and new_date:
+            # compare dates
+            #1 if the same don't do anything
+            if form.due_date.data == listing_step['steps'][0]['due_date'].date():
+                due_date_changed = False
+            #2 otherwise we need to send alert
+            else:
+                due_date_changed = True
+        #3 otherwise if there was a date but the date was removed
+        elif old_date and not new_date:
+            due_date_changed = False
+        #4
+        elif not old_date and new_date:
+            due_date_changed = True
+        #5
+        elif not old_date and not new_date:
+            due_date_changed = False
+
         status_changed = False if form.status.data == listing_step['steps'][0]['status'] else True
         attachment_changed = False if not s3_filepath else True
 
