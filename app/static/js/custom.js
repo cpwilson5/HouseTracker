@@ -52,3 +52,10 @@ $(document).ready(function(){
     });
   });
 });
+
+// toggles the browse button on listing photo edit
+$(document).ready(function(){
+    $(".edit_photo").click(function(){
+        $("#browse").toggle();
+    });
+});

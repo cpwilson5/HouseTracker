@@ -22,6 +22,7 @@ class ListingForm(FlaskForm):
     zip = StringField('Zip', validators=[DataRequired()])
     close_date = DateField('Closing Date', format='%Y-%m-%d', \
         default=datetime.today()+timedelta(days=30), validators=[DataRequired()])
+    photo = FileField('Photo', validators=[FileAllowed(['jpg', 'jpeg', 'gif', 'bmp', 'png'], 'Must be jpg, jpeg, gif, bmp or png files')])
 
 class ListingStepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])

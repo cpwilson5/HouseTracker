@@ -5,7 +5,7 @@ from pymongo import UpdateOne
 import datetime
 
 class Listing(object):
-    def __init__(self, name, address1, address2, city, state, zip, close_date):
+    def __init__(self, name, address1, address2, city, state, zip, close_date, photo=None):
         self.name = name
         self.address1 = address1
         self.address2 = address2
@@ -13,6 +13,7 @@ class Listing(object):
         self.state = state
         self.zip = zip
         self.close_date = close_date
+        self.photo = photo
 
     def add(self):
         return mongo.db.listings.insert({
@@ -23,6 +24,7 @@ class Listing(object):
             'state': self.state,
             'zip': self.zip,
             'close_date': datetime.datetime.combine(self.close_date, datetime.time.min).isoformat(),
+            'photo': self.photo,
             'user': current_user.get_id(),
             'account': current_user.get_account(),
             'active': True,
@@ -46,7 +48,11 @@ class Listing(object):
         }).sort(sort,order)
 
     @staticmethod
-    def update(id, name, address1, address2, city, state, zip, close_date):
+    def update(id, name, address1, address2, city, state, zip, close_date, photo):
+        listing = Listing.get(id)
+        if photo is None:
+            photo = listing['photo'] if 'photo' in listing else None
+
         return mongo.db.listings.update_one(
             {'_id': ObjectId(id)},
             {'$set': {
@@ -57,6 +63,7 @@ class Listing(object):
                 'state': state,
                 'zip': zip,
                 'close_date': datetime.datetime.combine(close_date, datetime.time.min).isoformat(),
+                'photo': photo,
                 'update_date': datetime.datetime.now().isoformat()
                 }
         }, upsert=False)

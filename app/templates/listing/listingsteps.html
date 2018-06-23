@@ -4,6 +4,7 @@
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
   <h1 class="display-4">{{ listing.name}}</h1>
+  <p class="lead">{{days_left}} days until closing</p>
 </div>
 
 <div class="container">
@@ -85,17 +86,21 @@
               <a href="{{ url_for('listing.edit_listing', id=id) }}" class="btn btn-outline-primary btn-sm float-right">Edit</a>
             </div>
           </div>
+          <div class="row align-items-center justify-content-center">
+            <span class="badge badge-pill badge-success mt-3">Expected close: {{ listing.close_date | pretty_date("%A, %B %-d")}}</span>
+          </div>
+          {% if listing.photo %}
+            <img src="{{ url_for('listing.get_photo', photo=listing.photo) }}" class="w-100 img-thumbnail rounded mx-auto d-block mt-3 mb-3">
+          {% else %}
+            <img src="{{ url_for('listing.get_photo', photo="placeholder.jpg") }}" class="w-100 img-thumbnail rounded mx-auto d-block mt-3 mb-3">
+          {% endif %}
           <p class="card-text">
-            <b>{{ listing.name }}</b><br>
             {{ listing.address1 }}<br>
             {% if listing.address2 %}
               {{ listing.address2 }}<br>
             {% endif %}
             {{ listing.city }}, {{ listing.state }} {{ listing.zip }}
           </p>
-          <div class="row align-items-center justify-content-center">
-            <span class="badge badge-pill badge-success">Expected close: {{ listing.close_date | pretty_date("%A, %B %-d")}}</span>
-          </div>
         </div>
       </div>
 

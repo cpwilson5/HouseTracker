@@ -40,9 +40,14 @@ def listings():
 def add_listing():
     form = ListingForm()
     if request.method == 'POST' and form.validate_on_submit():
+        if form.photo.data:
+            s3_filepath = s3_upload(form.photo, 'photo')
+        else:
+            s3_filepath = None
+
         listing = Listing(form.name.data, form.address1.data, \
         form.address2.data, form.city.data, form.state.data, form.zip.data, \
-        form.close_date.data)
+        form.close_date.data, photo=form.photo.data)
         listing_id = listing.add()
 
         # Add user's steps to new listing
@@ -58,7 +63,7 @@ def add_listing():
             listing_step = ListingStep(listing_id, step['name'], step['notes'], due_date=due_date)
             listing_step.add()
         flash("Successfully created %s with %s steps" % (form.name.data, steps_count), category='success')
-        return redirect(url_for('listing.listings'))
+        return redirect(url_for('listing.listing_steps', id=listing_id))
     else:
         flash_errors(form)
     return render_template('listing/listing.html', form=form)
@@ -77,11 +82,19 @@ def edit_listing(id):
         form.state.data = listing['state']
         form.zip.data = listing['zip']
         form.close_date.data = datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') if 'close_date' in listing else None
+        photo = listing['photo'] if 'photo' in listing else None
+
+        return render_template('listing/listing.html', id=id, form=form, photo=photo)
 
     if request.method == 'POST' and form.validate_on_submit():
+        if form.photo.data:
+            s3_filepath = s3_upload(form.photo, 'photo')
+        else:
+            s3_filepath = None
+
         Listing.update(id, form.name.data, form.address1.data, \
         form.address2.data, form.city.data, form.state.data, form.zip.data, \
-        form.close_date.data)
+        form.close_date.data, photo=s3_filepath)
 
         # compare changes to provide details in text/email
         if form.close_date.data <> datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S').date():
@@ -105,10 +118,16 @@ def edit_listing(id):
                 send_sms(text_distro, text_body)
         # otherwise don't send an email or text if closing date didn't change
 
-        return redirect(url_for('listing.listings'))
+        flash("Updated listing", category='success')
+        return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('listing/listing.html', id=id, form=form)
+        return render_template('listing/listing.html', id=id, form=form)
+
+@listing.route('/photo/<string:photo>', methods=['GET'])
+@login_required
+def get_photo(photo):
+    return redirect(s3_retrieve(photo, 'photo'))
 
 @listing.route('/listings/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
@@ -130,7 +149,10 @@ def listing_steps(id):
         listing_steps = []
     users = User.all(listing=id)
     listing = Listing.get(id)
-    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, title="Welcome")
+    days_left = (datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') - datetime.now()).days
+    if days_left < 0:
+        days_left = 0
+    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, days_left=days_left, title="Welcome")
 
 @listing.route('/listings/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required
@@ -138,7 +160,7 @@ def add_listing_step(id):
     form = ListingStepForm()
     if request.method == 'POST' and form.validate_on_submit():
         if form.attachment.data:
-            s3_filepath = s3_upload(form.attachment)
+            s3_filepath = s3_upload(form.attachment, 'attachment')
         else:
             s3_filepath = None
 
@@ -194,11 +216,12 @@ def edit_listing_step(id, step_id):
         form.due_date.data = listing_step['steps'][0]['due_date']
         form.status.data = listing_step['steps'][0]['status'] if 'status' in listing_step['steps'][0] else 'Green'
         attachment = listing_step['steps'][0]['attachment']
+
         return render_template('listing/listingstep.html', form=form, attachment=attachment, id=id, step_id=step_id)
 
     if request.method == 'POST' and form.validate_on_submit():
         if form.attachment.data:
-            s3_filepath = s3_upload(form.attachment)
+            s3_filepath = s3_upload(form.attachment, 'attachment')
         else:
             s3_filepath = None
 
@@ -264,7 +287,7 @@ def edit_listing_step(id, step_id):
 @listing.route('/attachment/<string:attachment>', methods=['GET'])
 @login_required
 def get_attachment(attachment):
-    return redirect(s3_retrieve(attachment))
+    return redirect(s3_retrieve(attachment, 'attachment'))
 
 @listing.route('/listings/<string:id>/steps/delete/<string:step_id>', methods=['GET', 'POST'])
 @login_required
