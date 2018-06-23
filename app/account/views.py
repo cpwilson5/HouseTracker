@@ -1,10 +1,10 @@
 from flask import render_template
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app
-from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm
+from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm, ForgotPasswordForm, ResetPasswordForm
 from models import User, Account, Step
 from ..configuration.models import AppStep
-from ..helpers import flash_errors, confirm_token, send_invitation
+from ..helpers import flash_errors, confirm_token, send_invitation, send_reset
 import json
 
 from . import account
@@ -214,18 +214,6 @@ def invite_admin():
     else:
         flash_errors(form)
 
-### resend invite - don't need any longer ###
-'''@account.route('/admins/invite/retry/<string:email>', methods=['GET'])
-@login_required
-def retry_invite_admin(email):
-    try:
-        send_invitation(email)
-        flash("Invitation sent", category='success')
-    except:
-        flash("Error attempting to resend invite", category='danger')
-        return render_template('account/admin.html', form=form)
-    return redirect(url_for('account.admins'))'''
-
 ###### page user visits to confirm the link from their email ######
 @account.route('/register/<token>', methods=['GET', 'POST'])
 def register_with_token(token):
@@ -300,3 +288,60 @@ def delete_admin(id):
     User.delete(id=id)
     flash("User removed succesfully", category='success')
     return redirect(url_for('account.admins'))
+
+###### page user visits to request forgotten password ######
+@account.route('/forgotpassword', methods=['GET', 'POST'])
+def forgot_password():
+    form = ForgotPasswordForm()
+
+    if request.method == 'GET':
+        return render_template('account/forgotpassword.html', form=form)
+
+    if request.method == 'POST' and form.validate_on_submit():
+        existing_user = User.get(email=form.email.data)
+        if existing_user:
+            try:
+                send_reset(form.email.data)
+                flash("Please check your email to reset your password", category='success')
+                return redirect(url_for('account.login'))
+            except:
+                flash("Error sending password reset", category='danger')
+                return render_template('account/forgotpassword.html', form=form)
+        else:
+            flash("Email address doesn't exist", category='danger')
+            return render_template('account/forgotpassword.html', form=form)
+    else:
+        flash_errors(form)
+
+
+###### page user visits to reset their password ######
+@account.route('/resetpassword/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    form = ResetPasswordForm()
+
+    email = confirm_token(token)
+    user = User.get(email=email)
+
+    if request.method == 'GET':
+        try:
+            if user:
+                return render_template('account/resetpassword.html', form=form)
+            else:
+                flash('The confirmation link is invalid or has expired.', 'danger')
+                return redirect(url_for('account.login'))
+        except:
+            flash('The confirmation link is invalid or has expired.', 'danger')
+            return redirect(url_for('account.login'))
+
+    if request.method == 'POST' and form.validate_on_submit():
+        id = user['_id']
+        first_name = user['first_name']
+        last_name = user['last_name']
+        email = user['email']
+        p = form.password.data
+
+        User.update(id=id, first_name=first_name, last_name=last_name, email=email, password=p)
+        flash("Updated successfully.  Login below.", category='success')
+        return redirect(url_for('account.login'))
+    else:
+        flash_errors(form)

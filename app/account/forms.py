@@ -49,3 +49,14 @@ class InviteForm(FlaskForm):
     last_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
     cell = StringField('Cell')
+
+class ForgotPasswordForm(FlaskForm):
+    """Login form to access writing and settings pages"""
+
+    email = StringField('Email', validators=[DataRequired()])
+
+class ResetPasswordForm(FlaskForm):
+    """Login form to access writing and settings pages"""
+
+    password = PasswordField('Password', validators=[DataRequired(), EqualTo('confirm', message='Passwords must match')])
+    confirm = PasswordField('Confirm Password', validators=[DataRequired()])
