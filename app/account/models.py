@@ -10,12 +10,14 @@ import datetime
 '''https://runningcodes.net/flask-login-and-mongodb/'''
 
 class User(UserMixin):
-    def __init__(self, id=None, email=None, account=None, superuser=False, active=False):
+    def __init__(self, id=None, email=None, account=None, superuser=False, active=False, role=None, listing=None):
         self.id = id
         self.email = email
         self.account = account
         self.superuser = superuser
         self.active = active
+        self.role = role
+        self.listing = listing
 
     def is_authenticated(self):
         return True
@@ -32,13 +34,19 @@ class User(UserMixin):
     def get_account(self):
         return self.account
 
+    def get_role(self):
+        return self.role
+
+    def get_listing(self):
+        return self.listing
+
     @property
     def is_superuser(self):
         return self.superuser
 
     @staticmethod
     def add(first_name, last_name, email, account_id, role, cell=None, password=None, \
-        invited_by=None, confirmed=True, listing='All', email_alert=False, text_alert=False):
+        invited_by=None, confirmed=True, listing='all', email_alert=False, text_alert=False):
         return mongo.db.users.insert({
             'first_name': first_name,
             'last_name': last_name,
@@ -122,7 +130,7 @@ def load_user(id):
     users = mongo.db.users.find_one({'_id': ObjectId(id)})
     if not users:
         return None
-    return User(str(users['_id']), users['email'], users['account'], users['superuser'], users['active'])
+    return User(str(users['_id']), users['email'], users['account'], users['superuser'], users['active'], users['role'], users['listing'])
 
 
 class Account(object):
@@ -241,5 +249,4 @@ class Step(object):
 
             order += 1
 
-        print operations
         return mongo.db.steps.bulk_write(operations)

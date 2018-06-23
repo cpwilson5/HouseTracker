@@ -31,7 +31,7 @@ def register():
                 step = Step(app_step['name'], app_step['notes'], days_before_close, account_id)
                 step.add()
             flash("Welcome and we added %s steps to get you started" % (app_steps_count), category='success')
-            return redirect(url_for('home.dashboard'))
+            return redirect(url_for('listing.listings'))
         else:
             flash("User already exists", category='danger')
     else:
@@ -143,7 +143,7 @@ def user():
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
             email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
-        return redirect(url_for('home.dashboard'))
+        return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)
 
@@ -170,7 +170,7 @@ def password():
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
             email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
-        return redirect(url_for('home.dashboard'))
+        return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)
 
@@ -251,7 +251,7 @@ def register_with_token(token):
             email_alert=ea, text_alert=ta)
         login_user(User(str(id),form.email.data,account_id,superuser=False, active=True))
         flash("Updated successfully", category='success')
-        return redirect(url_for('home.dashboard'))
+        return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)
 

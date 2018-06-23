@@ -9,6 +9,7 @@ from ..account.models import User, Step
 from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
 from ..helpers import flash_errors, confirm_token, send_invitation, distro
+from ..decorators import admin_login_required
 from datetime import datetime, timedelta
 import json
 
@@ -16,6 +17,7 @@ from . import listing
 
 @listing.route('/listings')
 @login_required
+@admin_login_required
 def listings():
 
     if request.args.get('sort') == 'closing':
@@ -30,6 +32,8 @@ def listings():
     else:
         sort = 'create_date'
         order = -1
+
+    print current_user.get_role()
 
     listings = Listing.all(active=True, complete=False, sort=sort, order=order)
 
