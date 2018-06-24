@@ -7,6 +7,7 @@
   <p class="lead">{{days_left}} days until closing</p>
 </div>
 
+{% if current_user.get_role() != 'client' %}
 <div class="container">
   <div class="row">
     <div class="col-md-8">
@@ -16,6 +17,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 
 {% endblock %}
 
@@ -36,7 +38,9 @@
           {% endif %}
 
         <div id="{{ listing_step.steps._id }}" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
+          {% if current_user.get_role() != 'client' %}
           <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
+          {% endif %}
             <h5 class="card-header">{{ listing_step.steps.name }}
               {% if listing_step.steps.due_date %}
               <span class="badge badge-pill badge-dark float-right">{{ listing_step.steps.due_date | pretty_date("%A, %B %-d") }}</span>
@@ -50,7 +54,11 @@
             <div class="card-footer">
               <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date }}</small>
               {% if listing_step.steps.attachment %}
+                {% if current_user.get_role() != 'client' %}
                 <span class="oi oi-paperclip float-right"></span>
+                {% else %}
+                <a style="color: #000;" class="float-right" href="{{ url_for('listing.get_attachment', attachment=listing_step.steps.attachment) }}"><span class="oi oi-paperclip"></span></a>
+                {% endif %}
               {% endif %}
             </div>
           </a>
@@ -59,7 +67,9 @@
       </div>
 
       <div id="closing" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray seagreen;">
+        {% if current_user.get_role() != 'client' %}
         <a href="{{ url_for('listing.edit_listing', id=id) }}" class="card-block clearfix">
+        {% endif %}
           <h5 class="card-header">Closing
             <span class="badge badge-pill badge-dark float-right">{{ listing.close_date | pretty_date("%A, %B %-d") }}</span>
           </h5>
@@ -82,9 +92,11 @@
             <div class="col">
                 <h5 class="card-title">Listing Info</h5>
             </div>
+            {% if current_user.get_role() != 'client' %}
             <div class="col">
               <a href="{{ url_for('listing.edit_listing', id=id) }}" class="btn btn-outline-primary btn-sm float-right">Edit</a>
             </div>
+            {% endif %}
           </div>
           <div class="row align-items-center justify-content-center">
             <span class="badge badge-pill badge-success mt-3">Expected close: {{ listing.close_date | pretty_date("%A, %B %-d")}}</span>

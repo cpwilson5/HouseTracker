@@ -33,14 +33,12 @@ def listings():
         sort = 'create_date'
         order = -1
 
-    print current_user.get_role()
-
     listings = Listing.all(active=True, complete=False, sort=sort, order=order)
-
     return render_template('listing/listings.html', listings=listings, title="Welcome")
 
 @listing.route('/listings/add', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def add_listing():
     form = ListingForm()
     if request.method == 'POST' and form.validate_on_submit():
@@ -75,6 +73,7 @@ def add_listing():
 
 @listing.route('/listings/edit/<string:id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def edit_listing(id):
     form = ListingForm()
     listing = Listing.get(id)
@@ -136,18 +135,21 @@ def get_photo(photo):
 
 @listing.route('/listings/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def delete_listing(id):
     Listing.delete(id)
     return redirect(url_for('listing.listings'))
 
 @listing.route('/listings/complete/<string:id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def complete_listing(id):
     Listing.complete(id)
     return redirect(url_for('listing.listings'))
 
 @listing.route('/listings/<string:id>/steps')
 @login_required
+@admin_login_required
 def listing_steps(id):
     listing_steps = list(ListingStep.all(id, active=True, complete=False))
     if not listing_steps:
@@ -161,6 +163,7 @@ def listing_steps(id):
 
 @listing.route('/listings/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def add_listing_step(id):
     form = ListingStepForm()
     if request.method == 'POST' and form.validate_on_submit():
@@ -211,6 +214,7 @@ def add_listing_step(id):
 
 @listing.route('/listings/<string:id>/steps/edit/<string:step_id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def edit_listing_step(id, step_id):
     form = ListingStepForm()
     listing_step = ListingStep.get(id, step_id)
@@ -337,12 +341,14 @@ def get_attachment(attachment):
 
 @listing.route('/listings/<string:id>/steps/delete/<string:step_id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def delete_listing_step(id, step_id):
     ListingStep.delete(id, step_id)
     return redirect(url_for('listing.listing_steps', id=id))
 
 @listing.route('/listings/<string:id>/steps/complete/<string:step_id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def complete_listing_step(id, step_id):
     ListingStep.complete(id, step_id)
     return redirect(url_for('listing.listing_steps', id=id))
@@ -420,6 +426,7 @@ def delete_client(id, client_id):
 ''' resend invite - don't think we need this now that we moved resend to edit
 @listing.route('/listings/<string:id>/clients/invite/retry/<string:email>', methods=['GET'])
 @login_required
+@admin_login_required
 def retry_invite_client(id, email):
     try:
         send_invitation(email)
