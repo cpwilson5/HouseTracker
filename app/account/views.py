@@ -5,6 +5,7 @@ from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordF
 from models import User, Account, Step
 from ..configuration.models import AppStep
 from ..helpers import flash_errors, confirm_token, send_invitation, send_reset
+from ..decorators import admin_login_required
 import json
 
 from . import account
@@ -31,7 +32,7 @@ def register():
                 step = Step(app_step['name'], app_step['notes'], days_before_close, account_id)
                 step.add()
             flash("Welcome and we added %s steps to get you started" % (app_steps_count), category='success')
-            return redirect(url_for('home.dashboard'))
+            return redirect(url_for('listing.listings'))
         else:
             flash("User already exists", category='danger')
     else:
@@ -66,12 +67,14 @@ def logout():
 
 @account.route('/steps')
 @login_required
+@admin_login_required
 def steps():
     steps = Step.all(current_user.get_account())
     return render_template('account/steps.html', steps=steps, title="Welcome")
 
 @account.route('/steps/add', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def add_step():
     form = StepForm()
     if request.method == 'POST' and form.validate_on_submit():
@@ -85,6 +88,7 @@ def add_step():
 
 @account.route('/steps/edit/<string:id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def edit_step(id):
     form = StepForm()
 
@@ -104,6 +108,7 @@ def edit_step(id):
 
 @account.route('/steps/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def delete_step(id):
     Step.delete(id)
     flash("Step removed succesfully", category='success')
@@ -118,6 +123,7 @@ def sort_step():
 ### My Account ###
 
 @account.route('/user', methods=['GET', 'POST'])
+@login_required
 def user():
     form = UserForm()
     user = User.get(current_user.get_id())
@@ -143,13 +149,14 @@ def user():
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
             email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
-        return redirect(url_for('home.dashboard'))
+        return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)
 
     return render_template('account/account.html', form=form, role=role)
 
 @account.route('/password', methods=['GET', 'POST'])
+@login_required
 def password():
     form = PasswordForm()
     user = User.get(current_user.get_id())
@@ -170,7 +177,7 @@ def password():
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
             email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
-        return redirect(url_for('home.dashboard'))
+        return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)
 
@@ -182,6 +189,7 @@ def password():
 
 @account.route('/admins')
 @login_required
+@admin_login_required
 def admins():
     users = User.all(account=current_user.get_account())
     return render_template('account/admins.html', users=users, title="Welcome")
@@ -189,6 +197,7 @@ def admins():
 
 @account.route('/admins/invite', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def invite_admin():
     form = InviteForm()
 
@@ -251,12 +260,13 @@ def register_with_token(token):
             email_alert=ea, text_alert=ta)
         login_user(User(str(id),form.email.data,account_id,superuser=False, active=True))
         flash("Updated successfully", category='success')
-        return redirect(url_for('home.dashboard'))
+        return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)
 
 @account.route('/admins/edit/<string:id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def edit_admin(id):
     form = InviteForm()
 
@@ -284,6 +294,7 @@ def edit_admin(id):
 
 @account.route('/admins/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def delete_admin(id):
     User.delete(id=id)
     flash("User removed succesfully", category='success')

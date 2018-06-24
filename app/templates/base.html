@@ -31,15 +31,19 @@
         {% endif %}
         <ul class="navbar-nav ml-md-auto">
           {% if current_user.is_authenticated %}
+          {% if current_user.get_role() != 'client' %}
           <li class="nav-item">
             <a class="nav-link p-2 text-dark" href="{{ url_for('listing.listings') }}">Listings</a>
           </li>
+          {% endif %}
           <li class="nav-item dropdown ml-2 mr-2">
             <a class="nav-link dropdown-toggle p-2 text-dark" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              {% if current_user.get_role() != 'client' %}
               <a class="dropdown-item" href="{{ url_for('account.admins') }}">Team Members</a>
               <a class="dropdown-item" href="{{ url_for('account.steps') }}">Setup Process</a>
               <div class="dropdown-divider"></div>
+              {% endif %}
               <a class="dropdown-item" href="{{ url_for('account.user') }}">My Account</a>
               {% if current_user.is_superuser %}
               <div class="dropdown-divider"></div>

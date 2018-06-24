@@ -7,18 +7,21 @@ from ..account.models import User
 from models import AppStep
 from bson import ObjectId
 from ..helpers import flash_errors
+from ..decorators import admin_login_required
 import json
 
 from . import configuration
 
 @configuration.route('/appsteps')
 @login_required
+@admin_login_required
 def app_steps():
     app_steps = AppStep.all()
     return render_template('configuration/appsteps.html', app_steps=app_steps, title="Welcome")
 
 @configuration.route('/appsteps/add', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def add_app_step():
     form = AppStepForm()
     if request.method == 'POST' and form.validate_on_submit():
@@ -31,6 +34,7 @@ def add_app_step():
 
 @configuration.route('/appsteps/edit/<string:id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def edit_app_step(id):
     form = AppStepForm()
 
@@ -49,6 +53,7 @@ def edit_app_step(id):
 
 @configuration.route('/appsteps/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
+@admin_login_required
 def delete_app_step(id):
         AppStep.delete(id)
         return redirect(url_for('configuration.app_steps'))
