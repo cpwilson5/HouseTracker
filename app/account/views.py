@@ -147,7 +147,7 @@ def user():
         ea = form.email_alert.data
         ta = form.text_alert.data
         User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
-            email_alert=ea, text_alert=ta)
+            confirmed=True, email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
         return redirect(url_for('listing.listings'))
     else:
