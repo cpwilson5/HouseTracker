@@ -145,6 +145,19 @@
           </div>
         </div>
       </div>
+
+      {% if current_user.get_role() == 'client' %}
+      <div class="card mt-4">
+        <div class="card-body">
+          <h5 class="card-title">Need Help?</h5>
+          <p class="card-text">
+            <p class="ml-3"><strong>Email: </strong>{{realtor.email}}<br>
+            <p class="ml-3"><strong>Cell: </strong>{{realtor.cell}}
+          </p>
+        </div>
+      </div>
+      {% endif %}
+
     </div>
   </div>
 </div>

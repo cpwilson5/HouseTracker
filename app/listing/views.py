@@ -5,7 +5,7 @@ from flask_pymongo import PyMongo
 from .forms import ListingForm, ListingStepForm
 from ..account.forms import InviteForm
 from models import Listing, ListingStep
-from ..account.models import User, Step
+from ..account.models import User, Step, Account
 from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
 from ..helpers import flash_errors, confirm_token, send_invitation, distro
@@ -156,10 +156,12 @@ def listing_steps(id):
         listing_steps = []
     users = User.all(listing=id)
     listing = Listing.get(id)
+    realtor = User.get(accounts_realtor=current_user.get_account())
+    print current_user.get_account()
     days_left = (datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') - datetime.now()).days
     if days_left < 0:
         days_left = 0
-    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, days_left=days_left, title="Welcome")
+    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, title="Welcome")
 
 @listing.route('/listings/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required
