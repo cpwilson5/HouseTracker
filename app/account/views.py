@@ -17,7 +17,7 @@ def register():
     if request.method == 'POST' and form.validate_on_submit():
         existing_user = User.get(email=form.email.data)
         if existing_user is None:
-            account = Account('namevalue', 'phonevalue', 'emailvalue')
+            account = Account(form.first_name.data + " " + form.last_name.data, form.cell.data, form.email.data)
             account_id = account.add()
             user_id = User.add(form.first_name.data, form.last_name.data, form.email.data, \
                 account_id, 'realtor', form.cell.data, form.password.data, confirmed=True)

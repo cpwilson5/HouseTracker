@@ -69,9 +69,12 @@ class User(UserMixin):
         })
 
     @staticmethod
-    def get(id=None, email=None):
+    def get(id=None, email=None, accounts_realtor=None):
         if id:
             find_by = {'_id': ObjectId(id)}
+        elif accounts_realtor:
+            find_by = {'account': ObjectId(accounts_realtor), 'role': 'realtor'}
+            print find_by
         else:
             find_by = {'email': email}
 
@@ -135,9 +138,9 @@ def load_user(id):
 
 class Account(object):
     def __init__(self, name, phone, email):
-        self.name = 'namevalue'
-        self.phone = 'phonevalue'
-        self.email = 'emailvavlue'
+        self.name = name
+        self.phone = phone
+        self.email = email
 
     def add(self):
         return mongo.db.accounts.insert({
