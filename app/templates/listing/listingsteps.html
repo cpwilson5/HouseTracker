@@ -11,9 +11,9 @@
 <div class="container">
   <div class="row">
     <div class="col-md-8">
-      <a class="btn btn-primary btn-md mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
-      <button id="sortorder" class="expander btn btn-outline-primary btn-md mb-4 ml-2">Sort</a>
-      <button id="saveorder" style="display:none" class="btn btn-outline-primary btn-md mb-4 ml-2">Save</a>
+      <a class="btn btn-outline-secondary btn-md mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
+      <button id="sortorder" class="expander btn btn-outline-secondary btn-md mb-4 ml-2">Sort</a>
+      <button id="saveorder" style="display:none" class="btn btn-outline-secondary btn-md mb-4 ml-2">Save</a>
     </div>
   </div>
 </div>
@@ -41,13 +41,14 @@
           {% if current_user.get_role() != 'client' %}
           <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
           {% endif %}
-            <h5 class="card-header">{{ listing_step.steps.name }}
-              {% if listing_step.steps.due_date %}
-              <span class="badge badge-pill badge-dark float-right">{{ listing_step.steps.due_date | pretty_date("%A, %B %-d") }}</span>
-              {% else %}
-              <span class="badge badge-pill badge-light float-right">No Due Date</span>
-              {% endif %}
-            </h5>
+            <div class="card-header">
+               <span class="font-weight-bold text-uppercase">{{ listing_step.steps.name }}</span>
+               {% if listing_step.steps.due_date %}
+               <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%A, %B %-d") }}</span>
+               {% else %}
+               <span class="text-success float-right">No Due Date</span>
+               {% endif %}
+             </div>
             <div class="card-body">
               <p class="card-text">{{ listing_step.steps.notes }}</p>
             </div>
@@ -70,9 +71,10 @@
         {% if current_user.get_role() != 'client' %}
         <a href="{{ url_for('listing.edit_listing', id=id) }}" class="card-block clearfix">
         {% endif %}
-          <h5 class="card-header">Closing
-            <span class="badge badge-pill badge-dark float-right">{{ listing.close_date | pretty_date("%A, %B %-d") }}</span>
-          </h5>
+        <div class="card-header">
+           <span class="font-weight-bold text-uppercase">Closing</span>
+           <span class="text-success float-right">{{ listing.close_date | pretty_date("%A, %B %-d") }}</span>
+         </div>
           <div class="card-body">
             <p class="card-text">You're expected closing date is {{ listing.close_date | pretty_date("%A, %B %-d") }}</p>
           </div>
@@ -94,12 +96,12 @@
             </div>
             {% if current_user.get_role() != 'client' %}
             <div class="col">
-              <a href="{{ url_for('listing.edit_listing', id=id) }}" class="btn btn-outline-primary btn-sm float-right">Edit</a>
+              <a href="{{ url_for('listing.edit_listing', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Edit</a>
             </div>
             {% endif %}
           </div>
-          <div class="row align-items-center justify-content-center">
-            <span class="badge badge-pill badge-success mt-3">Expected close: {{ listing.close_date | pretty_date("%A, %B %-d")}}</span>
+          <div class="row align-items-center justify-content-center mt-2">
+            <span class="text-success text-uppercase"><strong>Closing: {{ listing.close_date | pretty_date("%A, %b %-d")}}</strong></span>
           </div>
           {% if listing.photo %}
             <img src="{{ url_for('listing.get_photo', photo=listing.photo) }}" class="w-100 img-thumbnail rounded mx-auto d-block mt-3 mb-3">
@@ -123,7 +125,7 @@
                 <h5 class="card-title">Clients</h5>
             </div>
             <div class="col">
-              <a href="{{ url_for('listing.invite_client', id=id) }}" class="btn btn-outline-primary btn-sm float-right">Add</a>
+              <a href="{{ url_for('listing.invite_client', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Add</a>
             </div>
           </div>
           <div class="list-group mt-2">
@@ -151,8 +153,8 @@
         <div class="card-body">
           <h5 class="card-title">Need Help?</h5>
           <p class="card-text">
-            <p class="ml-3"><strong>Email: </strong>{{realtor.email}}<br>
-            <p class="ml-3"><strong>Cell: </strong>{{realtor.cell}}
+            <p><strong>Email: </strong>{{realtor.email}}<br>
+            <p><strong>Cell: </strong>{{realtor.cell}}
           </p>
         </div>
       </div>

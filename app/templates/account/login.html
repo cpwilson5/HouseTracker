@@ -12,7 +12,7 @@
   <div class="card card-outline-secondary">
       <div class="card-header">
           <h3 class="mb-0 d-inline">Login</h3>
-          <span class="float-right mt-1"><a href="{{ url_for('account.forgot_password') }}">Forgot Password?</a></span>
+          <span class="float-right mt-1"><a class="text-secondary" href="{{ url_for('account.forgot_password') }}">Forgot Password?</a></span>
       </div>
       <div class="card-body">
           <form class="form" role="form" autocomplete="off" id="loginForm" novalidate="" method="POST">
@@ -28,7 +28,7 @@
                       {{ form.remember_me (class_="form-check-input")}} <span>Remember me on this computer</span>
                   </label>
               </div>
-              <button type="submit" class="btn btn-primary btn-lg float-right" id="btnLogin">Login</button>
+              <button type="submit" class="btn btn-secondary btn-lg float-right" id="btnLogin">Login</button>
           </form>
       </div>
       <!--/card-body-->

@@ -52,7 +52,7 @@
             </div>
           </li>
           <li class="nav-item ml-2 mr-2">
-            <a class="btn btn-outline-primary" href="{{ url_for('account.logout') }}">Log out</a>
+            <a class="btn btn-outline-secondary" href="{{ url_for('account.logout') }}">Log out</a>
           </li>
           {% else %}
           <li class="nav-item ml-2 mr-2">
@@ -62,10 +62,10 @@
             <a class="nav-link p-2 text-dark" href="{{ url_for('home.pricing') }}">Pricing</a>
           </li>
           <li>
-            <a class="mr-2 btn btn-outline-primary ml-2 mr-2" href="{{ url_for('account.register') }}">Sign up</a>
+            <a class="mr-2 btn btn-outline-secondary ml-2 mr-2" href="{{ url_for('account.register') }}">Sign up</a>
           </li>
           <li>
-            <a class="btn btn-outline-primary ml-2 mr-2" href="{{ url_for('account.login') }}">Log in</a>
+            <a class="btn btn-outline-secondary ml-2 mr-2" href="{{ url_for('account.login') }}">Log in</a>
           </li>
           {% endif %}
         </ul>

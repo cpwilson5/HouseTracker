@@ -10,7 +10,11 @@
   <!-- form card login with validation feedback -->
   <div class="card card-outline-secondary">
       <div class="card-header">
-          <h3 class="mb-0">Add Step</h3>
+          <h3 class="mb-0 d-inline-block">Add/Edit Step</h3>
+          <!-- Don't show delete because it's a new step -->
+          {% if step != [] %}
+            <a class="btn btn-outline-danger float-right" href="{{ url_for('configuration.delete_app_step', id=id) }}" role="button">Delete</a>
+          {% endif %}
       </div>
       <div class="card-body">
           <form class="form" role="form" autocomplete="off" id="loginForm" novalidate="" method="POST">
@@ -31,8 +35,7 @@
                   {{ form.notes (class_="form-control")}}
                 </div>
               </div>
-              <a class="btn btn-outline-danger" href="{{ url_for('configuration.delete_app_step', id=id) }}" role="button">Delete</a>
-              <button type="submit" class="btn btn-primary float-right" id="btnLogin">Add</button>
+              <button type="submit" class="btn btn-secondary float-right" id="btnLogin">Add</button>
           </form>
       </div>
       <!--/card-body-->

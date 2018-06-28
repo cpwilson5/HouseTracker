@@ -11,7 +11,10 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0">Add Listing</h3>
+            <h3 class="mb-0 d-inline-block">Add/Edit Listing</h3>
+            {% if id %}
+            <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_listing', id=id) }}" role="button">Delete</a>
+            {% endif %}
         </div>
         <div class="card-body">
             <form action="" method="POST" name="form" class="form" enctype="multipart/form-data" role="form">
@@ -65,12 +68,9 @@
                 <div class="form-group row">
                   <div class="col-lg-12">
                     {% if id %}
-                    <a class="btn btn-outline-danger" href="{{ url_for('listing.delete_listing', id=id) }}" role="button">Delete</a>
-                    <a class="btn btn-outline-primary ml-3" href="{{ url_for('listing.complete_listing', id=id) }}" role="button">Complete</a>
-                    <input type="submit" class="btn btn-primary float-right" value="Save">
-                    {% else %}
-                    <input type="submit" class="btn btn-primary float-right" value="Save">
+                    <a class="btn btn-outline-secondary" href="{{ url_for('listing.complete_listing', id=id) }}" role="button">Complete</a>
                     {% endif %}
+                    <input type="submit" class="btn btn-secondary float-right" value="Save">
                   </div>
                 </div>
             </form>
