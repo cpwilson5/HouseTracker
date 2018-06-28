@@ -20,8 +20,7 @@ class ListingForm(FlaskForm):
     city = StringField('City', validators=[DataRequired()])
     state = SelectField('State', choices=[(state, state) for state in STATE_ABBREV], validators=[DataRequired()])
     zip = StringField('Zip', validators=[DataRequired()])
-    close_date = DateField('Closing Date', format='%Y-%m-%d', \
-        default=datetime.today()+timedelta(days=30), validators=[DataRequired()])
+    close_date = DateField('Closing Date', format='%Y-%m-%d', validators=[Optional()])
     photo = FileField('Photo', validators=[FileAllowed(['jpg', 'jpeg', 'gif', 'bmp', 'png'], 'Must be JPG, JPEG, GIF, BMP or PNG')])
 
 class ListingStepForm(FlaskForm):
@@ -29,5 +28,5 @@ class ListingStepForm(FlaskForm):
     notes = StringField('Notes',widget=TextArea())
     due_date = DateField('Due Date', format='%Y-%m-%d', \
         default=datetime.today(), validators=[Optional()])
-    status = SelectField('Status', choices=[('green','Green'),('yellow','Yellow'),('red','Red')])
+    status = SelectField('Status', choices=[('red','Red'),('yellow','Yellow'),('green','Green')])
     attachment = FileField('Attachment', validators=[FileAllowed(['jpg', 'jpeg', 'gif', 'bmp', 'png', 'pdf'], 'Must be JPG, JPEG, GIF, BMP, PNG or PDF')])

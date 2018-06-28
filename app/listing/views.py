@@ -49,7 +49,7 @@ def add_listing():
 
         listing = Listing(form.name.data, form.address1.data, \
         form.address2.data, form.city.data, form.state.data, form.zip.data, \
-        form.close_date.data, photo=form.photo.data)
+        form.close_date.data, photo=s3_filepath)
         listing_id = listing.add()
 
         # Add user's steps to new listing
@@ -57,13 +57,13 @@ def add_listing():
         steps_count = steps.count(True)
         for step in steps:
             # takes the account steps and dervies the new date based on the close date
-            if 'days_before_close' in step:
+            if 'days_before_close' in step and form.close_date.data:
                 days_before_close = step['days_before_close']
                 due_date = form.close_date.data - timedelta(days=days_before_close) if days_before_close else None
             else:
                 due_date = None
 
-            listing_step = ListingStep(listing_id, step['name'], step['notes'], due_date=due_date, status='green')
+            listing_step = ListingStep(listing_id, step['name'], step['notes'], due_date=due_date, status='red')
             listing_step.add()
         flash("Successfully created %s with %s steps" % (form.name.data, steps_count), category='success')
         return redirect(url_for('listing.listing_steps', id=listing_id))
@@ -85,7 +85,7 @@ def edit_listing(id):
         form.city.data = listing['city']
         form.state.data = listing['state']
         form.zip.data = listing['zip']
-        form.close_date.data = datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') if 'close_date' in listing else None
+        form.close_date.data = datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') if listing['close_date'] else None
         photo = listing['photo'] if 'photo' in listing else None
 
         return render_template('listing/listing.html', id=id, form=form, photo=photo)
@@ -101,7 +101,12 @@ def edit_listing(id):
         form.close_date.data, photo=s3_filepath)
 
         # compare changes to provide details in text/email
-        if form.close_date.data <> datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S').date():
+        if listing['close_date']:
+            close_date = datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S').date()
+        else:
+            close_date = None
+
+        if form.close_date.data <> close_date:
             # build body of email/text based on what changed and email/text only if changes
             email_body = "You're closing date has been updated to " + form.close_date.data.strftime('%m/%d/%Y') + "<br><br>"
             text_body = "You're closing date has been updated to " + form.close_date.data.strftime('%m/%d/%Y') + ".\n\n"
@@ -158,9 +163,12 @@ def listing_steps(id):
     listing = Listing.get(id)
     realtor = User.get(accounts_realtor=current_user.get_account())
     print current_user.get_account()
-    days_left = (datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') - datetime.now()).days
-    if days_left < 0:
-        days_left = 0
+    if listing['close_date']:
+        days_left = (datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') - datetime.now()).days
+        if days_left < 0:
+            days_left = 0
+    else:
+        days_left = "TBD"
     return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, title="Welcome")
 
 @listing.route('/listings/<string:id>/steps/add', methods=['GET', 'POST'])
@@ -225,7 +233,7 @@ def edit_listing_step(id, step_id):
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
         form.due_date.data = listing_step['steps'][0]['due_date']
-        form.status.data = listing_step['steps'][0]['status'] if 'status' in listing_step['steps'][0] else 'Green'
+        form.status.data = listing_step['steps'][0]['status'] if 'status' in listing_step['steps'][0] else 'Red'
         attachment = listing_step['steps'][0]['attachment']
 
         return render_template('listing/listingstep.html', form=form, attachment=attachment, id=id, step_id=step_id)
@@ -387,9 +395,10 @@ def invite_client(id):
         else:
             ###  NEED TO FIX THIS TO ADD A LISTING TO AN ARRAY FOR THE USER ###
             flash("User already exists", category='danger')
-            return render_template('listing/client.html', id=id, form=form)
+            return render_template('listing/client.html', id=id, user=[], form=form)
     else:
         flash_errors(form)
+        return render_template('listing/client.html', id=id, user=[], form=form)
 
 @listing.route('/listings/<string:id>/clients/edit/<string:client_id>', methods=['GET', 'POST'])
 @login_required

@@ -16,6 +16,12 @@ class Listing(object):
         self.photo = photo
 
     def add(self):
+        ### Enables no closing date to be added when listing is created ###
+        if self.close_date is None:
+            close_date = ''
+        else:
+            close_date = datetime.datetime.combine(self.close_date, datetime.time.min).isoformat()
+
         return mongo.db.listings.insert({
             'name': self.name,
             'address1': self.address1,
@@ -23,7 +29,7 @@ class Listing(object):
             'city': self.city,
             'state': self.state,
             'zip': self.zip,
-            'close_date': datetime.datetime.combine(self.close_date, datetime.time.min).isoformat(),
+            'close_date': close_date,
             'photo': self.photo,
             'user': current_user.get_id(),
             'account': current_user.get_account(),

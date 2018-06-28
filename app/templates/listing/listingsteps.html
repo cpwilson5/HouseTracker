@@ -30,12 +30,12 @@
         {% for listing_step in listing_steps %}
 
         {% if listing_step.steps.status == 'red' %}
-            {% set border_color = 'indianred' %}
-          {% elif listing_step.steps.status == 'yellow' %}
-            {% set border_color = 'khaki' %}
-          {% else %}
-            {% set border_color = 'seagreen '%}
-          {% endif %}
+          {% set border_color = 'indianred' %}
+        {% elif listing_step.steps.status == 'yellow' %}
+          {% set border_color = 'khaki' %}
+        {% else %}
+          {% set border_color = 'seagreen '%}
+        {% endif %}
 
         <div id="{{ listing_step.steps._id }}" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
           {% if current_user.get_role() != 'client' %}
@@ -46,7 +46,7 @@
                {% if listing_step.steps.due_date %}
                <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%A, %B %-d") }}</span>
                {% else %}
-               <span class="text-success float-right">No Due Date</span>
+               <span class="text-success float-right">No Scheduled Date</span>
                {% endif %}
              </div>
             <div class="card-body">
@@ -67,16 +67,22 @@
         {% endfor %}
       </div>
 
-      <div id="closing" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray seagreen;">
+      {% if listing.close_date %}
+        {% set border_color = 'seagreen' %}
+      {% else %}
+        {% set border_color = 'indianred '%}
+      {% endif %}
+
+      <div id="closing" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
         {% if current_user.get_role() != 'client' %}
         <a href="{{ url_for('listing.edit_listing', id=id) }}" class="card-block clearfix">
         {% endif %}
         <div class="card-header">
            <span class="font-weight-bold text-uppercase">Closing</span>
-           <span class="text-success float-right">{{ listing.close_date | pretty_date("%A, %B %-d") }}</span>
+           <span class="text-success float-right">{{ listing.close_date | pretty_date("%A, %B %-d") if listing.close_date else "TBD"}}</span>
          </div>
           <div class="card-body">
-            <p class="card-text">You're expected closing date is {{ listing.close_date | pretty_date("%A, %B %-d") }}</p>
+            <p class="card-text">You're expected closing date is {{ listing.close_date | pretty_date("%A, %B %-d") if listing.close_date else "TBD"}}</p>
           </div>
           <div class="card-footer">
             <small class="text-muted">Last updated {{ listing.update_date | pretty_date }}</small>
@@ -101,7 +107,7 @@
             {% endif %}
           </div>
           <div class="row align-items-center justify-content-center mt-2">
-            <span class="text-success text-uppercase"><strong>Closing: {{ listing.close_date | pretty_date("%A, %b %-d")}}</strong></span>
+            <span class="text-success text-uppercase"><strong>Closing: {{ listing.close_date | pretty_date("%A, %b %-d") if listing.close_date else "TBD"}}</strong></span>
           </div>
           {% if listing.photo %}
             <img src="{{ url_for('listing.get_photo', photo=listing.photo) }}" class="w-100 img-thumbnail rounded mx-auto d-block mt-3 mb-3">

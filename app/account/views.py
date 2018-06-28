@@ -219,9 +219,10 @@ def invite_admin():
             return redirect(url_for('account.admins'))
         else:
             flash("User already exists", category='danger')
-            return render_template('account/admin.html', form=form)
+            return render_template('account/admin.html', user=[], form=form)
     else:
         flash_errors(form)
+        return render_template('account/admin.html', user=[], form=form)
 
 ###### page user visits to confirm the link from their email ######
 @account.route('/register/<token>', methods=['GET', 'POST'])
