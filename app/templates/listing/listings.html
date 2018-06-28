@@ -3,7 +3,7 @@
 
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="display-4">Listings</h1>
+  <h1 class="text-uppercase">Listings</h1>
 </div>
 
 {% endblock %}
@@ -13,7 +13,7 @@
 <div class="container">
   <div class="row">
     <div class="col">
-      <a class="btn btn-primary btn-md mb-4" href="{{ url_for('listing.add_listing') }}">+ Add</a>
+      <a class="btn btn-outline-secondary btn-md mb-4" href="{{ url_for('listing.add_listing') }}">+ Add</a>
     </div>
     <div class="col">
       <div class="dropdown">
@@ -34,20 +34,23 @@
   {% for listing in listings %}
     <div class="card mb-4 inline-block">
       <a href="{{ url_for('listing.listing_steps', id=listing._id) }}" class="card-block clearfix">
-        <h5 class="card-header">{{ listing.name }} <span class="badge badge-pill badge-success float-right">{{ listing.close_date | pretty_date("%B %-d")}}</span></h5>
-        <div class="progress mb-3">
+        <div class="card-header">
+           <span class="font-weight-bold text-uppercase">{{ listing.name }}</span>
+           <span class="text-success float-right">{{ listing.close_date | pretty_date("%B %-d")}}</span>
+         </div>
+        <div class="progress" style="height: 10px;">
           {% set complete = listing.steps | selectattr("complete_date") | list | count %}
           {% set incomplete = listing.steps | selectattr("active") | rejectattr("complete_date") | list | count %}
           {% set percent = (complete/(incomplete+complete)) * 100|round|int if (incomplete + complete) > 0 else 0  %}
-          <div class="progress-bar" role="progressbar"
+          <div class="progress-bar bg-success" role="progressbar"
             style="width: {{ percent }}%"
             aria-valuenow="{{ percent }}"
             aria-valuemin="0" aria-valuemax="100"></div>
         </div>
         {% if listing.photo %}
-          <img src="{{ url_for('listing.get_photo', photo=listing.photo) }}" style="height:150px;" class="w-175 mx-auto d-block">
+          <img src="{{ url_for('listing.get_photo', photo=listing.photo) }}" style="height:150px;" class="w-100 mx-auto d-block">
         {% else %}
-          <img src="{{ url_for('listing.get_photo', photo="placeholder.jpg") }}" style="height:150px;" class="w-75 mx-auto d-block">
+          <img src="{{ url_for('listing.get_photo', photo="placeholder.jpg") }}" style="height:150px;" class="w-100 mx-auto d-block">
         {% endif %}
         <div class="card-body">
           <p class="card-text">
@@ -60,9 +63,9 @@
         </div>
         <ul class="list-group list-group-flush">
           {% if listing.steps | selectattr("active") | rejectattr("complete_date") | first | count > 1 %}
-            <li class="list-group-item"><b>Next Step:</b> {{ (listing.steps | selectattr("active") | rejectattr("complete_date") | first).name }}</li>
+            <li class="list-group-item d-inline-block text-truncate"><b>Next Step:</b> {{ (listing.steps | selectattr("active") | rejectattr("complete_date") | first).name }}</li>
           {% else %}
-            <li class="list-group-item d-flex justify-content-between">No more steps!  <a href="{{ url_for('listing.complete_listing', id=listing._id) }}">Archive?</a></li>
+            <li class="list-group-item d-flex justify-content-between"><b>Closed</b></li>
           {% endif %}
         </ul>
         <div class="card-footer">

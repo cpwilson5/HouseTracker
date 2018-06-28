@@ -6,7 +6,11 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0">Add/Edit Client</h3>
+            <h3 class="mb-0 d-inline-block">Add/Edit Client</h3>
+            <!-- Don't show delete because it's a new client or client who shouldn't be able to delete -->
+            {% if user != [] and current_user.get_role() != 'client' %}
+            <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_client', id=id, client_id=user._id) }}" role="button">Delete</a>
+            {% endif %}
         </div>
         <div class="card-body">
             <form action="" method="POST" name="form" class="form" role="form" autocomplete="off">
@@ -51,13 +55,9 @@
                 {% endif %}
                 <div class="form-group row">
                     <div class="col-lg-12">
-                      <!-- Don't show delete because it's a new user -->
-                      {% if user != [] and current_user.get_role() != 'client' %}
-                      <a class="btn btn-outline-danger" href="{{ url_for('listing.delete_client', id=id, client_id=user._id) }}" role="button">Delete</a>
-                      {% endif %}
                       <!-- Only show "send invitation" if hasn't confirmed email -->
                       {% if not user['confirmed'] %}
-                      <input type="submit" class="btn btn-primary float-right" value="Send Invitation">
+                      <input type="submit" class="btn btn-secondary float-right" value="Send Invitation">
                       {% endif %}
                     </div>
                 </div>

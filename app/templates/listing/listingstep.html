@@ -11,7 +11,10 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0">Listing Step</h3>
+            <h3 class="mb-0 d-inline-block">Listing Step</h3>
+            {% if id %}
+            <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_listing_step', id=id, step_id=step_id) }}" role="button">Delete</a>
+            {% endif %}
         </div>
         <div class="card-body">
             <form action="" method="POST" name="form" class="form" enctype="multipart/form-data" role="form">
@@ -39,9 +42,11 @@
                   </div>
                   {% if attachment %}
                   <div class="col-md-9 mb-3">
-                    <label class="form-control-label">Attachment</label>
-                    <a class="badge badge-pill badge-primary oi ml-2" href="{{ url_for('listing.get_attachment', attachment=attachment) }}">View</a>
-                    {{ form.attachment(class_="form-control") }}
+                    <label class="form-control-label">Attachment</label><br>
+                    <a class="btn btn-outline-secondary" href="{{ url_for('listing.get_attachment', attachment=attachment) }}" role="button">View Attachment</a>
+                    &nbsp;&nbsp;&nbsp; or &nbsp;&nbsp;&nbsp;
+                    <a href="#" class="text-secondary"><span class="edit_photo" title="Edit Photo">Upload New</span></a>
+                    <div id="browse" style="display:none;" class="mt-3">{{ form.attachment(class_="form-control") }}</div>
                   </div>
                   {% else %}
                   <div class="col-md-9 mb-3">
@@ -54,12 +59,9 @@
                 <div class="form-group row">
                     <div class="col-lg-12" text-right"">
                       {% if id %}
-                      <a class="btn btn-outline-danger" href="{{ url_for('listing.delete_listing_step', id=id, step_id=step_id) }}" role="button">Delete</a>
-                      <a class="btn btn-outline-primary ml-3" href="{{ url_for('listing.complete_listing_step', id=id, step_id=step_id) }}" role="button">Complete</a>
-                      <input type="submit" class="btn btn-primary float-right" value="Save">
-                      {% else %}
-                      <input type="submit" class="btn btn-primary float-right" value="Save">
+                      <a class="btn btn-outline-secondary" href="{{ url_for('listing.complete_listing_step', id=id, step_id=step_id) }}" role="button">Complete</a>
                       {% endif %}
+                      <input type="submit" class="btn btn-secondary float-right" value="Save">
                     </div>
                 </div>
             </form>

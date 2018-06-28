@@ -61,3 +61,29 @@ at the end */
 .edit a {
 	color: #000;
 }
+
+/* remove rounded corners on progress bar */
+.progress {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    border-radius: 0 !important;
+}
+
+/* make the dropdown text green (not blue) */
+.container .dropdown .dropdown-menu a:focus
+{
+  color: #28a745;
+  background-color: #fff;
+  border-color: #28a745;
+}
+
+/* make the dropdown text green (not blue) */
+.navbar .dropdown-menu a:focus
+{
+  color: #28a745;
+  background-color: #fff;
+  border-color: #28a745;
+}
