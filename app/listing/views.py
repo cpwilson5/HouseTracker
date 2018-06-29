@@ -162,7 +162,7 @@ def listing_steps(id):
     users = User.all(listing=id)
     listing = Listing.get(id)
     realtor = User.get(accounts_realtor=current_user.get_account())
-    print current_user.get_account()
+
     if listing['close_date']:
         days_left = (datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') - datetime.now()).days
         if days_left < 0:
@@ -194,9 +194,6 @@ def add_listing_step(id):
         if form.due_date.data:
             email_body = email_body + "Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "<br>"
             text_body = text_body + "Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "\n"
-        if form.status.data:
-            email_body = email_body + "Status: " + form.status.data.capitalize() + "<br>"
-            text_body = text_body + "Status: " + form.status.data.capitalize() + "\n"
         if s3_filepath:
             email_body = email_body + "Attachment: Added<br>"
             text_body = text_body + "Attachment: Added\n"
