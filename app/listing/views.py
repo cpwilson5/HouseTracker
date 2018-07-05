@@ -10,7 +10,7 @@ from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
 from ..helpers import flash_errors, confirm_token, send_invitation, distro
 from ..decorators import admin_login_required
-from datetime import datetime, timedelta
+import datetime
 import json
 
 from . import listing
@@ -47,16 +47,23 @@ def add_listing():
         else:
             s3_filepath = None
 
+        if form.close_date.data is None:
+            date_time = ''
+        elif form.close_time.data is None:
+            date_time = datetime.datetime.combine(form.close_date.data, datetime.time.min)
+        else:
+            date_time = datetime.datetime.combine(form.close_date.data, form.close_time.data)
+
         listing = Listing(form.name.data, form.address1.data, \
         form.address2.data, form.city.data, form.state.data, form.zip.data, \
-        form.close_date.data, photo=s3_filepath)
+        date_time, photo=s3_filepath)
         listing_id = listing.add()
 
         # Add user's steps to new listing
         steps = Step.all(current_user.get_account())
         steps_count = steps.count(True)
         for step in steps:
-            # takes the account steps and dervies the new date based on the close date
+            # takes the account steps and derives the new date based on the close date
             if 'days_before_close' in step and form.close_date.data:
                 days_before_close = step['days_before_close']
                 due_date = form.close_date.data - timedelta(days=days_before_close) if days_before_close else None
@@ -85,7 +92,8 @@ def edit_listing(id):
         form.city.data = listing['city']
         form.state.data = listing['state']
         form.zip.data = listing['zip']
-        form.close_date.data = datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') if listing['close_date'] else None
+        form.close_date.data = listing['close_date'] if listing['close_date'] else None
+        form.close_time.data = listing['close_date'] if listing['close_date'] else None
         photo = listing['photo'] if 'photo' in listing else None
 
         return render_template('listing/listing.html', id=id, form=form, photo=photo)
@@ -96,20 +104,27 @@ def edit_listing(id):
         else:
             s3_filepath = None
 
+        if form.close_date.data is None:
+            date_time = ''
+        elif form.close_time.data is None:
+            date_time = datetime.datetime.combine(form.close_date.data, datetime.time.min)
+        else:
+            date_time = datetime.datetime.combine(form.close_date.data, form.close_time.data)
+
         Listing.update(id, form.name.data, form.address1.data, \
         form.address2.data, form.city.data, form.state.data, form.zip.data, \
-        form.close_date.data, photo=s3_filepath)
+        date_time, photo=s3_filepath)
 
         # compare changes to provide details in text/email
         if listing['close_date']:
-            close_date = datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S').date()
+            db_close_date = listing['close_date'].replace(tzinfo=None)
         else:
-            close_date = None
+            db_close_date = None
 
-        if form.close_date.data <> close_date:
+        if date_time <> db_close_date and form.close_date.data:
             # build body of email/text based on what changed and email/text only if changes
-            email_body = "You're closing date has been updated to " + form.close_date.data.strftime('%m/%d/%Y') + "<br><br>"
-            text_body = "You're closing date has been updated to " + form.close_date.data.strftime('%m/%d/%Y') + ".\n\n"
+            email_body = "You're closing date has been updated to " + date_time.strftime('%m/%d/%Y %-H:%M %p') + "<br><br>"
+            text_body = "You're closing date has been updated to " + date_time.strftime('%m/%d/%Y %-H:%M %p') + ".\n\n"
 
             email_body = email_body + "<br>Login for more details: " + url_for('account.login', _external=True)
             text_body = text_body + "\nLogin here: " + url_for('account.login', _external=True)
@@ -164,7 +179,7 @@ def listing_steps(id):
     realtor = User.get(accounts_realtor=current_user.get_account())
 
     if listing['close_date']:
-        days_left = (datetime.strptime(listing['close_date'], '%Y-%m-%dT%H:%M:%S') - datetime.now()).days
+        days_left = (listing['close_date'].replace(tzinfo=None) - datetime.datetime.now()).days
         if days_left < 0:
             days_left = 0
     else:
@@ -182,8 +197,15 @@ def add_listing_step(id):
         else:
             s3_filepath = None
 
+        if form.due_date.data is None:
+            date_time = ''
+        elif form.time.data is None:
+            date_time = datetime.datetime.combine(form.due_date.data, datetime.time.min)
+        else:
+            date_time = datetime.datetime.combine(form.due_date.data, form.time.data)
+
         listing_step = ListingStep(listing_id=id, name=form.name.data, \
-        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data, \
+        notes=form.notes.data, attachment=s3_filepath, due_date=date_time, \
         status = form.status.data)
         listing_step.add()
 
@@ -191,9 +213,9 @@ def add_listing_step(id):
         email_body = "A listing step '" + form.name.data + "' has been added.<br><br>"
         text_body = "A listing step '" + form.name.data + "' has been added.\n\n"
 
-        if form.due_date.data:
-            email_body = email_body + "Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "<br>"
-            text_body = text_body + "Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "\n"
+        if date_time:
+            email_body = email_body + "Due Date: " + date_time.strftime('%m/%d/%Y %-I:%M %p') + "<br>"
+            text_body = text_body + "Due Date: " + date_time.strftime('%m/%d/%Y %-I:%M %p') + "\n"
         if s3_filepath:
             email_body = email_body + "Attachment: Added<br>"
             text_body = text_body + "Attachment: Added\n"
@@ -229,7 +251,8 @@ def edit_listing_step(id, step_id):
     if request.method == 'GET':
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
-        form.due_date.data = listing_step['steps'][0]['due_date']
+        form.due_date.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] else None
+        form.time.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] else None
         form.status.data = listing_step['steps'][0]['status'] if 'status' in listing_step['steps'][0] else 'Red'
         attachment = listing_step['steps'][0]['attachment']
 
@@ -241,9 +264,16 @@ def edit_listing_step(id, step_id):
         else:
             s3_filepath = None
 
+        if form.due_date.data is None:
+            date_time = ''
+        elif form.time.data is None:
+            date_time = datetime.datetime.combine(form.due_date.data, datetime.time.min)
+        else:
+            date_time = datetime.datetime.combine(form.due_date.data, form.time.data)
+
         # update listing step
         ListingStep.update(id=id, step_id=step_id, name=form.name.data, \
-        notes=form.notes.data, attachment=s3_filepath, due_date=form.due_date.data, \
+        notes=form.notes.data, attachment=s3_filepath, due_date=date_time, \
         status=form.status.data)
 
         # compare changes to provide details in text/email
@@ -265,7 +295,7 @@ def edit_listing_step(id, step_id):
             old_date = False
 
         # check if a new date exists to tell us if we should text/email
-        if form.due_date.data:
+        if date_time:
             new_date = True
         else:
             new_date = False
@@ -276,7 +306,9 @@ def edit_listing_step(id, step_id):
         if old_date and new_date:
             # compare dates
             #1 if the same don't do anything
-            if form.due_date.data == listing_step['steps'][0]['due_date'].date():
+            print
+
+            if date_time == listing_step['steps'][0]['due_date'].replace(tzinfo=None):
                 due_date_changed = False
             #2 otherwise we need to send alert
             else:
@@ -310,8 +342,8 @@ def edit_listing_step(id, step_id):
                 email_body = email_body + "Notes: " + form.notes.data + "<br>"
                 text_body = text_body + "Notes: Updated\n"
             if due_date_changed:
-                email_body = email_body + "Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "<br>"
-                text_body = text_body + "Due Date: " + form.due_date.data.strftime('%m/%d/%Y') + "\n"
+                email_body = email_body + "Due Date: " + date_time.strftime('%m/%d/%Y %-I:%M %p') + "<br>"
+                text_body = text_body + "Due Date: " + date_time.strftime('%m/%d/%Y %-I:%M %p') + "\n"
             if status_changed:
                 email_body = email_body + "Status: " + form.status.data.capitalize() + "<br>"
                 text_body = text_body + "Status: " + form.status.data.capitalize() + "\n"

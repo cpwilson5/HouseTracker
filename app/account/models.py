@@ -74,7 +74,6 @@ class User(UserMixin):
             find_by = {'_id': ObjectId(id)}
         elif accounts_realtor:
             find_by = {'account': ObjectId(accounts_realtor), 'role': 'realtor'}
-            print find_by
         else:
             find_by = {'email': email}
 

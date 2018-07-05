@@ -20,7 +20,7 @@ class Listing(object):
         if self.close_date is None:
             close_date = ''
         else:
-            close_date = datetime.datetime.combine(self.close_date, datetime.time.min).isoformat()
+            close_date = self.close_date
 
         return mongo.db.listings.insert({
             'name': self.name,
@@ -68,7 +68,7 @@ class Listing(object):
                 'city': city,
                 'state': state,
                 'zip': zip,
-                'close_date': datetime.datetime.combine(close_date, datetime.time.min).isoformat(),
+                'close_date': close_date,
                 'photo': photo,
                 'update_date': datetime.datetime.now().isoformat()
                 }
@@ -109,7 +109,7 @@ class ListingStep(object):
         if self.due_date is None:
             due_date = ''
         else:
-            due_date = datetime.datetime.combine(self.due_date, datetime.time.min)
+            due_date = self.due_date
 
         # because there is an array of objects (aka hard to get to what we need) and we need to ensure we
         # add the next step to the end, we stored a listing step count on the listing itself
@@ -170,13 +170,10 @@ class ListingStep(object):
 
     @staticmethod
     def update(id, step_id, name, notes, attachment, due_date, status):
-        if due_date is None:
-            due_date = ''
-        else:
-            due_date = datetime.datetime.combine(due_date, datetime.time.min)
-
         if attachment is None:
             attachment = ListingStep.get(id, step_id)['steps'][0]['attachment']
+
+        print due_date
 
         return mongo.db.listings.update_one({
             '_id': ObjectId(id),
