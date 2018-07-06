@@ -59,3 +59,8 @@ $(document).ready(function(){
         $("#browse").toggle();
     });
 });
+
+// shows tooltips for the whole page
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+});

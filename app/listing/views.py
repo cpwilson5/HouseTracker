@@ -279,6 +279,8 @@ def edit_listing_step(id, step_id):
         # compare changes to provide details in text/email
         name_changed = False if form.name.data == listing_step['steps'][0]['name'] else True
         notes_changed = False if form.notes.data == listing_step['steps'][0]['notes'] else True
+        status_changed = False if form.status.data == listing_step['steps'][0]['status'] else True
+        attachment_changed = False if not s3_filepath else True
 
         # 5 scenarios for dates
             #1 same date to same date - don't send
@@ -323,11 +325,8 @@ def edit_listing_step(id, step_id):
         elif not old_date and not new_date:
             due_date_changed = False
 
-        status_changed = False if form.status.data == listing_step['steps'][0]['status'] else True
-        attachment_changed = False if not s3_filepath else True
-
         # build body of email/text based on what changed and email/text only if changes
-        if notes_changed or due_date_changed or status_changed or attachment_changed:
+        if due_date_changed or attachment_changed:
             if name_changed:
                 email_body = "You're listing step \'" + listing_step['steps'][0]['name'] + \
                     "\' has been updated to '" + form.name.data + "\'.<br><br>"
