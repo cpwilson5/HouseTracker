@@ -153,7 +153,7 @@ def user():
     else:
         flash_errors(form)
 
-    return render_template('account/account.html', form=form, role=role)
+    return render_template('account/user.html', form=form, role=role)
 
 @account.route('/password', methods=['GET', 'POST'])
 @login_required

@@ -150,32 +150,6 @@ class Account(object):
             'update_date': datetime.datetime.now().isoformat()
         })
 
-    '''def get(self):
-        return mongo.db.steps.find_one({
-            '_id': ObjectId(id)
-        })
-
-    @staticmethod
-    def all():
-        return mongo.db.steps.find({
-            'user': current_user.get_id(),
-            'active': 'true'
-        })
-
-    @staticmethod
-    def update(id, form):
-        return mongo.db.steps.update_one(
-            {'_id': ObjectId(id)},
-            {'$set': {'name': self.name, 'update_date': datetime.datetime.now().isoformat()}
-        }, upsert=False)
-
-    @staticmethod
-    def delete(id):
-        return mongo.db.steps.update_one(
-            {'_id': ObjectId(id)},
-            {'$set': {'active': 'false'}
-        }, upsert=False)'''
-
 
 class Step(object):
     def __init__(self, name, notes, days_before_close, account):

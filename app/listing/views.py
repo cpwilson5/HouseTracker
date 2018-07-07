@@ -2,7 +2,7 @@ from flask import render_template
 from flask_login import login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app as app
 from flask_pymongo import PyMongo
-from .forms import ListingForm, ListingStepForm
+from .forms import ListingForm, ListingStepForm, InfoForm
 from ..account.forms import InviteForm
 from models import Listing, ListingStep
 from ..account.models import User, Step, Account
@@ -147,6 +147,24 @@ def edit_listing(id):
     else:
         flash_errors(form)
         return render_template('listing/listing.html', id=id, form=form)
+
+@listing.route('/listings/<string:id>/info', methods=['GET', 'POST'])
+@login_required
+def edit_info(id):
+    form = InfoForm()
+    listing = Listing.get(id)
+
+    if request.method == 'GET':
+        form.info.data = listing['info'] if 'info' in listing else None
+
+    if request.method == 'POST' and form.validate_on_submit():
+        info = form.info.data
+        Listing.info_update(id, info=info) ### this should be on a listing edit method in the model, not a new method
+        flash("Updated listing", category='success')
+        return redirect(url_for('listing.listing_steps', id=id))
+    else:
+        flash_errors(form)
+    return render_template('listing/info.html', form=form)
 
 @listing.route('/photo/<string:photo>', methods=['GET'])
 @login_required

@@ -154,17 +154,32 @@
         </div>
       </div>
 
-      {% if current_user.get_role() == 'client' %}
       <div class="card mt-4">
         <div class="card-body">
-          <h5 class="card-title">Need Help?</h5>
+          <h5 class="card-title">Realtor Info</h5>
           <p class="card-text">
+            <p><strong>Name: </strong>{{realtor.first_name}} {{realtor.last_name}}<br>
             <p><strong>Email: </strong>{{realtor.email}}<br>
             <p><strong>Cell: </strong>{{realtor.cell}}
           </p>
         </div>
       </div>
-      {% endif %}
+
+      <div class="card mt-4">
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+                <h5 class="card-title">Contacts/Info</h5>
+            </div>
+            <div class="col">
+              <a href="{{ url_for('listing.edit_info', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Edit</a>
+            </div>
+          </div>
+          <p class="card-text">
+            <pre>{{ listing.info }}</pre>
+          </p>
+        </div>
+      </div>
 
     </div>
   </div>

@@ -75,6 +75,16 @@ class Listing(object):
         }, upsert=False)
 
     @staticmethod
+    def info_update(id, info):
+        return mongo.db.listings.update_one(
+            {'_id': ObjectId(id)},
+            {'$set': {
+                'info': info,
+                'update_date': datetime.datetime.now().isoformat()
+                }
+        }, upsert=False)
+
+    @staticmethod
     def delete(id):
         return mongo.db.listings.update_one(
             {'_id': ObjectId(id)},

@@ -1,6 +1,6 @@
 from flask import flash
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField
+from wtforms import StringField, SelectField, TextAreaField
 from wtforms.fields.html5 import DateField
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms_components import TimeField
@@ -34,6 +34,9 @@ class ListingForm(FlaskForm):
                 flash("Date must be present when entering time", category='danger')
                 result = False
         return result
+
+class InfoForm(FlaskForm):
+    info = TextAreaField('Info', validators=[Optional()])
 
 class ListingStepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
