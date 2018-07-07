@@ -8,7 +8,7 @@ from models import Listing, ListingStep
 from ..account.models import User, Step, Account
 from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
-from ..helpers import flash_errors, confirm_token, send_invitation, distro
+from ..helpers import flash_errors, confirm_token, send_invitation, distro, pretty_date
 from ..decorators import admin_login_required
 import datetime
 import json
@@ -93,7 +93,7 @@ def edit_listing(id):
         form.state.data = listing['state']
         form.zip.data = listing['zip']
         form.close_date.data = listing['close_date'] if listing['close_date'] else None
-        form.close_time.data = listing['close_date'] if listing['close_date'] else None
+        form.close_time.data = listing['close_date'] if listing['close_date'] and (listing['close_date'].hour <> 0 and listing['close_date'] <> 0) else None
         photo = listing['photo'] if 'photo' in listing else None
 
         return render_template('listing/listing.html', id=id, form=form, photo=photo)
@@ -123,8 +123,8 @@ def edit_listing(id):
 
         if date_time <> db_close_date and form.close_date.data:
             # build body of email/text based on what changed and email/text only if changes
-            email_body = "You're closing date has been updated to " + date_time.strftime('%m/%d/%Y %-H:%M %p') + "<br><br>"
-            text_body = "You're closing date has been updated to " + date_time.strftime('%m/%d/%Y %-H:%M %p') + ".\n\n"
+            email_body = "You're closing date has been updated to " + pretty_date(date_time) + "<br><br>"
+            text_body = "You're closing date has been updated to " + pretty_date(date_time) + ".\n\n"
 
             email_body = email_body + "<br>Login for more details: " + url_for('account.login', _external=True)
             text_body = text_body + "\nLogin here: " + url_for('account.login', _external=True)
@@ -214,8 +214,8 @@ def add_listing_step(id):
         text_body = "A listing step '" + form.name.data + "' has been added.\n\n"
 
         if date_time:
-            email_body = email_body + "Due Date: " + date_time.strftime('%m/%d/%Y %-I:%M %p') + "<br>"
-            text_body = text_body + "Due Date: " + date_time.strftime('%m/%d/%Y %-I:%M %p') + "\n"
+            email_body = email_body + "Scheduled Date: " + pretty_date(date_time) + "<br>"
+            text_body = text_body + "Scheduled Date: " + pretty_date(date_time) + "\n"
         if s3_filepath:
             email_body = email_body + "Attachment: Added<br>"
             text_body = text_body + "Attachment: Added\n"
@@ -252,7 +252,7 @@ def edit_listing_step(id, step_id):
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
         form.due_date.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] else None
-        form.time.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] else None
+        form.time.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] and (listing_step['steps'][0]['due_date'].hour <> 0 and listing_step['steps'][0]['due_date'] <> 0) else None
         form.status.data = listing_step['steps'][0]['status'] if 'status' in listing_step['steps'][0] else 'Red'
         attachment = listing_step['steps'][0]['attachment']
 
@@ -341,8 +341,8 @@ def edit_listing_step(id, step_id):
                 email_body = email_body + "Notes: " + form.notes.data + "<br>"
                 text_body = text_body + "Notes: Updated\n"
             if due_date_changed:
-                email_body = email_body + "Due Date: " + date_time.strftime('%m/%d/%Y %-I:%M %p') + "<br>"
-                text_body = text_body + "Due Date: " + date_time.strftime('%m/%d/%Y %-I:%M %p') + "\n"
+                email_body = email_body + "Scheduled Date: " + pretty_date(date_time) + "<br>"
+                text_body = text_body + "Scheduled Date: " + pretty_date(date_time) + "\n"
             if status_changed:
                 email_body = email_body + "Status: " + form.status.data.capitalize() + "<br>"
                 text_body = text_body + "Status: " + form.status.data.capitalize() + "\n"
