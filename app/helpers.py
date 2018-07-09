@@ -45,7 +45,15 @@ def confirm_token(token):
         return False
     return email
 
+# pretty_date in template/html
 # def pretty_date(value): --> see listing init.py file
+
+# pretty_date in view
+def pretty_date(date_time):
+    if date_time.hour <> 0 or date_time.minute <> 0:
+        return date_time.strftime('%m/%d/%Y %-I:%M %p')
+    else:
+        return date_time.strftime('%m/%d/%Y')
 
 def distro(users, type):
     distro = []

@@ -74,7 +74,6 @@ class User(UserMixin):
             find_by = {'_id': ObjectId(id)}
         elif accounts_realtor:
             find_by = {'account': ObjectId(accounts_realtor), 'role': 'realtor'}
-            print find_by
         else:
             find_by = {'email': email}
 
@@ -150,32 +149,6 @@ class Account(object):
             'create_date': datetime.datetime.now().isoformat(),
             'update_date': datetime.datetime.now().isoformat()
         })
-
-    '''def get(self):
-        return mongo.db.steps.find_one({
-            '_id': ObjectId(id)
-        })
-
-    @staticmethod
-    def all():
-        return mongo.db.steps.find({
-            'user': current_user.get_id(),
-            'active': 'true'
-        })
-
-    @staticmethod
-    def update(id, form):
-        return mongo.db.steps.update_one(
-            {'_id': ObjectId(id)},
-            {'$set': {'name': self.name, 'update_date': datetime.datetime.now().isoformat()}
-        }, upsert=False)
-
-    @staticmethod
-    def delete(id):
-        return mongo.db.steps.update_one(
-            {'_id': ObjectId(id)},
-            {'$set': {'active': 'false'}
-        }, upsert=False)'''
 
 
 class Step(object):

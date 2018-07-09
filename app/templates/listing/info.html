@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block body %}
+
+<div class="col-md-6 offset-md-3 pt-5">
+  <!-- form card login with validation feedback -->
+  <div class="card card-outline-secondary">
+      <div class="card-header">
+          <h3 class="mb-0 d-inline-block">Add/Edit Contact Info</h3>
+      </div>
+      <div class="card-body">
+          <form class="form" role="form" autocomplete="off" novalidate="" method="POST">
+              {{ form.hidden_tag() }}
+              <div class="form-row mb-3">
+                <div class="col">
+                  {{ form.info (class_="form-control")}}
+                </div>
+              </div>
+              <button type="submit" class="btn btn-secondary float-right" id="btnLogin">Save</button>
+          </form>
+      </div>
+      <!--/card-body-->
+  </div>
+  <!-- /form card login -->
+</div>
+
+{% endblock %}
