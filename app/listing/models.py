@@ -183,8 +183,6 @@ class ListingStep(object):
         if attachment is None:
             attachment = ListingStep.get(id, step_id)['steps'][0]['attachment']
 
-        print due_date
-
         return mongo.db.listings.update_one({
             '_id': ObjectId(id),
             'steps._id': ObjectId(step_id)

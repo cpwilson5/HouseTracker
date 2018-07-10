@@ -4,7 +4,7 @@ from flask import request, redirect, render_template, url_for, flash, current_ap
 from flask_pymongo import PyMongo
 from .forms import ListingForm, ListingStepForm, InfoForm
 from ..account.forms import InviteForm
-from models import Listing, ListingStep
+from .models import Listing, ListingStep
 from ..account.models import User, Step, Account
 from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
@@ -93,7 +93,7 @@ def edit_listing(id):
         form.state.data = listing['state']
         form.zip.data = listing['zip']
         form.close_date.data = listing['close_date'] if listing['close_date'] else None
-        form.close_time.data = listing['close_date'] if listing['close_date'] and (listing['close_date'].hour <> 0 and listing['close_date'] <> 0) else None
+        form.close_time.data = listing['close_date'] if listing['close_date'] and (listing['close_date'].hour != 0 and listing['close_date'] != 0) else None
         photo = listing['photo'] if 'photo' in listing else None
 
         return render_template('listing/listing.html', id=id, form=form, photo=photo)
@@ -121,7 +121,7 @@ def edit_listing(id):
         else:
             db_close_date = None
 
-        if date_time <> db_close_date and form.close_date.data:
+        if date_time != db_close_date and form.close_date.data:
             # build body of email/text based on what changed and email/text only if changes
             email_body = "You're closing date has been updated to " + pretty_date(date_time) + "<br><br>"
             text_body = "You're closing date has been updated to " + pretty_date(date_time) + ".\n\n"
@@ -270,7 +270,7 @@ def edit_listing_step(id, step_id):
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
         form.due_date.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] else None
-        form.time.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] and (listing_step['steps'][0]['due_date'].hour <> 0 and listing_step['steps'][0]['due_date'] <> 0) else None
+        form.time.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] and (listing_step['steps'][0]['due_date'].hour != 0 and listing_step['steps'][0]['due_date'] != 0) else None
         form.status.data = listing_step['steps'][0]['status'] if 'status' in listing_step['steps'][0] else 'Red'
         attachment = listing_step['steps'][0]['attachment']
 

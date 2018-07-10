@@ -2,7 +2,7 @@ from flask import render_template
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app
 from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm, ForgotPasswordForm, ResetPasswordForm
-from models import User, Account, Step
+from .models import User, Account, Step
 from ..configuration.models import AppStep
 from ..helpers import flash_errors, confirm_token, send_invitation, send_reset
 from ..decorators import admin_login_required

@@ -25,7 +25,6 @@ def create_app(config_name):
     login_manager.login_message_category = "danger"
     login_manager.login_view = "account.login"
 
-    from app import models
 
     from .home import home as home_blueprint
     app.register_blueprint(home_blueprint)

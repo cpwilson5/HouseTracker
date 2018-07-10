@@ -4,7 +4,7 @@ from flask import request, redirect, render_template, url_for, flash, current_ap
 from flask_pymongo import PyMongo
 from .forms import AppStepForm
 from ..account.models import User
-from models import AppStep
+from .models import AppStep
 from bson import ObjectId
 from ..helpers import flash_errors
 from ..decorators import admin_login_required
