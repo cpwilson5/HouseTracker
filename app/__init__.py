@@ -3,7 +3,7 @@ from flask import Flask, render_template
 from flask_pymongo import PyMongo
 from flask_login import LoginManager
 from flask_mail import Mail, Message
-
+from .database import mongo
 
 # local imports
 from config import app_config
@@ -17,7 +17,7 @@ def create_app(config_name):
     app.config.from_object(app_config[config_name])
     app.config.from_pyfile('config.py')
 
-
+    mongo.init_app(app)
     mail.init_app(app)
 
     login_manager.init_app(app)
