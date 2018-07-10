@@ -10,7 +10,7 @@ if __name__ == '__main__':
 
 """
 cd housetracker
-source env/bin/activate
+source venv/bin/activate
 export FLASK_CONFIG=development
 export FLASK_APP=run.py
 export FLASK_DEBUG=true
