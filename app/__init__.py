@@ -3,7 +3,7 @@ from flask import Flask, render_template
 from flask_pymongo import PyMongo
 from flask_login import LoginManager
 from flask_mail import Mail, Message
-from database import mongo
+
 
 # local imports
 from config import app_config
