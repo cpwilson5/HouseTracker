@@ -4,6 +4,7 @@ from flask_pymongo import PyMongo
 from flask_login import LoginManager
 from flask_mail import Mail, Message
 from .database import mongo
+from flask_wtf.csrf import CSRFProtect
 import os
 
 # local imports
@@ -11,11 +12,10 @@ is_prod = os.environ.get('IS_HEROKU', None)
 if not is_prod:
     from config import app_config
 
-print("here is the env" + is_prod)
-
 # db variable initialization
 login_manager = LoginManager()
 mail = Mail()
+csrf = CSRFProtect()
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
@@ -25,6 +25,7 @@ def create_app(config_name):
 
     mongo.init_app(app)
     mail.init_app(app)
+    csrf.init_app(app)
 
     login_manager.init_app(app)
     login_manager.login_message = "You must be logged in to access this page."
