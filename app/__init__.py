@@ -14,7 +14,6 @@ if not is_prod:
     from config import app_config
 
 print(is_prod)
-sys.stdout.flush()
 
 # db variable initialization
 login_manager = LoginManager()
