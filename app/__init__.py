@@ -6,11 +6,15 @@ from flask_mail import Mail, Message
 from .database import mongo
 from flask_wtf.csrf import CSRFProtect
 import os
+import sys
 
 # local imports
 is_prod = os.environ.get('IS_HEROKU', None)
 if not is_prod:
     from config import app_config
+
+print(is_prod)
+sys.stdout.flush()
 
 # db variable initialization
 login_manager = LoginManager()
