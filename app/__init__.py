@@ -11,7 +11,7 @@ is_prod = os.environ.get('IS_HEROKU', None)
 if not is_prod:
     from config import app_config
 
-print(is_prod)
+print("here is the env" + is_prod)
 
 # db variable initialization
 login_manager = LoginManager()
