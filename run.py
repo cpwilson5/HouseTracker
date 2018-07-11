@@ -9,6 +9,7 @@ if __name__ == '__main__':
     app.run()
 
 """
+--> below should automatically happen now when you cd into housetracker <--
 cd housetracker
 source venv/bin/activate
 export FLASK_CONFIG=development

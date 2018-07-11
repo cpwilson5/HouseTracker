@@ -4,9 +4,14 @@ from flask_pymongo import PyMongo
 from flask_login import LoginManager
 from flask_mail import Mail, Message
 from .database import mongo
+import os
 
 # local imports
-from config import app_config
+is_prod = os.environ.get('IS_HEROKU', None)
+if not is_prod:
+    from config import app_config
+
+print(is_prod)
 
 # db variable initialization
 login_manager = LoginManager()
@@ -14,8 +19,9 @@ mail = Mail()
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(app_config[config_name])
-    app.config.from_pyfile('config.py')
+    if not is_prod:
+        app.config.from_object(app_config[config_name])
+        app.config.from_pyfile('config.py')
 
     mongo.init_app(app)
     mail.init_app(app)
@@ -24,7 +30,6 @@ def create_app(config_name):
     login_manager.login_message = "You must be logged in to access this page."
     login_manager.login_message_category = "danger"
     login_manager.login_view = "account.login"
-
 
     from .home import home as home_blueprint
     app.register_blueprint(home_blueprint)
