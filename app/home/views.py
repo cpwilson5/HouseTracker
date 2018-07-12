@@ -11,8 +11,8 @@ def homepage():
     Render the homepage template on the / route
     """
     print("hey")
-    print(IS_HEROKU)
-    print(SECRET_KEY)
+    print(os.environ.get('IS_HEROKU'))
+    print(os.environ.get('SECRET_KEY'))
     return render_template('home/index.html', title="Welcome")
 
 @home.route('/features')

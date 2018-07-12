@@ -17,8 +17,8 @@ def s3_upload(source_file, upload_dir=None, acl='public-read'):
     destination_filename = uuid4().hex + source_extension
 
     # Connect to S3 and upload file.
-    conn = boto.connect_s3(os.environ.get["S3_KEY"], os.environ.get["S3_SECRET"])
-    b = conn.get_bucket(os.environ.get["S3_BUCKET"])
+    conn = boto.connect_s3(os.environ.get('S3_KEY'), os.environ.get('S3_SECRET'))
+    b = conn.get_bucket(os.environ.get('S3_BUCKET'))
 
     #uncomment if we want to start using folders
     sml = b.new_key("/".join([upload_dir, destination_filename]))
@@ -29,8 +29,8 @@ def s3_upload(source_file, upload_dir=None, acl='public-read'):
 
 def s3_retrieve(key, upload_dir=None, acl='public-read'):
     # Connect to S3 and get file.
-    conn = boto.connect_s3(os.environ.get["S3_KEY"], os.environ.get["S3_SECRET"])
-    b = conn.get_bucket(os.environ.get["S3_BUCKET"])
+    conn = boto.connect_s3(os.environ.get('S3_KEY'), os.environ.get('S3_SECRET'))
+    b = conn.get_bucket(os.environ.get('S3_BUCKET'))
 
     sml = b.get_key("/".join([upload_dir, key]))
     url = sml.generate_url(3600, query_auth=True, force_http=True)
