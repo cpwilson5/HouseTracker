@@ -8,6 +8,7 @@ from twilio import twiml
 from twilio.rest import TwilioRestClient
 from flask_mail import Message
 from app import mail
+import os
 
 def s3_upload(source_file, upload_dir=None, acl='public-read'):
     source_filename = secure_filename(source_file.data.filename)
