@@ -3,6 +3,7 @@ from flask import current_app as app
 from itsdangerous import URLSafeSerializer
 from .utils import send_email
 import re
+import os
 
 def flash_errors(form):
     """Flashes form errors"""
@@ -31,15 +32,15 @@ def send_reset(email):
     send_email([email], subject, html)
 
 def generate_confirmation_token(email):
-    serializer = URLSafeSerializer(app.config['SECRET_KEY'])
-    return serializer.dumps(email, salt=app.config['SECURITY_PASSWORD_SALT'])
+    serializer = URLSafeSerializer(os.environ.get['SECRET_KEY'])
+    return serializer.dumps(email, salt=os.environ.get['SECURITY_PASSWORD_SALT'])
 
 def confirm_token(token):
-    serializer = URLSafeSerializer(app.config['SECRET_KEY'])
+    serializer = URLSafeSerializer(os.environ.get['SECRET_KEY'])
     try:
         email = serializer.loads(
             token,
-            salt=app.config['SECURITY_PASSWORD_SALT'],
+            salt=os.environ.get['SECURITY_PASSWORD_SALT'],
         )
     except:
         return False

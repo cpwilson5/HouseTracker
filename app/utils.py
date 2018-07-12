@@ -16,8 +16,8 @@ def s3_upload(source_file, upload_dir=None, acl='public-read'):
     destination_filename = uuid4().hex + source_extension
 
     # Connect to S3 and upload file.
-    conn = boto.connect_s3(app.config["S3_KEY"], app.config["S3_SECRET"])
-    b = conn.get_bucket(app.config["S3_BUCKET"])
+    conn = boto.connect_s3(os.environ.get["S3_KEY"], os.environ.get["S3_SECRET"])
+    b = conn.get_bucket(os.environ.get["S3_BUCKET"])
 
     #uncomment if we want to start using folders
     sml = b.new_key("/".join([upload_dir, destination_filename]))
@@ -28,8 +28,8 @@ def s3_upload(source_file, upload_dir=None, acl='public-read'):
 
 def s3_retrieve(key, upload_dir=None, acl='public-read'):
     # Connect to S3 and get file.
-    conn = boto.connect_s3(app.config["S3_KEY"], app.config["S3_SECRET"])
-    b = conn.get_bucket(app.config["S3_BUCKET"])
+    conn = boto.connect_s3(os.environ.get["S3_KEY"], os.environ.get["S3_SECRET"])
+    b = conn.get_bucket(os.environ.get["S3_BUCKET"])
 
     sml = b.get_key("/".join([upload_dir, key]))
     url = sml.generate_url(3600, query_auth=True, force_http=True)
@@ -47,9 +47,9 @@ def send_email(recipients, subject, body):
     mail.send(msg)
 
 def send_sms(to_numbers, body):
-    account_sid = app.config['TWILIO_ACCOUNT_SID']
-    auth_token = app.config['TWILIO_AUTH_TOKEN']
-    twilio_number = app.config['TWILIO_NUMBER']
+    account_sid = os.environ.get['TWILIO_ACCOUNT_SID']
+    auth_token = os.environ.get['TWILIO_AUTH_TOKEN']
+    twilio_number = os.environ.get['TWILIO_NUMBER']
     client = TwilioRestClient(account_sid, auth_token)
     for to_number in to_numbers:
         client.messages.create(to=to_number,from_=twilio_number,body=body)
