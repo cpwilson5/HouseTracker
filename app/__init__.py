@@ -13,7 +13,7 @@ is_prod = os.environ.get('IS_HEROKU', None)
 if not is_prod:
     from config import app_config
 
-print(is_prod)
+print(app.config['myname'])
 
 # db variable initialization
 login_manager = LoginManager()
@@ -24,7 +24,7 @@ def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
     if not is_prod:
         app.config.from_object(app_config[config_name])
-        app.config.from_pyfile('config.py')
+        #app.config.from_pyfile('config.py')
 
     mongo.init_app(app)
     mail.init_app(app)
