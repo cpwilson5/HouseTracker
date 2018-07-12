@@ -28,6 +28,8 @@ def create_app(config_name):
     mail.init_app(app)
     csrf.init_app(app)
 
+    app.config.update(SECRET_KEY = os.environ.get('SECRET_KEY'))
+
     login_manager.init_app(app)
     login_manager.login_message = "You must be logged in to access this page."
     login_manager.login_message_category = "danger"
