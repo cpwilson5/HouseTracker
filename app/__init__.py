@@ -22,9 +22,7 @@ def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
     if not is_prod:
         app.config.from_object(app_config[config_name])
-        #app.config.from_pyfile('config.py')
-
-    print(app.config['myname'])
+        app.config.from_pyfile('config.py')
 
     mongo.init_app(app)
     mail.init_app(app)
