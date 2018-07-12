@@ -2,6 +2,7 @@ from flask import render_template
 from flask_login import login_required
 from flask_pymongo import PyMongo
 from ..helpers import flash_errors
+import os
 
 from . import home
 
