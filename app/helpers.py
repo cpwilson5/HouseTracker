@@ -33,14 +33,14 @@ def send_reset(email):
 
 def generate_confirmation_token(email):
     serializer = URLSafeSerializer(os.environ.get['SECRET_KEY'])
-    return serializer.dumps(email, salt=os.environ.get['SECURITY_PASSWORD_SALT'])
+    return serializer.dumps(email, salt=os.environ.get['MAIL_SECURITY_PASSWORD_SALT'])
 
 def confirm_token(token):
     serializer = URLSafeSerializer(os.environ.get['SECRET_KEY'])
     try:
         email = serializer.loads(
             token,
-            salt=os.environ.get['SECURITY_PASSWORD_SALT'],
+            salt=os.environ.get['MAIL_SECURITY_PASSWORD_SALT'],
         )
     except:
         return False
