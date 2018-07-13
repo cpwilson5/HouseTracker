@@ -11,8 +11,7 @@ import sys
 from config import app_config
 
 # determine environment
-#config = os.environ.get('config', 'development')
-#print(config)
+config = os.environ.get('CONFIG', 'development')
 
 # db variable initialization
 login_manager = LoginManager()
@@ -21,7 +20,7 @@ csrf = CSRFProtect()
 
 def create_app(config_name):  ## config_name is legacy from when using the local flask server
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(app_config['development'])
+    app.config.from_object(app_config[config])
     #app.config.from_pyfile('config.py')
 
     mongo.init_app(app)
