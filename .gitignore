@@ -1,5 +1,6 @@
 # Specific to my project
 config-old.py
+.env-dev
 *.pyc
 
 # Byte-compiled / optimized / DLL files
