@@ -36,7 +36,7 @@
       <a href="{{ url_for('listing.listing_steps', id=listing._id) }}" class="card-block clearfix">
         <div class="card-header">
            <span class="font-weight-bold text-uppercase">{{ listing.name }}</span>
-           <span class="text-success float-right">{{ listing.close_date | pretty_date("%B %-d")}}</span>
+           {% if listing.close_date %}<span class="text-success float-right">{{ listing.close_date | pretty_date("%B %-d")}}</span>{% endif %}
          </div>
         <div class="progress" style="height: 10px;">
           {% set complete = listing.steps | selectattr("complete_date") | list | count %}
