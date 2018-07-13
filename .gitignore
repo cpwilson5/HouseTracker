@@ -1,5 +1,6 @@
 # Specific to my project
 config.py
+keys.py
 *.pyc
 
 # Byte-compiled / optimized / DLL files

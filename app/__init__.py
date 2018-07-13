@@ -8,10 +8,10 @@ from flask_wtf.csrf import CSRFProtect
 import os
 import sys
 
-# local imports
-is_prod = os.environ.get('IS_HEROKU', None)
-if not is_prod:
-    from config import app_config
+from config import app_config
+
+# determine environment
+config_name = os.environ.get('config', 'development')
 
 # db variable initialization
 login_manager = LoginManager()
@@ -20,25 +20,12 @@ csrf = CSRFProtect()
 
 def create_app(config_name):
     app = Flask(__name__, instance_relative_config=True)
-    if not is_prod:
-        app.config.from_object(app_config[config_name])
-        #app.config.from_pyfile('config.py')
-
-    app.config['MONGO_DBNAME'] = os.environ.get('MONGO_DBNAME')
-    app.config['MONGO_URI'] = os.environ.get('MONGO_URI')
-
-    app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
-    app.config['MAIL_PORT'] = os.environ.get('MAIL_PORT')
-    app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS')
-    app.config['MAIL_USE_SSL'] = os.environ.get('MAIL_USE_SSL')
-    app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-    app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+    app.config.from_object(app_config[config_name])
+    #app.config.from_pyfile('config.py')
 
     mongo.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
-
-    app.config.update(SECRET_KEY = os.environ.get('SECRET_KEY'))
 
     login_manager.init_app(app)
     login_manager.login_message = "You must be logged in to access this page."
