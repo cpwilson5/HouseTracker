@@ -11,16 +11,17 @@ import sys
 from config import app_config
 
 # determine environment
-config_name = os.environ.get('config', 'development')
+#config = os.environ.get('config', 'development')
+#print(config)
 
 # db variable initialization
 login_manager = LoginManager()
 mail = Mail()
 csrf = CSRFProtect()
 
-def create_app(config_name):
+def create_app(config_name):  ## config_name is legacy from when using the local flask server
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(app_config[config_name])
+    app.config.from_object(app_config['development'])
     #app.config.from_pyfile('config.py')
 
     mongo.init_app(app)
