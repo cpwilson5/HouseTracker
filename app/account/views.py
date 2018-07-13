@@ -24,8 +24,6 @@ def register():
 
             login_user(User(str(user_id),form.email.data,account_id,superuser=False,active=True))
 
-            print(os.environ.get('MONGO_URI'))
-
             # Add default app steps to new users
             app_steps = AppStep.all()
             app_steps_count = app_steps.count(True)

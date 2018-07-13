@@ -24,13 +24,14 @@ def create_app(config_name):
         app.config.from_object(app_config[config_name])
         #app.config.from_pyfile('config.py')
 
+    app.config['MONGO_DBNAME'] = os.environ.get('MONGO_DBNAME')
+    app.config['MONGO_URI'] = os.environ.get('MONGO_URI')
+
     mongo.init_app(app)
     mail.init_app(app)
     csrf.init_app(app)
 
     app.config.update(SECRET_KEY = os.environ.get('SECRET_KEY'))
-    app.config['MONGO_DBNAME'] = os.environ.get('MONGO_DBNAME')
-    app.config['MONGO_URI'] = os.environ.get('MONGO_URI')
 
     login_manager.init_app(app)
     login_manager.login_message = "You must be logged in to access this page."
