@@ -62,7 +62,7 @@ def distro(users, type):
     for user in users:
         if type == 'cell':
             cell_number = user[type].encode("utf-8") #convert unicode to string
-            value = re.sub('[^0-9]', '', cell_number) #strip out non-numerics
+            value = re.sub(b'[^0-9]', '', cell_number) #strip out non-numerics
         else:
             value = user[type]
 

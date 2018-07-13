@@ -5,7 +5,7 @@ from flask import current_app as app
 from werkzeug.utils import secure_filename
 from flask import Flask, request
 from twilio import twiml
-from twilio.rest import TwilioRestClient
+from twilio.rest import Client
 from flask_mail import Message
 from app import mail
 import os
@@ -51,6 +51,6 @@ def send_sms(to_numbers, body):
     account_sid = app.config['TWILIO_ACCOUNT_SID']
     auth_token = app.config['TWILIO_AUTH_TOKEN']
     twilio_number = app.config['TWILIO_NUMBER']
-    client = TwilioRestClient(account_sid, auth_token)
+    client = Client(account_sid, auth_token)
     for to_number in to_numbers:
         client.messages.create(to=to_number,from_=twilio_number,body=body)
