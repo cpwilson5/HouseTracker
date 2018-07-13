@@ -1,5 +1,4 @@
 # Specific to my project
-config.py
 keys.py
 *.pyc
 
