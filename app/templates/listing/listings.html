@@ -21,9 +21,10 @@
     <div class="col">
       <a class="btn btn-outline-secondary btn-md mb-4" href="{{ url_for('listing.add_listing') }}">+ Add</a>
     </div>
-    <div class="col">
-      <div class="dropdown">
-        <button class="btn btn-outline-secondary dropdown-toggle mr-2 float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <div class="col-8">
+      {% if completed == False %}
+      <div class="dropdown1">
+        <button class="btn btn-outline-secondary dropdown-toggle float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Sort
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -33,7 +34,8 @@
           <a class="dropdown-item {% if request.args.get('sort') == 'updated' or not request.args.get('sort')%} active {% endif %}" href="?sort=updated">Recently updated</a>
         </div>
       </div>
-      <div class="dropdown">
+      {% endif %}
+      <div class="dropdown2">
         <button class="btn btn-outline-secondary dropdown-toggle mr-2 float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Status
         </button>
