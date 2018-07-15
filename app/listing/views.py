@@ -23,17 +23,22 @@ def listings():
     if request.args.get('sort') == 'closing':
         sort = 'close_date'
         order = 1
-    elif request.args.get('sort') == 'updated':
-        sort = 'update_date'
+    elif request.args.get('sort') == 'created':
+        sort = 'create_date'
         order = -1
     elif request.args.get('sort') == 'inactive':
         sort = 'update_date'
         order = 1
     else:
-        sort = 'create_date'
+        sort = 'update_date'
         order = -1
 
-    listings = Listing.all(active=True, complete=False, sort=sort, order=order)
+    if request.args.get('completed') == 'true':
+        complete = True
+    else:
+        complete = False
+
+    listings = Listing.all(active=True, complete=complete, sort=sort, order=order)
     return render_template('listing/listings.html', listings=listings, title="Welcome")
 
 @listing.route('/listings/add', methods=['GET', 'POST'])
@@ -185,6 +190,13 @@ def complete_listing(id):
     Listing.complete(id)
     return redirect(url_for('listing.listings'))
 
+@listing.route('/listings/reactivate/<string:id>', methods=['GET', 'POST'])
+@login_required
+@admin_login_required
+def reactivate_listing(id):
+    Listing.reactivate(id)
+    return redirect(url_for('listing.listings'))
+
 @listing.route('/listings/<string:id>/steps')
 @login_required
 @admin_login_required
@@ -326,8 +338,6 @@ def edit_listing_step(id, step_id):
         if old_date and new_date:
             # compare dates
             #1 if the same don't do anything
-            print
-
             if date_time == listing_step['steps'][0]['due_date'].replace(tzinfo=None):
                 due_date_changed = False
             #2 otherwise we need to send alert

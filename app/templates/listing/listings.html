@@ -1,9 +1,15 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
+{% set completed = False %}
+{% if request.args.get('completed') == 'true': %}
+    {% set completed = True %}
+{% endif %}
+
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
   <h1 class="text-uppercase">Listings</h1>
+  {% if completed == True %}<p class="lead">Completed in the last 30 days</p>{% endif %}
 </div>
 
 {% endblock %}
@@ -21,10 +27,19 @@
           Sort
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" href="?sort=closing">Closing date</a>
-          <a class="dropdown-item" href="?sort=inactive">Oldest update</a>
-          <a class="dropdown-item" href="?sort=created">Recently created</a>
-          <a class="dropdown-item" href="?sort=updated">Recently updated</a>
+          <a class="dropdown-item {% if request.args.get('sort') == 'closing' %} active {% endif %}" href="?sort=closing">Closing date</a>
+          <a class="dropdown-item {% if request.args.get('sort') == 'inactive' %} active {% endif %}" href="?sort=inactive">Oldest update</a>
+          <a class="dropdown-item {% if request.args.get('sort') == 'created' %} active {% endif %}" href="?sort=created">Recently created</a>
+          <a class="dropdown-item {% if request.args.get('sort') == 'updated' or not request.args.get('sort')%} active {% endif %}" href="?sort=updated">Recently updated</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="btn btn-outline-secondary dropdown-toggle mr-2 float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Status
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item {% if completed == False %} active {% endif %}" href="?completed=false">Active</a>
+          <a class="dropdown-item {% if completed == True %} active {% endif %}" href="?completed=true">Completed</a>
         </div>
       </div>
     </div>
@@ -33,10 +48,16 @@
   <div class="card-deck">
   {% for listing in listings %}
     <div class="card mb-4 inline-block">
-      <a href="{{ url_for('listing.listing_steps', id=listing._id) }}" class="card-block clearfix">
+      {% if completed == False %}<a href="{{ url_for('listing.listing_steps', id=listing._id) }}" class="card-block clearfix">{% endif %}
         <div class="card-header">
            <span class="font-weight-bold text-uppercase">{{ listing.name }}</span>
-           {% if listing.close_date %}<span class="text-success float-right">{{ listing.close_date | pretty_date("%B %-d")}}</span>{% endif %}
+           {% if completed == True %}
+              <span class="float-right"><a href="{{ url_for('listing.reactivate_listing', id=listing._id) }}" class="btn btn-outline-secondary btn-sm float-right">Reactivate</a></span>
+           {% elif listing.close_date %}
+              <span class="text-success float-right">{{ listing.close_date | pretty_date("%B %-d")}}</span>
+           {% else %}
+              <span class="text-success float-right">Closing date pending</span>
+           {% endif %}
          </div>
         <div class="progress" style="height: 10px;">
           {% set complete = listing.steps | selectattr("complete_date") | list | count %}
@@ -62,7 +83,9 @@
           </p>
         </div>
         <ul class="list-group list-group-flush">
-          {% if listing.steps | selectattr("active") | rejectattr("complete_date") | first | count > 1 %}
+          {% if completed == True %}
+            <li class="list-group-item d-flex justify-content-between"></li>
+          {% elif listing.steps | selectattr("active") | rejectattr("complete_date") | first | count > 1 %}
             <li class="list-group-item d-inline-block text-truncate"><b>Next Step:</b> {{ (listing.steps | selectattr("active") | rejectattr("complete_date") | first).name }}</li>
           {% else %}
             <li class="list-group-item d-flex justify-content-between"><b>Closed</b></li>

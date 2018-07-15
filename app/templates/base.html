@@ -41,7 +41,7 @@
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 {% if current_user.get_role() != 'client' %}
                 <a class="dropdown-item" href="{{ url_for('account.admins') }}">Team Members</a>
-                <a class="dropdown-item" href="{{ url_for('account.steps') }}">Listing Template</a>
+                <a class="dropdown-item" href="{{ url_for('account.steps') }}">Listing Templates</a>
                 <div class="dropdown-divider"></div>
                 {% endif %}
                 <a class="dropdown-item" href="{{ url_for('account.user') }}">My Account</a>

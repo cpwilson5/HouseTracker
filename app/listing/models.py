@@ -46,12 +46,22 @@ class Listing(object):
         })
 
     @staticmethod
-    def all(active=True, complete=False, sort='create_date', order=-1):
-        return mongo.db.listings.find({
-            'account': current_user.get_account(),
-            'active': active,
-            'complete_date' : { '$exists': complete }
-        }).sort(sort,order)
+    def all(active=True, complete=False, sort='update_date', order=-1):
+        if complete == False: #this is the default and the listings results
+            return mongo.db.listings.find({
+                'account': current_user.get_account(),
+                'active': active,
+                'complete_date' : { '$exists': complete }
+            }).sort(sort,order)
+
+        if complete == True: #this limits to the last 30 days until we build paging
+            thirty_days_before = (datetime.datetime.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+
+            return mongo.db.listings.find({
+                'account': current_user.get_account(),
+                'active': active,
+                'complete_date' : { '$gte' : thirty_days_before }
+            }).sort(sort,order)
 
     @staticmethod
     def update(id, name, address1, address2, city, state, zip, close_date, photo):
@@ -102,6 +112,19 @@ class Listing(object):
                 'complete_date': datetime.datetime.now().isoformat(),
                 'update_date': datetime.datetime.now().isoformat()
             }
+        }, upsert=False)
+
+    @staticmethod
+    def reactivate(id):
+        return mongo.db.listings.update_one(
+            {'_id': ObjectId(id)},
+            {
+                '$unset': {
+                    'complete_date': '',
+                },
+                '$set': {
+                    'update_date': datetime.datetime.now().isoformat()
+                }
         }, upsert=False)
 
 

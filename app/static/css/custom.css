@@ -88,6 +88,13 @@ at the end */
   border-color: #28a745;
 }
 
+/* make the dropdown active text green (not blue) */
+.dropdown-item.active, .dropdown-item:active {
+  color: #28a745;
+  background-color: #fff;
+  border-color: #28a745;
+}
+
 /* Browser specific (not valid) styles to make preformatted text wrap - used for other contact section */
 pre {
  white-space: pre-wrap;       /* css-3 */
