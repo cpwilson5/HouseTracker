@@ -30,7 +30,7 @@ def add_app_step():
         return redirect(url_for('configuration.app_steps'))
     else:
         flash_errors(form)
-    return render_template('configuration/appstep.html', form=form)
+    return render_template('configuration/appstep.html', step=[], form=form)
 
 @configuration.route('/appsteps/edit/<string:id>', methods=['GET', 'POST'])
 @login_required

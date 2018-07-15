@@ -13,7 +13,7 @@
         <div class="card-header">
             <h3 class="mb-0 d-inline-block">Listing Step</h3>
             {% if id %}
-            <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_listing_step', id=id, step_id=step_id) }}" role="button">Delete</a>
+            <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
             {% endif %}
         </div>
         <div class="card-body">
@@ -63,7 +63,7 @@
                 <div class="form-group row">
                     <div class="col-lg-12" text-right"">
                       {% if id %}
-                      <a class="btn btn-outline-secondary" href="{{ url_for('listing.complete_listing_step', id=id, step_id=step_id) }}" role="button">Complete</a>
+                      <a class="btn btn-outline-secondary" href="#" role="button" data-toggle="modal" data-target="#completeModal">Complete</a>
                       {% endif %}
                       <input type="submit" class="btn btn-secondary float-right" value="Save">
                     </div>
@@ -71,6 +71,49 @@
             </form>
         </div>
     </div>
+</div>
+
+<!-- Complete Confirm Modal -->
+<div class="modal fade" id="completeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        By marking this step complete, it will be hidden from the listing.<br><br>
+        Click continue to complete the step.
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-secondary" href="{{ url_for('listing.complete_listing_step', id=id, step_id=step_id) }}" role="button">Continue</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        By deleting this listing step, you will remove this step from the listing.<br><br>
+        To complete a listing step, click the "complete" button on the edit page rather than the "delete" button.<br><br>
+        Click delete to remove this step from your listing.
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_listing_step', id=id, step_id=step_id) }}" role="button">Delete</a>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

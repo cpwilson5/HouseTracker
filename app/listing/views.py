@@ -181,6 +181,7 @@ def get_photo(photo):
 @admin_login_required
 def delete_listing(id):
     Listing.delete(id)
+    flash("Listing deleted", category='success')
     return redirect(url_for('listing.listings'))
 
 @listing.route('/listings/complete/<string:id>', methods=['GET', 'POST'])
@@ -188,6 +189,7 @@ def delete_listing(id):
 @admin_login_required
 def complete_listing(id):
     Listing.complete(id)
+    flash("Congrats!  Your listing has been closed", category='success')
     return redirect(url_for('listing.listings'))
 
 @listing.route('/listings/reactivate/<string:id>', methods=['GET', 'POST'])
@@ -195,6 +197,7 @@ def complete_listing(id):
 @admin_login_required
 def reactivate_listing(id):
     Listing.reactivate(id)
+    flash("Listing has been reactivated", category='success')
     return redirect(url_for('listing.listings'))
 
 @listing.route('/listings/<string:id>/steps')

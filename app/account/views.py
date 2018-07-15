@@ -83,7 +83,7 @@ def add_step():
         return redirect(url_for('account.steps'))
     else:
         flash_errors(form)
-    return render_template('account/step.html', form=form)
+    return render_template('account/step.html', step=[], form=form)
 
 
 @account.route('/steps/edit/<string:id>', methods=['GET', 'POST'])
