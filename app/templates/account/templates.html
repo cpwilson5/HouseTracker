@@ -1,0 +1,55 @@
+<!-- javascript sort will require a csrf token so need to set it here -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block header %}
+<div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+  <h1 class="text-uppercase">Templates</h1>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <a class="btn btn-outline-secondary btn-md mb-4" href="{{ url_for('account.add_template') }}">+ Add</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<!-- Custom styles for this template -->
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+
+      {% if templates.count() > 0 %}
+      <div class="card border-bottom-0 border-left-0 border-right-0 border-top-0">
+          <div class="card-body">
+            <strong>
+              <span class="col-md-10">Name</span>
+              <span class="col-auto float-right">Steps</span>
+            </strong>
+          </div>
+        </a>
+      </div>
+      {% endif %}
+
+      <div id="sortable">
+      {% for template in templates %}
+        <div id="{{ template._id }}" class="card mb-4">
+          <a href="{{ url_for('account.edit_template', id=template._id) }}" class="card-block clearfix">
+            <div class="card-body">
+              <span class="col-md-10">{{ template.name }}</span>
+              <span class="col-auto float-right">count of steps should go here</span>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
