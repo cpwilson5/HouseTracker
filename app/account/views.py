@@ -113,7 +113,7 @@ def delete_template(id):
     return redirect(url_for('account.templates'))
 
 
-### Steps ###
+### Template Steps ###
 
 @account.route('/templates/<string:id>/steps')
 @login_required
