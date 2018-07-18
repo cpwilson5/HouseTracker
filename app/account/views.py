@@ -166,7 +166,7 @@ def delete_template_step(id, step_id):
 @account.route('/templates/<string:id>/steps/sort', methods=['POST'])
 @login_required
 def sort_template_step(id):
-    TemplateStep.sort(id, current_user.get_account(), request.form['order'])
+    TemplateStep.sort(id, request.form['order'])
     return json.dumps({'status':'Successfully sorted'})
 
 
