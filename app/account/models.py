@@ -196,17 +196,16 @@ class Template(object):
         }, upsert=False)
 
 
-class Step(object):
-    def __init__(self, template_id, name, notes, days_before_close, account):
+class TemplateStep(object):
+    def __init__(self, template_id, name, notes, days_before_close):
         self.template_id = template_id
         self.name = name
         self.notes = notes
         self.days_before_close = days_before_close
-        self.account = account
 
     def add(self):
-        listing = Template.get(self.template_id)
-        next_order = template['order'] + 1 if 'order' in listing else 1
+        template = Template.get(self.template_id)
+        next_order = template['order'] + 1 if 'order' in template else 1
 
         return mongo.db.templates.update_one({
             '_id': ObjectId(self.template_id)
@@ -242,7 +241,7 @@ class Step(object):
             { '$unwind' : '$steps' },
             { '$match' : {
                 '_id' : ObjectId(id),
-                'steps.active': active,
+                'steps.active': True,
                 }
             },
             { '$sort' : { 'steps.order' : 1 } }

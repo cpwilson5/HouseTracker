@@ -24,29 +24,38 @@
   <div class="row">
     <div class="col-md-8 offset-md-2">
 
-      {% if templates.count() > 0 %}
-      <div class="card border-bottom-0 border-left-0 border-right-0 border-top-0">
-          <div class="card-body">
-            <strong>
-              <span class="col-md-10">Name</span>
-              <span class="col-auto float-right">Steps</span>
-            </strong>
-          </div>
-        </a>
-      </div>
-      {% endif %}
-
       <div id="sortable">
       {% for template in templates %}
         <div id="{{ template._id }}" class="card mb-4">
-          <a href="{{ url_for('account.edit_template', id=template._id) }}" class="card-block clearfix">
+          <a href="{{ url_for('account.template_steps', id=template._id) }}" class="card-block">
             <div class="card-body">
-              <span class="col-md-10">{{ template.name }}</span>
-              <span class="col-auto float-right">count of steps should go here</span>
+              <span class="col-md-8">{{ template.name }}</span>
+              <object><a style="color: #000;" class="float-right" href="#" role="button" data-id={{template._id}} data-toggle="modal" data-target="#deleteTemplateModal"><span class="oi oi-trash"></span></a></object>
             </div>
           </a>
         </div>
       {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteTemplateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        By deleting this template, this template will no longer be available to be used for new listings.<br><br>
+        Click delete to remove this template.
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-danger float-right" id="deleteTemplate" href="{{ url_for('account.delete_template', id=javascript_appends_this) }}" role="button">Delete</a>
       </div>
     </div>
   </div>

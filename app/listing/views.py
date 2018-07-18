@@ -5,7 +5,7 @@ from flask_pymongo import PyMongo
 from .forms import ListingForm, ListingStepForm, InfoForm
 from ..account.forms import InviteForm
 from .models import Listing, ListingStep
-from ..account.models import User, Step, Account
+from ..account.models import User, TemplateStep, Account
 from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
 from ..helpers import flash_errors, confirm_token, send_invitation, distro, pretty_date
