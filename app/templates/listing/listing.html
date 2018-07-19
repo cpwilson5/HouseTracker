@@ -77,6 +77,12 @@
                     {% if id %}
                     <a class="btn btn-outline-secondary" href="#" role="button" data-toggle="modal" data-target="#completeModal">Complete</a>
                     {% endif %}
+                    {% if not id %}
+                    <div class="col-md-3 mb-3">
+                      <label class="form-control-label">Templates</label>
+                      {{ form.templates (class_="form-control")}}
+                    </div>
+                    {% endif %}
                     <input type="submit" class="btn btn-secondary float-right" value="Save">
                   </div>
                 </div>

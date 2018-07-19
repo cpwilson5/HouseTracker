@@ -5,7 +5,7 @@ from flask_pymongo import PyMongo
 from .forms import ListingForm, ListingStepForm, InfoForm
 from ..account.forms import InviteForm
 from .models import Listing, ListingStep
-from ..account.models import User, TemplateStep, Account
+from ..account.models import User, Template, TemplateStep, Account
 from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
 from ..helpers import flash_errors, confirm_token, send_invitation, distro, pretty_date
@@ -46,6 +46,10 @@ def listings():
 @admin_login_required
 def add_listing():
     form = ListingForm()
+    if request.method == 'GET':
+        templates = Template.all(current_user.get_account())
+        form.templates.choices = [(template['_id'], template['name']) for template in templates]
+
     if request.method == 'POST' and form.validate_on_submit():
         if form.photo.data:
             s3_filepath = s3_upload(form.photo, 'photo')
@@ -78,7 +82,7 @@ def add_listing():
             listing_step = ListingStep(listing_id, step['name'], step['notes'], due_date=due_date, status='red')
             listing_step.add()
         flash("Successfully created %s with %s steps" % (form.name.data, steps_count), category='success')
-        return redirect(url_for('listing.listing_steps', id=listing_id))
+        return redirect(url_for('listing.listing_steps', id=listing_id, templates=templates))
     else:
         flash_errors(form)
     return render_template('listing/listing.html', form=form)

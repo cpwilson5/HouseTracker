@@ -176,7 +176,7 @@ class Template(object):
         return mongo.db.templates.find({
             'account': account,
             'active': 'true'
-        })
+        }).sort('name',1)
 
     @staticmethod
     def update(id, name):

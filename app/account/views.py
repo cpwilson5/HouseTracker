@@ -115,13 +115,26 @@ def delete_template(id):
 
 ### Template Steps ###
 
-@account.route('/templates/<string:id>/steps')
+@account.route('/templates/<string:id>/steps', methods=['GET', 'POST'])
 @login_required
 @admin_login_required
 def template_steps(id):
     template = Template.get(id)
     template_steps = TemplateStep.all(id)
-    return render_template('account/templatesteps.html', id=id, template=template, template_steps=template_steps)
+
+    # this is edit template but we're doing it in a modal since it's just a name
+    form = TemplateForm()
+
+    if request.method == 'GET':
+        form.name.data = template['name']
+
+    if request.method == 'POST' and form.validate_on_submit():
+        Template.update(id, form.name.data)
+        return redirect(url_for('account.template_steps', id=id))
+    else:
+        flash_errors(form)
+
+    return render_template('account/templatesteps.html', form=form, id=id, template=template, template_steps=template_steps)
 
 @account.route('/templates/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required

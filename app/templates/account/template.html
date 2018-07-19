@@ -13,11 +13,7 @@
   <!-- form card login with validation feedback -->
   <div class="card card-outline-secondary">
       <div class="card-header">
-          <h3 class="mb-0 d-inline-block">Add/Edit Template</h3>
-          <!-- Don't show delete because it's a new template -->
-          {% if template != [] %}
-            <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
-          {% endif %}
+          <h3 class="mb-0 d-inline-block">Add Template</h3>
       </div>
       <div class="card-body">
           <form class="form" role="form" autocomplete="off" id="loginForm" novalidate="" method="POST">
@@ -34,27 +30,6 @@
       <!--/card-body-->
   </div>
   <!-- /form card login -->
-</div>
-
-<!-- Delete Confirm Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        By deleting this template, this template will no longer be available for selection for new listings that are created.<br><br>
-        Click delete to remove this template.
-      </div>
-      <div class="modal-footer">
-        <a class="btn btn-outline-danger float-right" href="{{ url_for('account.delete_template', id=id) }}" role="button">Delete</a>
-      </div>
-    </div>
-  </div>
 </div>
 
 {% endblock %}

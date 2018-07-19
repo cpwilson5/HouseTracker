@@ -5,8 +5,11 @@
 {% block title %}Home{% endblock %}
 
 {% block header %}
-<div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="text-uppercase">{{ template.name }}</h1>
+<div class="row">
+  <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto">
+    <h1 class="text-uppercase template-name" style="display:inline">{{ template.name }}</h1>
+    <a style="color: #28a745;" href="#" role="button"  data-toggle="modal" data-target="#editModal"><span class="oi oi-pencil ml-3 h5"></span></a>
+  </div>
 </div>
 
 <div class="container">
@@ -48,6 +51,34 @@
         </div>
       {% endfor %}
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Confirm Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Template</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form class="form" role="form" autocomplete="off" id="loginForm" novalidate="" method="POST">
+          {{ form.hidden_tag() }}
+          <div class="modal-body">
+            <div class="form-row mb-3">
+            <div class="col">
+              <label for="inputName">Name</label>
+              {{ form.name (class_="form-control")}}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-secondary float-right" id="btnLogin">Save</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
