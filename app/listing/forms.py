@@ -26,7 +26,7 @@ class ListingForm(FlaskForm):
     close_date = DateField('Closing Date', validators=[Optional()])
     close_time = TimeField('Closing Time', validators=[Optional()])
     photo = FileField('Photo', validators=[FileAllowed(['jpg', 'jpeg', 'gif', 'bmp', 'png'], 'Must be JPG, JPEG, GIF, BMP or PNG')])
-    templates = SelectField('Templates', coerce=ObjectId)
+    template = SelectField('Template', coerce=ObjectId)
 
     def validate(self):
         result = True

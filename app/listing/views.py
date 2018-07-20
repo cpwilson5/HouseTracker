@@ -48,7 +48,7 @@ def add_listing():
     form = ListingForm()
     if request.method == 'GET':
         templates = Template.all(current_user.get_account())
-        form.templates.choices = [(template['_id'], template['name']) for template in templates]
+        form.template.choices = [("111111111111111111111111", "Use a template...")] + [(template['_id'], template['name']) for template in templates]
 
     if request.method == 'POST' and form.validate_on_submit():
         if form.photo.data:
@@ -68,21 +68,29 @@ def add_listing():
         date_time, photo=s3_filepath)
         listing_id = listing.add()
 
-        # Add user's steps to new listing
-        steps = Step.all(current_user.get_account())
-        steps_count = steps.count(True)
-        for step in steps:
+        # Add user's template steps to new listing
+        template_steps = list(TemplateStep.all(form.template.data))
+        template_steps_count = template_steps.count(True)
+        for template_step in template_steps:
             # takes the account steps and derives the new date based on the close date
-            if 'days_before_close' in step and form.close_date.data:
-                days_before_close = step['days_before_close']
-                due_date = form.close_date.data - timedelta(days=days_before_close) if days_before_close else None
+            if 'days_before_close' in template_step['steps'] and form.close_date.data:
+                days_before_close = template_step['steps']['days_before_close']
+
+                if days_before_close:
+                    due_date = form.close_date.data - datetime.timedelta(days=days_before_close)
+                    due_date_time = datetime.datetime.combine(due_date, datetime.datetime.min.time())
+                else:
+                    due_date_time = None
             else:
                 due_date = None
 
-            listing_step = ListingStep(listing_id, step['name'], step['notes'], due_date=due_date, status='red')
+            name = template_step['steps']['name'] if 'name' in template_step['steps'] else None
+            notes = template_step['steps']['notes'] if 'notes' in template_step['steps'] else None
+
+            listing_step = ListingStep(listing_id, name=name, notes=notes, due_date=due_date_time, status='red')
             listing_step.add()
-        flash("Successfully created %s with %s steps" % (form.name.data, steps_count), category='success')
-        return redirect(url_for('listing.listing_steps', id=listing_id, templates=templates))
+        flash("Successfully created %s with %s steps" % (form.name.data, template_steps_count), category='success')
+        return redirect(url_for('listing.listing_steps', id=listing_id))
     else:
         flash_errors(form)
     return render_template('listing/listing.html', form=form)
