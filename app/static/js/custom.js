@@ -82,4 +82,4 @@ $(document).ready(function(){
     var templateId = $(event.relatedTarget).data('id');
     $("#deleteTemplate").attr("href", $('#deleteTemplate').attr('href') + templateId);
   });
-});
+}); 
