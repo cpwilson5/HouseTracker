@@ -151,78 +151,144 @@ class Account(object):
         })
 
 
-class Step(object):
-    def __init__(self, name, notes, days_before_close, account):
+class Template(object):
+    def __init__(self, name, account):
         self.name = name
-        self.notes = notes
-        self.days_before_close = days_before_close
         self.account = account
 
     def add(self):
-        next_order = mongo.db.steps.count({
-            'account': self.account,
-            'active': 'true'
-        })
-
-        return mongo.db.steps.insert({
+        return mongo.db.templates.insert({
             'name': self.name,
-            'notes': self.notes,
-            'days_before_close': self.days_before_close,
             'account': self.account,
             'active': 'true',
-            'order': next_order + 1,
             'create_date': datetime.datetime.now().isoformat(),
             'update_date': datetime.datetime.now().isoformat()
         })
 
     @staticmethod
     def get(id):
-        return mongo.db.steps.find_one({
+        return mongo.db.templates.find_one({
             '_id': ObjectId(id)
         })
 
     @staticmethod
     def all(account):
-        return mongo.db.steps.find({
+        return mongo.db.templates.find({
             'account': account,
             'active': 'true'
-        }).sort('order', 1)
+        }).sort('name',1)
 
     @staticmethod
-    def update(id, name, notes, days_before_close):
-        return mongo.db.steps.update_one(
+    def update(id, name):
+        return mongo.db.templates.update_one(
             {'_id': ObjectId(id)},
             {'$set': {
                 'name': name,
-                'notes': notes,
-                'days_before_close': days_before_close,
                 'update_date': datetime.datetime.now().isoformat()
                 }
         }, upsert=False)
 
     @staticmethod
     def delete(id):
-        return mongo.db.steps.update_one(
+        return mongo.db.templates.update_one(
             {'_id': ObjectId(id)},
             {'$set': {'active': 'false'}
         }, upsert=False)
 
+
+class TemplateStep(object):
+    def __init__(self, template_id, name, notes, days_before_close):
+        self.template_id = template_id
+        self.name = name
+        self.notes = notes
+        self.days_before_close = days_before_close
+
+    def add(self):
+        template = Template.get(self.template_id)
+        next_order = template['order'] + 1 if 'order' in template else 1
+
+        return mongo.db.templates.update_one({
+            '_id': ObjectId(self.template_id)
+        },{
+            '$set': { 'update_date': datetime.datetime.now().isoformat() },
+            '$inc': {'order': 1}, #increment the listing order count to keep track of # of listing steps
+            '$push': {
+                'steps':
+                {
+                    '_id': ObjectId(),
+                    'name': self.name,
+                    'notes': self.notes,
+                    'days_before_close': self.days_before_close,
+                    'active': True,
+                    'order': next_order, #set the new listing step to the next number
+                    'create_date': datetime.datetime.now().isoformat(),
+                    'update_date': datetime.datetime.now().isoformat()
+                }
+            }
+        }, upsert=False)
+
     @staticmethod
-    def sort(account_id, step_ids):
+    def get(id, step_id):
+        return mongo.db.templates.find_one({
+            '_id': ObjectId(id),
+            'steps._id': ObjectId(step_id)
+        },
+        {'steps.$':1})
+
+    @staticmethod
+    def all(id):
+        return mongo.db.templates.aggregate([
+            { '$unwind' : '$steps' },
+            { '$match' : {
+                '_id' : ObjectId(id),
+                'steps.active': True,
+                }
+            },
+            { '$sort' : { 'steps.order' : 1 } }
+        ])
+
+    @staticmethod
+    def update(id, step_id, name, notes, days_before_close):
+        return mongo.db.templates.update_one({
+            '_id': ObjectId(id),
+            'steps._id': ObjectId(step_id)
+        },{
+            '$set': {
+                'steps.$.name': name,
+                'steps.$.notes': notes,
+                'steps.$.days_before_close': days_before_close,
+                'steps.$.update_date': datetime.datetime.now().isoformat()
+            }
+        }, upsert=False)
+
+    @staticmethod
+    def delete(id, step_id):
+        return mongo.db.templates.update_one({
+            '_id': ObjectId(id),
+            'steps._id': ObjectId(step_id)
+        },{
+            '$set': {
+                'steps.$.active': False,
+                'steps.$.update_date': datetime.datetime.now().isoformat()
+            }
+        }, upsert=False)
+
+    @staticmethod
+    def sort(id, step_ids):
         steps = step_ids.split(',')
         operations = []
         order = 1
 
         for step_id in steps:
             operations.append(UpdateOne({
-                    '_id': ObjectId(step_id),
-                    'account': ObjectId(account_id)
+                    '_id': ObjectId(id),
+                    'steps._id': ObjectId(step_id)
                 },{
                     '$set': {
-                        'order': order
+                        'steps.$.order': order
                     }
                 }, upsert=False))
 
             order += 1
 
-        return mongo.db.steps.bulk_write(operations)
+        return mongo.db.templates.bulk_write(operations)
