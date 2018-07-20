@@ -21,7 +21,10 @@ class RegForm(FlaskForm):
     email_alert = BooleanField('Email alert')
     text_alert = BooleanField('Text alert')
 
-class StepForm(FlaskForm):
+class TemplateForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+
+class TemplateStepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     notes = TextAreaField('Notes', validators=[Optional()])
     days_before_close = IntegerField('Days Before Close', validators=[Optional()])

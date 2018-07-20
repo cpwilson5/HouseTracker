@@ -41,8 +41,9 @@ $(document).ready(function(){
       sortUrl = "/appsteps/sort";
     }
 
-    if (window.location.pathname.split( '/' )[1] == 'steps') {
-      sortUrl = "/steps/sort";
+    if (window.location.pathname.split( '/' )[1] == 'templates') {
+      var template_id = window.location.pathname.split( '/' )[2];
+      sortUrl = "/templates/" + template_id + "/steps/sort";
     }
 
     if (window.location.pathname.split( '/' )[1] == 'listings') {
@@ -73,4 +74,12 @@ $(document).ready(function(){
 // shows tooltips for the whole page
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
+});
+
+// handles passing a variable to a modal on the templates collection/list page so I can use the trash icon
+$(document).ready(function(){
+  $('#deleteTemplateModal').on('show.bs.modal', function (event) {
+    var templateId = $(event.relatedTarget).data('id');
+    $("#deleteTemplate").attr("href", $('#deleteTemplate').attr('href') + templateId);
+  });
 });

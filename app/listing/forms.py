@@ -8,6 +8,7 @@ from wtforms.widgets import TextArea
 from werkzeug.utils import secure_filename
 from wtforms.validators import DataRequired, Optional
 from datetime import datetime, timedelta
+from bson import ObjectId
 
 STATE_ABBREV = ('AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
                 'HI', 'ID', 'IL', 'IN', 'IO', 'KS', 'KY', 'LA', 'MA', 'MD',
@@ -25,6 +26,7 @@ class ListingForm(FlaskForm):
     close_date = DateField('Closing Date', validators=[Optional()])
     close_time = TimeField('Closing Time', validators=[Optional()])
     photo = FileField('Photo', validators=[FileAllowed(['jpg', 'jpeg', 'gif', 'bmp', 'png'], 'Must be JPG, JPEG, GIF, BMP or PNG')])
+    template = SelectField('Template', coerce=ObjectId)
 
     def validate(self):
         result = True

@@ -1,8 +1,8 @@
 from flask import render_template
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app
-from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm, ForgotPasswordForm, ResetPasswordForm
-from .models import User, Account, Step
+from .forms import TemplateForm, TemplateStepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm, ForgotPasswordForm, ResetPasswordForm
+from .models import User, Account, Template, TemplateStep
 from ..configuration.models import AppStep
 from ..helpers import flash_errors, confirm_token, send_invitation, send_reset
 from ..decorators import admin_login_required
@@ -63,62 +63,125 @@ def logout():
     flash("Logged out successfully", category='success')
     return redirect(url_for('home.homepage'))
 
-### Steps ###
+### Templates ###
 
-@account.route('/steps')
+@account.route('/templates')
 @login_required
 @admin_login_required
-def steps():
-    steps = Step.all(current_user.get_account())
-    return render_template('account/steps.html', steps=steps, title="Welcome")
+def templates():
+    templates = Template.all(current_user.get_account())
+    return render_template('account/templates.html', templates=templates)
 
-@account.route('/steps/add', methods=['GET', 'POST'])
+@account.route('/templates/add', methods=['GET', 'POST'])
 @login_required
 @admin_login_required
-def add_step():
-    form = StepForm()
+def add_template():
+    form = TemplateForm()
     if request.method == 'POST' and form.validate_on_submit():
-        step = Step(form.name.data, form.notes.data, form.days_before_close.data, current_user.get_account())
-        step.add()
-        return redirect(url_for('account.steps'))
+        template = Template(form.name.data, current_user.get_account())
+        id = template.add()
+        return redirect(url_for('account.template_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('account/step.html', step=[], form=form)
+    return render_template('account/template.html', template=[], form=form)
 
 
-@account.route('/steps/edit/<string:id>', methods=['GET', 'POST'])
+@account.route('/templates/edit/<string:id>', methods=['GET', 'POST'])
 @login_required
 @admin_login_required
-def edit_step(id):
-    form = StepForm()
+def edit_template(id):
+    form = TemplateForm()
 
     if request.method == 'GET':
-        step = Step.get(id)
-        form.name.data = step['name']
-        form.notes.data = step['notes']
-        form.days_before_close.data = step['days_before_close'] if 'days_before_close' in step else None
+        template = Template.get(id)
+        form.name.data = template['name']
 
     if request.method == 'POST' and form.validate_on_submit():
-        Step.update(id, form.name.data, form.notes.data, form.days_before_close.data)
-        return redirect(url_for('account.steps'))
+        Template.update(id, form.name.data)
+        return redirect(url_for('account.templates'))
     else:
         flash_errors(form)
-    return render_template('account/step.html', id=id, form=form)
+    return render_template('account/template.html', id=id, template=template, form=form)
 
 
-@account.route('/steps/delete/<string:id>', methods=['GET', 'POST'])
+@account.route('/templates/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
 @admin_login_required
-def delete_step(id):
-    Step.delete(id)
-    flash("Step removed succesfully", category='success')
-    return redirect(url_for('account.steps'))
+def delete_template(id):
+    Template.delete(id)
+    flash("Template removed succesfully", category='success')
+    return redirect(url_for('account.templates'))
 
-@account.route('/steps/sort', methods=['POST'])
+
+### Template Steps ###
+
+@account.route('/templates/<string:id>/steps', methods=['GET', 'POST'])
 @login_required
-def sort_step():
-    Step.sort(current_user.get_account(), request.form['order'])
+@admin_login_required
+def template_steps(id):
+    template = Template.get(id)
+    template_steps = TemplateStep.all(id)
+
+    # this is edit template but we're doing it in a modal since it's just a name
+    form = TemplateForm()
+
+    if request.method == 'GET':
+        form.name.data = template['name']
+
+    if request.method == 'POST' and form.validate_on_submit():
+        Template.update(id, form.name.data)
+        return redirect(url_for('account.template_steps', id=id))
+    else:
+        flash_errors(form)
+
+    return render_template('account/templatesteps.html', form=form, id=id, template=template, template_steps=template_steps)
+
+@account.route('/templates/<string:id>/steps/add', methods=['GET', 'POST'])
+@login_required
+@admin_login_required
+def add_template_step(id):
+    form = TemplateStepForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        template_step = TemplateStep(id, form.name.data, form.notes.data, form.days_before_close.data)
+        template_step.add()
+        return redirect(url_for('account.template_steps', id=id))
+    else:
+        flash_errors(form)
+    return render_template('account/templatestep.html', template_step=[], form=form)
+
+@account.route('/templates/<string:id>/steps/edit/<string:step_id>', methods=['GET', 'POST'])
+@login_required
+@admin_login_required
+def edit_template_step(id, step_id):
+    form = TemplateStepForm()
+
+    if request.method == 'GET':
+        template_step = TemplateStep.get(id, step_id)
+        form.name.data = template_step['steps'][0]['name']
+        form.notes.data = template_step['steps'][0]['notes']
+        form.days_before_close.data = template_step['steps'][0]['days_before_close'] if 'days_before_close' in template_step['steps'][0] else None
+
+    if request.method == 'POST' and form.validate_on_submit():
+        TemplateStep.update(id, step_id, form.name.data, form.notes.data, form.days_before_close.data)
+        return redirect(url_for('account.template_steps', id=id))
+    else:
+        flash_errors(form)
+    return render_template('account/templatestep.html', id=id, step_id=step_id, template_step=template_step, form=form)
+
+@account.route('/templates/<string:id>/steps/delete/<string:step_id>', methods=['GET', 'POST'])
+@login_required
+@admin_login_required
+def delete_template_step(id, step_id):
+    TemplateStep.delete(id, step_id)
+    flash("Step removed succesfully", category='success')
+    return redirect(url_for('account.template_steps', id=id))
+
+@account.route('/templates/<string:id>/steps/sort', methods=['POST'])
+@login_required
+def sort_template_step(id):
+    TemplateStep.sort(id, request.form['order'])
     return json.dumps({'status':'Successfully sorted'})
+
 
 ### My Account ###
 
