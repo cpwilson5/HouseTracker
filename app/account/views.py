@@ -24,14 +24,28 @@ def register():
 
             login_user(User(str(user_id),form.email.data,account_id,superuser=False,active=True))
 
-            # Add default app steps to new users
-            app_steps = AppStep.all()
-            app_steps_count = app_steps.count(True)
-            for app_step in app_steps:
-                days_before_close = app_step['days_before_close'] if 'days_before_close' in app_step else None
-                step = Step(app_step['name'], app_step['notes'], days_before_close, account_id)
-                step.add()
-            flash("Welcome and we added %s steps to get you started" % (app_steps_count), category='success')
+            # Add default app template and app template steps to new users
+            app_templates = AppTemplate.all()
+            app_templates_count = app_templates.count(True)
+            for app_template in app_templates:
+                # get the app template steps
+                print()
+                app_template_steps = AppTemplateStep.all(app_template['_id'])
+
+                # create the template in the account
+                template = Template(app_template['name'], account_id)
+                template_id = template.add()
+
+                # create each template step in the new account template
+                for app_template_step in app_template_steps:
+                    days_before_close = app_template_step['steps']['days_before_close'] if 'days_before_close' in app_template_step['steps'] else None
+                    name = app_template_step['steps']['name'] if 'name' in app_template_step['steps'] else None
+                    notes = app_template_step['steps']['notes'] if 'notes' in app_template_step['steps'] else None
+
+                    template_step = TemplateStep(template_id, name, notes, days_before_close)
+                    template_step.add()
+
+            flash("Welcome and we added %s templates to get you started" % (app_templates_count), category='success')
             return redirect(url_for('listing.listings'))
         else:
             flash("User already exists", category='danger')
