@@ -1,0 +1,86 @@
+<!-- javascript sort will require a csrf token so need to set it here -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block header %}
+<div class="row">
+  <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto">
+    <h1 class="text-uppercase template-name" style="display:inline">{{ template.name }}</h1>
+    <a style="color: #28a745;" href="#" role="button"  data-toggle="modal" data-target="#editModal"><span class="oi oi-pencil ml-3 h5"></span></a>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <a class="btn btn-outline-secondary btn-md mb-4" href="{{ url_for('configuration.add_app_template_step', id=id) }}">+ Add</a>
+      <button id="sortorder" class="expander btn btn-outline-secondary btn-md mb-4 ml-2 float-right">Sort</a>
+      <button id="saveorder" style="display:none" class="btn btn-outline-secondary btn-md mb-4 ml-2 float-right">Save</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<!-- Custom styles for this template -->
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+
+      <div class="card border-bottom-0 border-left-0 border-right-0 border-top-0">
+          <div class="card-body">
+            <strong>
+              <span class="col-md-10">Name</span>
+              <span class="col-auto float-right">Days before close</span>
+            </strong>
+          </div>
+        </a>
+      </div>
+
+      <div id="sortable">
+      {% for template_step in template_steps %}
+        <div id="{{ template_step.steps._id }}" class="card mb-4">
+          <a href="{{ url_for('configuration.edit_app_template_step', id=template._id, step_id=template_step.steps._id) }}" class="card-block clearfix">
+            <div class="card-body">
+              <span class="col-md-10">{{ template_step.steps.name }}</span>
+              <span class="col-auto float-right">{{ template_step.steps.days_before_close if template_step.steps.days_before_close else '-' }}</span>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Confirm Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Template</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form class="form" role="form" autocomplete="off" id="loginForm" novalidate="" method="POST">
+          {{ form.hidden_tag() }}
+          <div class="modal-body">
+            <div class="form-row mb-3">
+            <div class="col">
+              <label for="inputName">Name</label>
+              {{ form.name (class_="form-control")}}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-secondary float-right" id="btnLogin">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

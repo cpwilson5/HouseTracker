@@ -37,8 +37,9 @@ $(document).ready(function(){
     var sortedItems = $sortables.sortable("toArray");
     var sortUrl;
 
-    if (window.location.pathname.split( '/' )[1] == 'appsteps') {
-      sortUrl = "/appsteps/sort";
+    if (window.location.pathname.split( '/' )[1] == 'apptemplates') {
+      var app_template_id = window.location.pathname.split( '/' )[2];
+      sortUrl = "/apptemplates/" + app_template_id + "/steps/sort";
     }
 
     if (window.location.pathname.split( '/' )[1] == 'templates') {
@@ -82,4 +83,4 @@ $(document).ready(function(){
     var templateId = $(event.relatedTarget).data('id');
     $("#deleteTemplate").attr("href", $('#deleteTemplate').attr('href') + templateId);
   });
-}); 
+});

@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app
 from .forms import TemplateForm, TemplateStepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm, ForgotPasswordForm, ResetPasswordForm
 from .models import User, Account, Template, TemplateStep
-from ..configuration.models import AppStep
+from ..configuration.models import AppTemplate, AppTemplateStep
 from ..helpers import flash_errors, confirm_token, send_invitation, send_reset
 from ..decorators import admin_login_required
 import json
@@ -160,13 +160,14 @@ def edit_template_step(id, step_id):
         form.name.data = template_step['steps'][0]['name']
         form.notes.data = template_step['steps'][0]['notes']
         form.days_before_close.data = template_step['steps'][0]['days_before_close'] if 'days_before_close' in template_step['steps'][0] else None
+        return render_template('account/templatestep.html', id=id, step_id=step_id, template_step=template_step, form=form)
 
     if request.method == 'POST' and form.validate_on_submit():
         TemplateStep.update(id, step_id, form.name.data, form.notes.data, form.days_before_close.data)
         return redirect(url_for('account.template_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('account/templatestep.html', id=id, step_id=step_id, template_step=template_step, form=form)
+        return render_template('account/templatestep.html', id=id, step_id=step_id, template_step=[], form=form)
 
 @account.route('/templates/<string:id>/steps/delete/<string:step_id>', methods=['GET', 'POST'])
 @login_required

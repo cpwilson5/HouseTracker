@@ -12,7 +12,7 @@
       <div class="card-header">
           <h3 class="mb-0 d-inline-block">Add/Edit Step</h3>
           <!-- Don't show delete because it's a new step -->
-          {% if step != [] %}
+          {% if template_step != [] %}
             <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
           {% endif %}
       </div>
@@ -54,11 +54,11 @@
         </button>
       </div>
       <div class="modal-body">
-        By deleting this app step, this step will no longer be added to new accounts that sign up.<br><br>
-        Click delete to remove this app step.
+        By deleting this step, this step will no longer be added to new listings that are created when using this template.<br><br>
+        Click delete to remove this step.
       </div>
       <div class="modal-footer">
-        <a class="btn btn-outline-danger float-right" href="{{ url_for('configuration.delete_app_step', id=id) }}" role="button">Delete</a>
+        <a class="btn btn-outline-danger float-right" href="{{ url_for('configuration.delete_app_template_step', id=id, step_id=step_id) }}" role="button">Delete</a>
       </div>
     </div>
   </div>
