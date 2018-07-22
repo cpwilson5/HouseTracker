@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
+{% set active_page = "listings" %}
+
 {% set completed = False %}
 {% if request.args.get('completed') == 'true': %}
     {% set completed = True %}
@@ -11,11 +13,9 @@
   <h1 class="text-uppercase">Listings</h1>
   {% if completed == True %}<p class="lead">Completed in the last 30 days</p>{% endif %}
 </div>
-
 {% endblock %}
 
 {% block body %}
-
 <div class="container">
   <div class="row">
     <div class="col">

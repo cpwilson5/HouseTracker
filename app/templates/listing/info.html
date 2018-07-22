@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
+{% set active_page = "listings" %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Edit Info</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block header %}
 {% endblock %}
 
@@ -10,7 +22,7 @@
   <!-- form card login with validation feedback -->
   <div class="card card-outline-secondary">
       <div class="card-header">
-          <h3 class="mb-0 d-inline-block">Add/Edit Contact Info</h3>
+          <h3 class="mb-0 d-inline-block">Edit Info</h3>
       </div>
       <div class="card-body">
           <form class="form" role="form" autocomplete="off" novalidate="" method="POST">

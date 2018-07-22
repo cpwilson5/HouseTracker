@@ -1,6 +1,24 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
+{% set active_page = "templates" %}
+
+{% set action = "Add" %}
+{% if template_step != [] %}
+  {% set action = "Edit" %}
+{% endif %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('account.templates') }}">Templates</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('account.template_steps', id=id) }}">Template</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ action }} Step</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block header %}
 {% endblock %}
 
@@ -10,9 +28,9 @@
   <!-- form card login with validation feedback -->
   <div class="card card-outline-secondary">
       <div class="card-header">
-          <h3 class="mb-0 d-inline-block">Add/Edit Step</h3>
+          <h3 class="mb-0 d-inline-block">{{ action }} Step</h3>
           <!-- Don't show delete because it's a new step -->
-          {% if template_step != [] %}
+          {% if action == "Edit" %}
             <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
           {% endif %}
       </div>

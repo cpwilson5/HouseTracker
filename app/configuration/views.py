@@ -94,7 +94,7 @@ def add_app_template_step(id):
         return redirect(url_for('configuration.app_template_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('configuration/apptemplatestep.html', template_step=[], form=form)
+    return render_template('configuration/apptemplatestep.html', template_step=[], id=id, form=form)
 
 @configuration.route('/apptemplates/<string:id>/steps/edit/<string:step_id>', methods=['GET', 'POST'])
 @login_required

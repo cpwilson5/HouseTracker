@@ -93,7 +93,7 @@ def add_listing():
         return redirect(url_for('listing.listing_steps', id=listing_id))
     else:
         flash_errors(form)
-    return render_template('listing/listing.html', form=form)
+    return render_template('listing/listing.html', id=[], form=form)
 
 @listing.route('/listings/edit/<string:id>', methods=['GET', 'POST'])
 @login_required
@@ -181,7 +181,7 @@ def edit_info(id):
         return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('listing/info.html', form=form)
+    return render_template('listing/info.html', id=id, form=form)
 
 @listing.route('/photo/<string:photo>', methods=['GET'])
 @login_required
@@ -284,7 +284,7 @@ def add_listing_step(id):
         return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('listing/listingstep.html', form=form)
+    return render_template('listing/listingstep.html', id=id, listing_step=[], form=form)
 
 @listing.route('/listings/<string:id>/steps/edit/<string:step_id>', methods=['GET', 'POST'])
 @login_required
@@ -412,7 +412,7 @@ def edit_listing_step(id, step_id):
         return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)
-        return redirect(url_for('listing.edit_listing_step', id=id, step_id=step_id))
+        return redirect(url_for('listing.edit_listing_step', id=id, listing_step=listing_step, step_id=step_id))
 
 
 @listing.route('/attachment/<string:attachment>', methods=['GET'])

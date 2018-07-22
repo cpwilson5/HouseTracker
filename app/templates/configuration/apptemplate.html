@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
+{% set active_page = "settings" %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('configuration.app_templates') }}">Templates</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Add Template</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
   <h1 class="text-uppercase">{{ template.name }}</h1>

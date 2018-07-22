@@ -1,9 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
+{% set active_page = "team" %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Team</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="text-uppercase">Team Members</h1>
+  <h1 class="text-uppercase">Team</h1>
 </div>
 
 <div class="container">

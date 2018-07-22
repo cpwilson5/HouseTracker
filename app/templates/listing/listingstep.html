@@ -1,6 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
+{% set active_page = "listings" %}
+
+{% set action = "Add" %}
+{% if listing_step != [] %}
+  {% set action = "Edit" %}
+{% endif %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ action }} Listing Step</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block header %}
 {% endblock %}
 
@@ -11,8 +28,8 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0 d-inline-block">Listing Step</h3>
-            {% if id %}
+            <h3 class="mb-0 d-inline-block">{{action }} Listing Step</h3>
+            {% if action == "Edit" %}
             <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
             {% endif %}
         </div>

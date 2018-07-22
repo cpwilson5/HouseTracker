@@ -161,7 +161,7 @@ def add_template_step(id):
         return redirect(url_for('account.template_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('account/templatestep.html', template_step=[], form=form)
+    return render_template('account/templatestep.html', id=id, template_step=[], form=form)
 
 @account.route('/templates/<string:id>/steps/edit/<string:step_id>', methods=['GET', 'POST'])
 @login_required

@@ -1,4 +1,22 @@
 {% extends "base.html" %}
+
+{% set active_page = "team" %}
+
+{% set action = "Add" %}
+{% if user != [] %}
+  {% set action = "Edit" %}
+{% endif %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('account.admins') }}">Team</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ action }} Team Member</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block body %}
 
 <div class="col-md-8 offset-md-2 pt-5">
@@ -6,9 +24,9 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0 d-inline-block">Add/Edit Team Member</h3>
+            <h3 class="mb-0 d-inline-block">{{ action }} Team Member</h3>
             <!-- Don't show delete because it's a new user -->
-            {% if user != [] %}
+            {% if action == "Edit" %}
               <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
             {% endif %}
         </div>

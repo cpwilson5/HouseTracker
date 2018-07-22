@@ -1,4 +1,22 @@
 {% extends "base.html" %}
+
+{% set active_page = "listings" %}
+
+{% set action = "Add" %}
+{% if user != [] and current_user.get_role() != 'client' %}
+  {% set action = "Edit" %}
+{% endif %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ action }} Client</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block body %}
 
 <div class="col-md-6 offset-md-3 pt-5">
@@ -6,10 +24,10 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0 d-inline-block">Add/Edit Client</h3>
+          <h3 class="mb-0 d-inline-block">{{ action }} Client</h3>
             <!-- Don't show delete because it's a new client or client who shouldn't be able to delete -->
-            {% if user != [] and current_user.get_role() != 'client' %}
-            <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
+            {% if action == "Edit" and current_user.get_role() != 'client' %}
+              <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
             {% endif %}
         </div>
         <div class="card-body">

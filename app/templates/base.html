@@ -32,18 +32,19 @@
         <ul class="navbar-nav ml-md-auto">
           {% if current_user.is_authenticated %}
             {% if current_user.get_role() != 'client' %}
-            <li class="nav-item">
+            <li class="nav-item {{ 'active' if active_page == 'listings' else '' }}">
               <a class="nav-link p-2 text-dark" href="{{ url_for('listing.listings') }}">Listings</a>
             </li>
+            <li class="nav-item ml-2 {{ 'active' if active_page == 'team' else '' }}">
+              <a class="nav-link p-2 text-dark" href="{{ url_for('account.admins') }}">Team</a>
+            </li>
+            <li class="nav-item ml-2 {{ 'active' if active_page == 'templates' else '' }}">
+              <a class="nav-link p-2 text-dark" href="{{ url_for('account.templates') }}">Templates</a>
+            </li>
             {% endif %}
-            <li class="nav-item dropdown ml-lg-2 mr-lg-2">
+            <li class="nav-item dropdown ml-lg-2 mr-lg-2 {{ 'active' if active_page == 'settings' else '' }}">
               <a class="nav-link dropdown-toggle p-2 text-dark" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                {% if current_user.get_role() != 'client' %}
-                <a class="dropdown-item" href="{{ url_for('account.admins') }}">Team Members</a>
-                <a class="dropdown-item" href="{{ url_for('account.templates') }}">Listing Templates</a>
-                <div class="dropdown-divider"></div>
-                {% endif %}
                 <a class="dropdown-item" href="{{ url_for('account.user') }}">My Account</a>
                 {% if current_user.is_superuser %}
                 <div class="dropdown-divider"></div>
@@ -84,10 +85,11 @@
       {% endif %}
     {% endwith %}
 
-  {% block header %}
+  {% block breadcrumb %}
   {% endblock %}
 
-
+  {% block header %}
+  {% endblock %}
 
   {% block body %}
   {% endblock %}
