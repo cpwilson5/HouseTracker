@@ -35,10 +35,10 @@
             <li class="nav-item {{ 'active' if active_page == 'listings' else '' }}">
               <a class="nav-link p-2 text-dark" href="{{ url_for('listing.listings') }}">Listings</a>
             </li>
-            <li class="nav-item ml-2 {{ 'active' if active_page == 'team' else '' }}">
+            <li class="nav-item ml-lg-2 {{ 'active' if active_page == 'team' else '' }}">
               <a class="nav-link p-2 text-dark" href="{{ url_for('account.admins') }}">Team</a>
             </li>
-            <li class="nav-item ml-2 {{ 'active' if active_page == 'templates' else '' }}">
+            <li class="nav-item ml-lg-2 {{ 'active' if active_page == 'templates' else '' }}">
               <a class="nav-link p-2 text-dark" href="{{ url_for('account.templates') }}">Templates</a>
             </li>
             {% endif %}
