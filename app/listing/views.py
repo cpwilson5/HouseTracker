@@ -410,7 +410,7 @@ def edit_listing_step(id, step_id):
             if text_distro:
                 send_sms(text_distro, text_body)
         # otherwise don't send an email or text if nothing changed
-
+        flash("Successfully updated listing step", category='success')
         return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)

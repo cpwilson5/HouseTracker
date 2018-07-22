@@ -29,7 +29,6 @@ def register():
             app_templates_count = app_templates.count(True)
             for app_template in app_templates:
                 # get the app template steps
-                print()
                 app_template_steps = AppTemplateStep.all(app_template['_id'])
 
                 # create the template in the account
@@ -277,7 +276,6 @@ def password():
 def admins():
     users = User.all(account=current_user.get_account())
     count = users.count(True)
-    print(count)
     return render_template('account/admins.html', users=users, count=count, title="Welcome")
 
 
