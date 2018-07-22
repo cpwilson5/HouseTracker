@@ -39,7 +39,8 @@ def listings():
         complete = False
 
     listings = Listing.all(active=True, complete=complete, sort=sort, order=order)
-    return render_template('listing/listings.html', listings=listings, title="Welcome")
+    count = listings.count(True)
+    return render_template('listing/listings.html', listings=listings, count=count, title="Welcome")
 
 @listing.route('/listings/add', methods=['GET', 'POST'])
 @login_required
@@ -220,6 +221,7 @@ def listing_steps(id):
     if not listing_steps:
         listing_steps = []
     users = User.all(listing=id)
+    users_count = users.count(True)
     listing = Listing.get(id)
     realtor = User.get(accounts_realtor=current_user.get_account())
 
@@ -229,7 +231,7 @@ def listing_steps(id):
             days_left = 0
     else:
         days_left = "TBD"
-    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, title="Welcome")
+    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, users_count=users_count, title="Welcome")
 
 @listing.route('/listings/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required

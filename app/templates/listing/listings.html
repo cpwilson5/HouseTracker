@@ -100,6 +100,11 @@
     </div>
   {% endfor %}
   </div>
+
+{% if count == 0 %}
+  <p class="font-weight-light font-italic text-center"><br>No listings, but it's okay, you can always add one above...</p>
+{% endif %}
+
 </div>
 
 {% endblock %}

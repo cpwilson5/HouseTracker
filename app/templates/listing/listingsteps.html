@@ -26,8 +26,10 @@
   <div class="row">
     <div class="col-md-8">
       <a class="btn btn-outline-secondary btn-md mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
+      {% if listing_steps %}
       <button id="sortorder" class="expander btn btn-outline-secondary btn-md mb-4 ml-2">Sort</a>
       <button id="saveorder" style="display:none" class="btn btn-outline-secondary btn-md mb-4 ml-2">Save</a>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -147,6 +149,7 @@
               <a href="{{ url_for('listing.invite_client', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Add</a>
             </div>
           </div>
+          {% if users_count > 0 %}
           <div class="list-group mt-2">
             {% for user in users %}
               {% if user['role'] == 'client' %}
@@ -164,6 +167,9 @@
               {% endif %}
             {% endfor %}
           </div>
+          {% else %}
+            <p class="font-weight-light font-italic text-center"><br>No clients added yet.<br><br>Add a client so he/she can login and receive automatic updates.</p>
+          {% endif %}
         </div>
       </div>
 
@@ -188,9 +194,13 @@
               <a href="{{ url_for('listing.edit_info', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Edit</a>
             </div>
           </div>
+          {% if listing.info %}
           <p class="card-text">
             <pre>{{ listing.info }}</pre>
           </p>
+          {% else %}
+          <p class="font-weight-light font-italic text-center"><br>Provide any extra details (contacts, information, etc) about the listing</p>
+          {% endif %}
         </div>
       </div>
 

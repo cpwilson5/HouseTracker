@@ -43,7 +43,13 @@
         </div>
         {% endif %}
       {% endfor %}
+
+      {% if count == 1 %} <!-- it's 1 because of the realtor -->
+        <p class="font-weight-light font-italic text-center"><br>You're flying solo!<br><br>Add a team member to give admin access to your account</p>
+      {% endif %}
+
     </div>
+
   </div>
 </div>
 

@@ -19,7 +19,8 @@ from . import configuration
 @admin_login_required
 def app_templates():
     templates = AppTemplate.all()
-    return render_template('configuration/apptemplates.html', templates=templates)
+    count = templates.count(True)
+    return render_template('configuration/apptemplates.html', templates=templates, count=count)
 
 @configuration.route('/apptemplates/add', methods=['GET', 'POST'])
 @login_required
@@ -68,6 +69,11 @@ def delete_app_template(id):
 def app_template_steps(id):
     template = AppTemplate.get(id)
     template_steps = AppTemplateStep.all(id)
+    # this is weird but I had to get the cursor twice
+    # because whenever I used "list" it would replace my template_steps_list
+    # even when I just was referencing the variable
+    template_steps_list = AppTemplateStep.all(id)
+    count = len(list(template_steps_list))
 
     # this is edit template but we're doing it in a modal since it's just a name
     form = TemplateForm()
@@ -81,7 +87,7 @@ def app_template_steps(id):
     else:
         flash_errors(form)
 
-    return render_template('configuration/apptemplatesteps.html', form=form, id=id, template=template, template_steps=template_steps)
+    return render_template('configuration/apptemplatesteps.html', form=form, id=id, template=template, template_steps=template_steps, count=count)
 
 @configuration.route('/apptemplates/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required

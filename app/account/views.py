@@ -84,7 +84,8 @@ def logout():
 @admin_login_required
 def templates():
     templates = Template.all(current_user.get_account())
-    return render_template('account/templates.html', templates=templates)
+    count = templates.count(True)
+    return render_template('account/templates.html', templates=templates, count=count)
 
 @account.route('/templates/add', methods=['GET', 'POST'])
 @login_required
@@ -135,6 +136,11 @@ def delete_template(id):
 def template_steps(id):
     template = Template.get(id)
     template_steps = TemplateStep.all(id)
+    # this is weird but I had to get the cursor twice
+    # because whenever I used "list" it would replace my template_steps_list
+    # even when I just was referencing the variable
+    template_steps_list = TemplateStep.all(id)
+    count = len(list(template_steps_list))
 
     # this is edit template but we're doing it in a modal since it's just a name
     form = TemplateForm()
@@ -148,7 +154,7 @@ def template_steps(id):
     else:
         flash_errors(form)
 
-    return render_template('account/templatesteps.html', form=form, id=id, template=template, template_steps=template_steps)
+    return render_template('account/templatesteps.html', form=form, id=id, template=template, template_steps=template_steps, count=count)
 
 @account.route('/templates/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required
@@ -270,7 +276,9 @@ def password():
 @admin_login_required
 def admins():
     users = User.all(account=current_user.get_account())
-    return render_template('account/admins.html', users=users, title="Welcome")
+    count = users.count(True)
+    print(count)
+    return render_template('account/admins.html', users=users, count=count, title="Welcome")
 
 
 @account.route('/admins/invite', methods=['GET', 'POST'])
