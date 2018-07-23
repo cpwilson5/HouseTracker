@@ -11,7 +11,9 @@
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
   <h1 class="text-uppercase">Listings</h1>
-  {% if completed == True %}<p class="lead">Completed in the last 30 days</p>{% endif %}
+  {% if completed == True %}<p class="lead">Completed in the last 30 days</p>
+  {% else %}<p class="lead">Active and in progress</p>
+  {% endif %}
 </div>
 {% endblock %}
 
