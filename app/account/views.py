@@ -19,7 +19,7 @@ def register():
         if existing_user is None:
             account = Account(form.first_name.data + " " + form.last_name.data, form.cell.data, form.email.data)
             account_id = account.add()
-            user_id = User.add(form.first_name.data, form.last_name.data, form.email.data, \
+            user_id = User.add(form.email.data, form.first_name.data, form.last_name.data, \
                 account_id, 'realtor', form.cell.data, form.password.data, confirmed=True)
 
             login_user(User(str(user_id),form.email.data,account_id,superuser=False,active=True))
@@ -229,7 +229,7 @@ def user():
         p = None # don't want to set the password as we don't have it on page; model handles
         ea = form.email_alert.data
         ta = form.text_alert.data
-        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
+        User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, \
             confirmed=True, email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
         return redirect(url_for('listing.listings'))
@@ -257,7 +257,7 @@ def password():
         p = form.password.data
         ea = user['email_alert']
         ta = user['text_alert']
-        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
+        User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, \
             email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
         return redirect(url_for('listing.listings'))
@@ -293,7 +293,7 @@ def invite_admin():
         if existing_user is None:
             try:
                 send_invitation(form.email.data)
-                User.add(form.first_name.data, form.last_name.data, form.email.data, \
+                User.add(form.email.data, form.first_name.data, form.last_name.data, \
                     current_user.get_account(), 'admin', invited_by=current_user.get_id(), confirmed=False)
                 flash("Invitation sent", category='success')
             except:
@@ -341,7 +341,7 @@ def register_with_token(token):
         ea = True if user['role'] == 'client' else False
         ta = True if user['role'] == 'client' else False
 
-        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, confirmed=True, \
+        User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, confirmed=True, \
             email_alert=ea, text_alert=ta)
         login_user(User(str(id),form.email.data,account_id,superuser=False, active=True))
         flash("Updated successfully", category='success')
@@ -365,7 +365,7 @@ def edit_admin(id):
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
-            User.update(id, form.first_name.data, form.last_name.data, form.email.data)
+            User.update(id, form.email.data, form.first_name.data, form.last_name.data)
             send_invitation(form.email.data)
             flash("Invitation resent", category='success')
         except:
@@ -381,7 +381,7 @@ def edit_admin(id):
 @login_required
 @admin_login_required
 def delete_admin(id):
-    User.delete(id=id)
+    User.delete(id=id, context='admin')
     flash("User removed succesfully", category='success')
     return redirect(url_for('account.admins'))
 
@@ -436,7 +436,7 @@ def reset_password(token):
         email = user['email']
         p = form.password.data
 
-        User.update(id=id, first_name=first_name, last_name=last_name, email=email, password=p)
+        User.update(id=id, email=email, first_name=first_name, last_name=last_name, password=p)
         flash("Updated successfully.  Login below.", category='success')
         return redirect(url_for('account.login'))
     else:

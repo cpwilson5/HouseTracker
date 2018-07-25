@@ -17,11 +17,16 @@ def flash_errors(form):
 ### Email confirmation ###
 '''https://realpython.com/handling-email-confirmation-in-flask/#add-email-confirmation'''
 
-def send_invitation(email):
-    token = generate_confirmation_token(email)
-    confirm_url = url_for('account.register_with_token', token=token, _external=True)
-    html = "Join by clicking here: " + confirm_url
-    subject = "You're invited to join House Tracker"
+def send_invitation(email, new_user=True):
+    if new_user:
+        token = generate_confirmation_token(email)
+        confirm_url = url_for('account.register_with_token', token=token, _external=True)
+        html = "Join by clicking here: " + confirm_url
+        subject = "You're invited to join House Tracker"
+    else:
+        html = "View your new listing by logging in here: " + url_for('account.login', _external=True)
+        subject = "You've been added to another listing"
+
     send_email([email], subject, html)
 
 def send_reset(email):

@@ -45,7 +45,7 @@ class User(UserMixin):
         return self.superuser
 
     @staticmethod
-    def add(first_name, last_name, email, account_id, role, cell=None, password=None, \
+    def add(email, first_name, last_name, account_id, role, cell=None, password=None, \
         invited_by=None, confirmed=True, listing='all', email_alert=False, text_alert=False):
         return mongo.db.users.insert({
             'first_name': first_name,
@@ -95,19 +95,34 @@ class User(UserMixin):
         return mongo.db.users.find(find_by)
 
     @staticmethod
-    def update(id, first_name, last_name, email, cell=None, password=None, confirmed=False, \
-    email_alert=False, text_alert=False):
+    def update(id, email, first_name=None, last_name=None, cell=None, password=None, confirmed=None, \
+    email_alert=None, text_alert=None, listing=None):
         set = {
-            'first_name': first_name,
-            'last_name': last_name,
             'email': email,
-            'cell': cell,
-            'confirmed':confirmed,
-            'email_alert': email_alert,
-            'text_alert': text_alert,
             'update_date': datetime.datetime.now().isoformat()
         }
 
+        # need to append to listing array as the client/partner already has at least one
+        if listing:
+            mongo.db.users.update_one({
+                '_id': ObjectId(id)},{
+                '$push': {'listing': listing}
+            }, upsert=False)
+
+        # if existing user is being updated so it shouldn't overwrite
+        # any information the user had set for themselves
+        if first_name:
+            set['first_name'] = first_name
+        if last_name:
+            set['last_name'] = last_name
+        if cell:
+            set['cell'] = cell
+        if confirmed:
+            set['confirmed'] = confirmed
+        if email_alert:
+            set['email_alert'] = email_alert
+        if text_alert:
+            set['text_alert'] = text_alert
         if password:
             set['password'] = generate_password_hash(password, method='sha256')
 
@@ -117,11 +132,18 @@ class User(UserMixin):
         }, upsert=False)
 
     @staticmethod
-    def delete(id):
-        return mongo.db.users.update_one(
-            {'_id': ObjectId(id)},
-            {'$set': {'active': 'false'}
-        }, upsert=False)
+    def delete(id, context, listing=None):
+        if context == 'admin':
+            return mongo.db.users.update_one(
+                {'_id': ObjectId(id)},
+                {'$set': {'active': 'false'}
+            }, upsert=False)
+
+        if context == 'client':
+            return mongo.db.users.update_one({
+                '_id': ObjectId(id)},{
+                '$pull': {'listing': listing}
+            }, upsert=False)
 
     @staticmethod
     def validate_login(password_hash, password):
