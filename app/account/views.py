@@ -62,6 +62,7 @@ def login():
             user_obj = User(str(user['_id']),user['email'],user['account'],user['superuser'],user['active'])
             if user_obj.is_active() is True:
                 login_user(user_obj, remember=form.remember_me.data)
+                User.log_login(user_obj)
                 flash("Logged in successfully", category='success')
                 return redirect(url_for('listing.listings'))
             else:

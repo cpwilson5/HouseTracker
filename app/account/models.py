@@ -149,6 +149,15 @@ class User(UserMixin):
     def validate_login(password_hash, password):
         return check_password_hash(password_hash, password)
 
+    # Added this to store login to Mongo #
+    def log_login(self):
+        return mongo.db.login.insert({
+            'user_id': self.id,
+            'email': self.email,
+            'account': self.account,
+            'login_date': datetime.datetime.now().isoformat()
+        })
+
 @login_manager.user_loader
 def load_user(id):
     users = mongo.db.users.find_one({'_id': ObjectId(id)})
