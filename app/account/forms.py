@@ -9,6 +9,13 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
 
+class ImpersonateForm(FlaskForm):
+    """Login form to access writing and settings pages"""
+
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    impersonate_email = StringField('Email', validators=[DataRequired(), Email()])
+
 class RegForm(FlaskForm):
     """Login form to access writing and settings pages"""
 

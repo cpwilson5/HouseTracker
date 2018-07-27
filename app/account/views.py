@@ -1,7 +1,7 @@
 from flask import render_template
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app
-from .forms import TemplateForm, TemplateStepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm, ForgotPasswordForm, ResetPasswordForm
+from .forms import TemplateForm, TemplateStepForm, UserForm, InviteForm, RegForm, LoginForm, ImpersonateForm, PasswordForm, ForgotPasswordForm, ResetPasswordForm
 from .models import User, Account, Template, TemplateStep
 from ..configuration.models import AppTemplate, AppTemplateStep
 from ..helpers import flash_errors, confirm_token, send_invitation, send_reset
@@ -70,6 +70,28 @@ def login():
         else:
             flash("Wrong email or password", category='danger')
     return render_template('account/login.html', title='login', form=form)
+
+@account.route('/impersonate', methods=['GET', 'POST'])
+def impersonate():
+    form = ImpersonateForm()
+
+    if request.method == 'POST':
+        user = User.get(email=form.email.data)
+        if user and User.validate_login(user['password'], form.password.data):
+            impersonate_user = User.get(email=form.impersonate_email.data)
+            if impersonate_user:
+                user_obj = User(str(impersonate_user['_id']),impersonate_user['email'],impersonate_user['account'],impersonate_user['superuser'],impersonate_user['active'])
+                if user_obj.is_active() is True:
+                    login_user(user_obj)
+                    flash("Logged in successfully", category='success')
+                    return redirect(url_for('listing.listings'))
+                else:
+                    flash("Wrong email or password", category='danger')
+            else:
+                flash("User doesn't exist", category='danger')
+        else:
+            flash("Wrong email or password", category='danger')
+    return render_template('account/impersonate.html', title='login', form=form)
 
 @account.route('/logout')
 def logout():
