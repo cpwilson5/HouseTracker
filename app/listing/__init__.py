@@ -21,5 +21,4 @@ def pretty_date(value, format="%a, %b %-d at %-I:%M %p EST"):
     #if obj.time() == datetime.time(0, 0):
     #    format = '%A, %B %-d'
 
-    # anything
     return obj.strftime(format)
