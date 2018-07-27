@@ -59,7 +59,7 @@
             <div class="card-header">
                <span class="font-weight-bold text-uppercase">{{ listing_step.steps.name }}</span>
                {% if listing_step.steps.due_date %}
-               <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date }}</span>
+               <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%A, %B %-d") }}</span>
                {% else %}
                <span class="text-success float-right">No Scheduled Date</span>
                {% endif %}

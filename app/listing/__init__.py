@@ -18,15 +18,7 @@ def pretty_date(value, format="%a, %b %-d at %-I:%M %p EST"):
 
     # ensure midnight doesn't show up on listing steps
     # since no time was really entered and midnight is just default
-    if obj.time() == datetime.time(0, 0):
-        format = '%A, %B %-d'
-
-    #if convert: # if we want to convert it from UTC
-    #    if obj.tzname() == None: # if it's a naive date object
-    #        utc = pytz.timezone('UTC')
-    #        tz = utc.localize(obj)
-
-    #    tz = pytz.timezone('US/Eastern')  # timezone you want to convert to from UTC
-    #    obj = utc.localize(obj, is_dst=None).astimezone(pytz.utc)
+    #if obj.time() == datetime.time(0, 0):
+    #    format = '%A, %B %-d'
 
     return obj.strftime(format)
