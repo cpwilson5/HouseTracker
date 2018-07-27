@@ -10,6 +10,7 @@ if __name__ == '__main__':
 
 """ native web server - uses the config.py file """
 """ below should automatically happen now when you cd into housetracker"""
+
 """
 cd housetracker
 source venv/bin/activate
