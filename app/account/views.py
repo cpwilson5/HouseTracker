@@ -77,7 +77,7 @@ def impersonate():
 
     if request.method == 'POST':
         user = User.get(email=form.email.data)
-        if user and User.validate_login(user['password'], form.password.data):
+        if user and User.validate_login(user['password'], form.password.data) and user['superuser']:
             impersonate_user = User.get(email=form.impersonate_email.data)
             if impersonate_user:
                 user_obj = User(str(impersonate_user['_id']),impersonate_user['email'],impersonate_user['account'],impersonate_user['superuser'],impersonate_user['active'])
