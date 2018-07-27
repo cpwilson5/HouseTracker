@@ -59,7 +59,12 @@
             <div class="card-header">
                <span class="font-weight-bold text-uppercase">{{ listing_step.steps.name }}</span>
                {% if listing_step.steps.due_date %}
-               <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%A, %B %-d") }}</span>
+                  {% if listing_step.steps.due_date.strftime('%H:%M:%S') != '00:00:00' %}
+                  {{ listing_step.steps.due_date.strftime('%H:%M:%S') }}
+                    <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date }}</span>
+                  {% else %}
+                    <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %b %-d") }}</span>
+                  {% endif %}
                {% else %}
                <span class="text-success float-right">No Scheduled Date</span>
                {% endif %}
