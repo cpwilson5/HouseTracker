@@ -16,7 +16,7 @@ def pretty_date(value, format="%a, %b %-d at %-I:%M %p EST", convert_to_tz=False
     else: # else if it's a string then convert to datetime (update_date and create_date)
         obj = dateutil.parser.parse(value)
 
-    if convert: # if we want to convert it from UTC
+    if convert_to_tz: # if we want to convert it from UTC
         tz = pytz.timezone('US/Eastern')  # timezone you want to convert to from UTC
         local_dt = obj.astimezone(tz)
         return local_dt.strftime(format)
