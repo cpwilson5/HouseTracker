@@ -47,13 +47,16 @@
       {% if count > 0 %}
 
       <div class="card border-bottom-0 border-left-0 border-right-0 border-top-0">
-          <div class="card-body">
-            <strong>
-              <span class="col-md-10">Name</span>
-              <span class="col-auto float-right">Days before close</span>
-            </strong>
+        <div class="card-body">
+          <div class="row">
+            <div class="col font-weight-bold text-uppercase">
+              Name
+            </div>
+            <div class="col font-weight-bold text-uppercase">
+              <span class="float-right">Days before close</span>
+            </div>
           </div>
-        </a>
+        </div>
       </div>
 
       <div id="sortable">
@@ -61,8 +64,14 @@
         <div id="{{ template_step.steps._id }}" class="card mb-4">
           <a href="{{ url_for('account.edit_template_step', id=template._id, step_id=template_step.steps._id) }}" class="card-block clearfix">
             <div class="card-body">
-              <span class="col-md-10">{{ template_step.steps.name }}</span>
-              <span class="col-auto float-right">{{ template_step.steps.days_before_close if template_step.steps.days_before_close else '-' }}</span>
+              <div class="row">
+                <div class="col">
+                  {{ template_step.steps.name }}
+                </div>
+                <div class="col">
+                  <span class="float-right">{{ template_step.steps.days_before_close if template_step.steps.days_before_close else '-' }}</span>
+                </div>
+              </div>
             </div>
           </a>
         </div>

@@ -57,16 +57,22 @@
           <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
           {% endif %}
             <div class="card-header">
-               <span class="font-weight-bold text-uppercase">{{ listing_step.steps.name }}</span>
-               {% if listing_step.steps.due_date %}
-                  {% if listing_step.steps.due_date.strftime('%H:%M:%S') != '00:00:00' %}
-                    <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d at %-I:%M %p") }}</span>
+              <div class="row">
+                <div class="col font-weight-bold text-uppercase">
+                  {{ listing_step.steps.name }}
+                </div>
+                <div class="col">
+                  {% if listing_step.steps.due_date %}
+                     {% if listing_step.steps.due_date.strftime('%H:%M:%S') != '00:00:00' %}
+                       <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d at %-I:%M %p") }}</span>
+                     {% else %}
+                       <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d") }}</span>
+                     {% endif %}
                   {% else %}
-                    <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d") }}</span>
+                     <span class="text-success float-right">No Scheduled Date</span>
                   {% endif %}
-               {% else %}
-               <span class="text-success float-right">No Scheduled Date</span>
-               {% endif %}
+                </div>
+              </div>
              </div>
             <div class="card-body">
               <p class="card-text">{{ listing_step.steps.notes }}</p>
