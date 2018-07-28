@@ -72,7 +72,7 @@
               <p class="card-text">{{ listing_step.steps.notes }}</p>
             </div>
             <div class="card-footer">
-              <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date }}</small>
+              <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date(convert_to_tz=True)}}</small>
               {% if listing_step.steps.attachment %}
                 {% if current_user.get_role() != 'client' %}
                 <span class="oi oi-paperclip float-right"></span>
