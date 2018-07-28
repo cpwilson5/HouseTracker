@@ -57,15 +57,15 @@ class User(UserMixin):
             'password': generate_password_hash(password, method='sha256'),
             'email_alert': email_alert,
             'text_alert': text_alert,
-            'create_date': datetime.datetime.now().isoformat(),
+            'create_date': datetime.datetime.utcnow(),
             'authenticated': False,
             'superuser': False,
             'invited_by': invited_by,
             'active': True,
             'confirmed': confirmed,
             'listing': listing,
-            'create_date': datetime.datetime.now().isoformat(),
-            'update_date': datetime.datetime.now().isoformat()
+            'create_date': datetime.datetime.utcnow(),
+            'update_date': datetime.datetime.utcnow()
         })
 
     @staticmethod
@@ -99,7 +99,7 @@ class User(UserMixin):
     email_alert=None, text_alert=None, listing=None):
         set = {
             'email': email,
-            'update_date': datetime.datetime.now().isoformat()
+            'update_date': datetime.datetime.utcnow()
         }
 
         # need to append to listing array as the client/partner already has at least one
@@ -155,7 +155,7 @@ class User(UserMixin):
             'user_id': self.id,
             'email': self.email,
             'account': self.account,
-            'login_date': datetime.datetime.now().isoformat()
+            'login_date': datetime.datetime.utcnow()
         })
 
 @login_manager.user_loader
@@ -177,8 +177,8 @@ class Account(object):
             'name': self.name,
             'phone': self.phone,
             'email': self.email,
-            'create_date': datetime.datetime.now().isoformat(),
-            'update_date': datetime.datetime.now().isoformat()
+            'create_date': datetime.datetime.utcnow(),
+            'update_date': datetime.datetime.utcnow()
         })
 
 
@@ -192,8 +192,8 @@ class Template(object):
             'name': self.name,
             'account': self.account,
             'active': 'true',
-            'create_date': datetime.datetime.now().isoformat(),
-            'update_date': datetime.datetime.now().isoformat()
+            'create_date': datetime.datetime.utcnow(),
+            'update_date': datetime.datetime.utcnow()
         })
 
     @staticmethod
@@ -215,7 +215,7 @@ class Template(object):
             {'_id': ObjectId(id)},
             {'$set': {
                 'name': name,
-                'update_date': datetime.datetime.now().isoformat()
+                'update_date': datetime.datetime.utcnow()
                 }
         }, upsert=False)
 
@@ -241,7 +241,7 @@ class TemplateStep(object):
         return mongo.db.templates.update_one({
             '_id': ObjectId(self.template_id)
         },{
-            '$set': { 'update_date': datetime.datetime.now().isoformat() },
+            '$set': { 'update_date': datetime.datetime.utcnow() },
             '$inc': {'order': 1}, #increment the listing order count to keep track of # of listing steps
             '$push': {
                 'steps':
@@ -252,8 +252,8 @@ class TemplateStep(object):
                     'days_before_close': self.days_before_close,
                     'active': True,
                     'order': next_order, #set the new listing step to the next number
-                    'create_date': datetime.datetime.now().isoformat(),
-                    'update_date': datetime.datetime.now().isoformat()
+                    'create_date': datetime.datetime.utcnow(),
+                    'update_date': datetime.datetime.utcnow()
                 }
             }
         }, upsert=False)
@@ -288,7 +288,7 @@ class TemplateStep(object):
                 'steps.$.name': name,
                 'steps.$.notes': notes,
                 'steps.$.days_before_close': days_before_close,
-                'steps.$.update_date': datetime.datetime.now().isoformat()
+                'steps.$.update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
@@ -300,7 +300,7 @@ class TemplateStep(object):
         },{
             '$set': {
                 'steps.$.active': False,
-                'steps.$.update_date': datetime.datetime.now().isoformat()
+                'steps.$.update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 

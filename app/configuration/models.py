@@ -14,8 +14,8 @@ class AppTemplate(object):
             'name': self.name,
             'active': 'true',
             'user': self.user,
-            'create_date': datetime.datetime.now().isoformat(),
-            'update_date': datetime.datetime.now().isoformat()
+            'create_date': datetime.datetime.utcnow(),
+            'update_date': datetime.datetime.utcnow()
         })
 
     @staticmethod
@@ -36,7 +36,7 @@ class AppTemplate(object):
             {'_id': ObjectId(id)},
             {'$set': {
                 'name': name,
-                'update_date': datetime.datetime.now().isoformat()
+                'update_date': datetime.datetime.utcnow()
                 }
         }, upsert=False)
 
@@ -62,7 +62,7 @@ class AppTemplateStep(object):
         return mongo.db.apptemplates.update_one({
             '_id': ObjectId(self.template_id)
         },{
-            '$set': { 'update_date': datetime.datetime.now().isoformat() },
+            '$set': { 'update_date': datetime.datetime.utcnow() },
             '$inc': {'order': 1}, #increment the listing order count to keep track of # of listing steps
             '$push': {
                 'steps':
@@ -73,8 +73,8 @@ class AppTemplateStep(object):
                     'days_before_close': self.days_before_close,
                     'active': True,
                     'order': next_order, #set the new listing step to the next number
-                    'create_date': datetime.datetime.now().isoformat(),
-                    'update_date': datetime.datetime.now().isoformat()
+                    'create_date': datetime.datetime.utcnow(),
+                    'update_date': datetime.datetime.utcnow()
                 }
             }
         }, upsert=False)
@@ -109,7 +109,7 @@ class AppTemplateStep(object):
                 'steps.$.name': name,
                 'steps.$.notes': notes,
                 'steps.$.days_before_close': days_before_close,
-                'steps.$.update_date': datetime.datetime.now().isoformat()
+                'steps.$.update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
@@ -121,7 +121,7 @@ class AppTemplateStep(object):
         },{
             '$set': {
                 'steps.$.active': False,
-                'steps.$.update_date': datetime.datetime.now().isoformat()
+                'steps.$.update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 

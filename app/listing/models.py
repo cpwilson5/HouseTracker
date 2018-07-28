@@ -35,8 +35,8 @@ class Listing(object):
             'account': current_user.get_account(),
             'active': True,
             'steps': [],
-            'create_date': datetime.datetime.now().isoformat(),
-            'update_date': datetime.datetime.now().isoformat()
+            'create_date': datetime.datetime.utcnow(),
+            'update_date': datetime.datetime.utcnow()
         })
 
     @staticmethod
@@ -80,7 +80,7 @@ class Listing(object):
                 'zip': zip,
                 'close_date': close_date,
                 'photo': photo,
-                'update_date': datetime.datetime.now().isoformat()
+                'update_date': datetime.datetime.utcnow()
                 }
         }, upsert=False)
 
@@ -90,7 +90,7 @@ class Listing(object):
             {'_id': ObjectId(id)},
             {'$set': {
                 'info': info,
-                'update_date': datetime.datetime.now().isoformat()
+                'update_date': datetime.datetime.utcnow()
                 }
         }, upsert=False)
 
@@ -100,7 +100,7 @@ class Listing(object):
             {'_id': ObjectId(id)},
             {'$set': {
                 'active': False,
-                'update_date': datetime.datetime.now().isoformat()
+                'update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
@@ -109,8 +109,8 @@ class Listing(object):
         return mongo.db.listings.update_one(
             {'_id': ObjectId(id)},
             {'$set': {
-                'complete_date': datetime.datetime.now().isoformat(),
-                'update_date': datetime.datetime.now().isoformat()
+                'complete_date': datetime.datetime.utcnow(),
+                'update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
@@ -123,7 +123,7 @@ class Listing(object):
                     'complete_date': '',
                 },
                 '$set': {
-                    'update_date': datetime.datetime.now().isoformat()
+                    'update_date': datetime.datetime.utcnow()
                 }
         }, upsert=False)
 
@@ -152,7 +152,7 @@ class ListingStep(object):
         return mongo.db.listings.update_one({
             '_id': ObjectId(self.listing_id)
         },{
-            '$set': { 'update_date': datetime.datetime.now().isoformat() },
+            '$set': { 'update_date': datetime.datetime.utcnow() },
             '$inc': {'order': 1}, #increment the listing order count to keep track of # of listing steps
             '$push': {
                 'steps':
@@ -165,8 +165,8 @@ class ListingStep(object):
                     'status': self.status,
                     'active': True,
                     'order': next_order, #set the new listing step to the next number
-                    'create_date': datetime.datetime.now().isoformat(),
-                    'update_date': datetime.datetime.now().isoformat()
+                    'create_date': datetime.datetime.utcnow(),
+                    'update_date': datetime.datetime.utcnow()
                 }
             }
         }, upsert=False)
@@ -216,8 +216,8 @@ class ListingStep(object):
                 'steps.$.attachment': attachment,
                 'steps.$.due_date': due_date,
                 'steps.$.status': status,
-                'steps.$.update_date': datetime.datetime.now().isoformat(),
-                'update_date': datetime.datetime.now().isoformat()
+                'steps.$.update_date': datetime.datetime.utcnow(),
+                'update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
@@ -229,8 +229,8 @@ class ListingStep(object):
         },{
             '$set': {
                 'steps.$.active': False,
-                'steps.$.update_date': datetime.datetime.now().isoformat(),
-                'update_date': datetime.datetime.now().isoformat()
+                'steps.$.update_date': datetime.datetime.utcnow(),
+                'update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
@@ -241,9 +241,9 @@ class ListingStep(object):
             'steps._id': ObjectId(step_id)
         },{
             '$set': {
-                'steps.$.complete_date': datetime.datetime.now().isoformat(),
-                'steps.$.update_date': datetime.datetime.now().isoformat(),
-                'update_date': datetime.datetime.now().isoformat()
+                'steps.$.complete_date': datetime.datetime.utcnow(),
+                'steps.$.update_date': datetime.datetime.utcnow(),
+                'update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
