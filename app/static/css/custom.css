@@ -88,6 +88,42 @@ at the end */
   border-color: #28a745;
 }
 
+/* make the dropdown active text green (not blue) */
+.dropdown-item.active, .dropdown-item:active {
+  color: #28a745;
+  background-color: #fff;
+  border-color: #28a745;
+}
+
+/* change all links to green */
+a {
+  color: #28a745;
+}
+
+/* nav bar green links with bottom bar */
+@media screen and (min-width: 992px) {
+  .navbar-light .navbar-nav .active>.nav-link, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-link.show, .navbar-light .navbar-nav .show>.nav-link {
+    color: #28a745 !important;
+    box-shadow: 0 3px 0 #28a745;
+  }
+
+  .navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
+    color: #28a745 !important;
+    box-shadow: 0 3px 0 #28a745;
+  }
+}
+@media screen and (max-width: 991px) {
+  .navbar-light .navbar-nav .active>.nav-link, .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .nav-link.show, .navbar-light .navbar-nav .show>.nav-link {
+    color: #28a745 !important;
+    box-shadow: -3px 0 #28a745;
+  }
+
+  .navbar-light .navbar-nav .nav-link:focus, .navbar-light .navbar-nav .nav-link:hover {
+    color: #28a745 !important;
+    box-shadow: -3px 0 #28a745;
+  }
+}
+
 /* Browser specific (not valid) styles to make preformatted text wrap - used for other contact section */
 pre {
  white-space: pre-wrap;       /* css-3 */
@@ -95,4 +131,8 @@ pre {
  white-space: -pre-wrap;      /* Opera 4-6 */
  white-space: -o-pre-wrap;    /* Opera 7 */
  word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+.breadcrumb {
+  margin-bottom: 0px;
 }

@@ -1,0 +1,80 @@
+<!-- javascript sort will require a csrf token so need to set it here -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+
+{% set active_page = "templates" %}
+
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Templates</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block header %}
+<div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+  <h1 class="text-uppercase">Templates</h1>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <a class="btn btn-outline-secondary btn-md mb-4" href="{{ url_for('account.add_template') }}">+ Add</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block body %}
+<!-- Custom styles for this template -->
+<div class="container">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+
+      <div id="sortable">
+      {% for template in templates %}
+        <div id="{{ template._id }}" class="card mb-4">
+          <a href="{{ url_for('account.template_steps', id=template._id) }}" class="card-block">
+            <div class="card-body">
+              <span class="col-md-8">{{ template.name }}</span>
+              <object><a style="color: #000;" class="float-right" href="#" role="button" data-id={{template._id}} data-toggle="modal" data-target="#deleteTemplateModal"><span class="oi oi-trash"></span></a></object>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+      </div>
+
+      {% if count == 0 %}
+        <p class="font-weight-light font-italic text-center">No templates yet!<br><br>Add a template so we can create steps automatically for your listings.</p>
+      {% endif %}
+
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteTemplateModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        By deleting this template, this template will no longer be available to be used for new listings.<br><br>
+        Click delete to remove this template.
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-danger float-right" id="deleteTemplate" href="{{ url_for('account.delete_template', id=javascript_appends_this) }}" role="button">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

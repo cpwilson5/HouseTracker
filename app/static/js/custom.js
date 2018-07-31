@@ -13,6 +13,16 @@ $(document).ready(function(){
       }
   });
 
+  // sets the csrf token using a meta tag
+  var csrf_token = $('meta[name=csrf-token]').attr('content');
+  $.ajaxSetup({
+      beforeSend: function(xhr, settings) {
+          if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+              xhr.setRequestHeader("X-CSRFToken", csrf_token);
+          }
+      }
+  });
+
   $("#sortable").sortable('disable');
 
   $('#sortorder').on('click',function(){
@@ -27,12 +37,14 @@ $(document).ready(function(){
     var sortedItems = $sortables.sortable("toArray");
     var sortUrl;
 
-    if (window.location.pathname.split( '/' )[1] == 'appsteps') {
-      sortUrl = "/appsteps/sort";
+    if (window.location.pathname.split( '/' )[1] == 'apptemplates') {
+      var app_template_id = window.location.pathname.split( '/' )[2];
+      sortUrl = "/apptemplates/" + app_template_id + "/steps/sort";
     }
 
-    if (window.location.pathname.split( '/' )[1] == 'steps') {
-      sortUrl = "/steps/sort";
+    if (window.location.pathname.split( '/' )[1] == 'templates') {
+      var template_id = window.location.pathname.split( '/' )[2];
+      sortUrl = "/templates/" + template_id + "/steps/sort";
     }
 
     if (window.location.pathname.split( '/' )[1] == 'listings') {
@@ -63,4 +75,12 @@ $(document).ready(function(){
 // shows tooltips for the whole page
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
+});
+
+// handles passing a variable to a modal on the templates collection/list page so I can use the trash icon
+$(document).ready(function(){
+  $('#deleteTemplateModal').on('show.bs.modal', function (event) {
+    var templateId = $(event.relatedTarget).data('id');
+    $("#deleteTemplate").attr("href", $('#deleteTemplate').attr('href') + templateId);
+  });
 });

@@ -4,8 +4,8 @@ from flask import request, redirect, render_template, url_for, flash, current_ap
 from flask_pymongo import PyMongo
 from .forms import ListingForm, ListingStepForm, InfoForm
 from ..account.forms import InviteForm
-from models import Listing, ListingStep
-from ..account.models import User, Step, Account
+from .models import Listing, ListingStep
+from ..account.models import User, Template, TemplateStep, Account
 from bson import ObjectId
 from ..utils import s3_upload, s3_retrieve, send_sms, send_email
 from ..helpers import flash_errors, confirm_token, send_invitation, distro, pretty_date
@@ -23,24 +23,34 @@ def listings():
     if request.args.get('sort') == 'closing':
         sort = 'close_date'
         order = 1
-    elif request.args.get('sort') == 'updated':
-        sort = 'update_date'
+    elif request.args.get('sort') == 'created':
+        sort = 'create_date'
         order = -1
     elif request.args.get('sort') == 'inactive':
         sort = 'update_date'
         order = 1
     else:
-        sort = 'create_date'
+        sort = 'update_date'
         order = -1
 
-    listings = Listing.all(active=True, complete=False, sort=sort, order=order)
-    return render_template('listing/listings.html', listings=listings, title="Welcome")
+    if request.args.get('completed') == 'true':
+        complete = True
+    else:
+        complete = False
+
+    listings = Listing.all(active=True, complete=complete, sort=sort, order=order)
+    count = listings.count(True)
+    return render_template('listing/listings.html', listings=listings, count=count, title="Welcome")
 
 @listing.route('/listings/add', methods=['GET', 'POST'])
 @login_required
 @admin_login_required
 def add_listing():
     form = ListingForm()
+    if request.method == 'GET':
+        templates = Template.all(current_user.get_account())
+        form.template.choices = [("111111111111111111111111", "Use a template...")] + [(template['_id'], template['name']) for template in templates]
+
     if request.method == 'POST' and form.validate_on_submit():
         if form.photo.data:
             s3_filepath = s3_upload(form.photo, 'photo')
@@ -59,24 +69,32 @@ def add_listing():
         date_time, photo=s3_filepath)
         listing_id = listing.add()
 
-        # Add user's steps to new listing
-        steps = Step.all(current_user.get_account())
-        steps_count = steps.count(True)
-        for step in steps:
+        # Add user's template steps to new listing
+        template_steps = list(TemplateStep.all(form.template.data))
+        template_steps_count = template_steps.count(True)
+        for template_step in template_steps:
             # takes the account steps and derives the new date based on the close date
-            if 'days_before_close' in step and form.close_date.data:
-                days_before_close = step['days_before_close']
-                due_date = form.close_date.data - timedelta(days=days_before_close) if days_before_close else None
+            if 'days_before_close' in template_step['steps'] and form.close_date.data:
+                days_before_close = template_step['steps']['days_before_close']
+
+                if days_before_close:
+                    due_date = form.close_date.data - datetime.timedelta(days=days_before_close)
+                    due_date_time = datetime.datetime.combine(due_date, datetime.datetime.min.time())
+                else:
+                    due_date_time = None
             else:
                 due_date = None
 
-            listing_step = ListingStep(listing_id, step['name'], step['notes'], due_date=due_date, status='red')
+            name = template_step['steps']['name'] if 'name' in template_step['steps'] else None
+            notes = template_step['steps']['notes'] if 'notes' in template_step['steps'] else None
+
+            listing_step = ListingStep(listing_id, name=name, notes=notes, due_date=due_date_time, status='red')
             listing_step.add()
-        flash("Successfully created %s with %s steps" % (form.name.data, steps_count), category='success')
+        flash("Successfully created %s with %s steps" % (form.name.data, template_steps_count), category='success')
         return redirect(url_for('listing.listing_steps', id=listing_id))
     else:
         flash_errors(form)
-    return render_template('listing/listing.html', form=form)
+    return render_template('listing/listing.html', id=[], form=form)
 
 @listing.route('/listings/edit/<string:id>', methods=['GET', 'POST'])
 @login_required
@@ -93,7 +111,7 @@ def edit_listing(id):
         form.state.data = listing['state']
         form.zip.data = listing['zip']
         form.close_date.data = listing['close_date'] if listing['close_date'] else None
-        form.close_time.data = listing['close_date'] if listing['close_date'] and (listing['close_date'].hour <> 0 and listing['close_date'] <> 0) else None
+        form.close_time.data = listing['close_date'] if listing['close_date'] and (listing['close_date'].hour != 0 and listing['close_date'] != 0) else None
         photo = listing['photo'] if 'photo' in listing else None
 
         return render_template('listing/listing.html', id=id, form=form, photo=photo)
@@ -121,7 +139,7 @@ def edit_listing(id):
         else:
             db_close_date = None
 
-        if date_time <> db_close_date and form.close_date.data:
+        if date_time != db_close_date and form.close_date.data:
             # build body of email/text based on what changed and email/text only if changes
             email_body = "You're closing date has been updated to " + pretty_date(date_time) + "<br><br>"
             text_body = "You're closing date has been updated to " + pretty_date(date_time) + ".\n\n"
@@ -164,7 +182,7 @@ def edit_info(id):
         return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('listing/info.html', form=form)
+    return render_template('listing/info.html', id=id, form=form)
 
 @listing.route('/photo/<string:photo>', methods=['GET'])
 @login_required
@@ -176,6 +194,7 @@ def get_photo(photo):
 @admin_login_required
 def delete_listing(id):
     Listing.delete(id)
+    flash("Listing deleted", category='success')
     return redirect(url_for('listing.listings'))
 
 @listing.route('/listings/complete/<string:id>', methods=['GET', 'POST'])
@@ -183,6 +202,15 @@ def delete_listing(id):
 @admin_login_required
 def complete_listing(id):
     Listing.complete(id)
+    flash("Congrats!  Your listing has been closed", category='success')
+    return redirect(url_for('listing.listings'))
+
+@listing.route('/listings/reactivate/<string:id>', methods=['GET', 'POST'])
+@login_required
+@admin_login_required
+def reactivate_listing(id):
+    Listing.reactivate(id)
+    flash("Listing has been reactivated", category='success')
     return redirect(url_for('listing.listings'))
 
 @listing.route('/listings/<string:id>/steps')
@@ -193,6 +221,7 @@ def listing_steps(id):
     if not listing_steps:
         listing_steps = []
     users = User.all(listing=id)
+    users_count = users.count(True)
     listing = Listing.get(id)
     realtor = User.get(accounts_realtor=current_user.get_account())
 
@@ -202,7 +231,7 @@ def listing_steps(id):
             days_left = 0
     else:
         days_left = "TBD"
-    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, title="Welcome")
+    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, users_count=users_count, title="Welcome")
 
 @listing.route('/listings/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required
@@ -257,7 +286,7 @@ def add_listing_step(id):
         return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('listing/listingstep.html', form=form)
+    return render_template('listing/listingstep.html', id=id, listing_step=[], form=form)
 
 @listing.route('/listings/<string:id>/steps/edit/<string:step_id>', methods=['GET', 'POST'])
 @login_required
@@ -270,7 +299,7 @@ def edit_listing_step(id, step_id):
         form.name.data = listing_step['steps'][0]['name']
         form.notes.data = listing_step['steps'][0]['notes']
         form.due_date.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] else None
-        form.time.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] and (listing_step['steps'][0]['due_date'].hour <> 0 and listing_step['steps'][0]['due_date'] <> 0) else None
+        form.time.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] and (listing_step['steps'][0]['due_date'].hour != 0 and listing_step['steps'][0]['due_date'] != 0) else None
         form.status.data = listing_step['steps'][0]['status'] if 'status' in listing_step['steps'][0] else 'Red'
         attachment = listing_step['steps'][0]['attachment']
 
@@ -326,8 +355,6 @@ def edit_listing_step(id, step_id):
         if old_date and new_date:
             # compare dates
             #1 if the same don't do anything
-            print
-
             if date_time == listing_step['steps'][0]['due_date'].replace(tzinfo=None):
                 due_date_changed = False
             #2 otherwise we need to send alert
@@ -383,11 +410,11 @@ def edit_listing_step(id, step_id):
             if text_distro:
                 send_sms(text_distro, text_body)
         # otherwise don't send an email or text if nothing changed
-
+        flash("Successfully updated listing step", category='success')
         return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)
-        return redirect(url_for('listing.edit_listing_step', id=id, step_id=step_id))
+        return redirect(url_for('listing.edit_listing_step', id=id, listing_step=listing_step, step_id=step_id))
 
 
 @listing.route('/attachment/<string:attachment>', methods=['GET'])
@@ -426,22 +453,23 @@ def invite_client(id):
 
     if request.method == 'POST' and form.validate_on_submit():
         existing_user = User.get(email=form.email.data)
-        if existing_user is None:
-            try:
-                send_invitation(form.email.data)
-                User.add(form.first_name.data,form.last_name.data, form.email.data, \
+
+        try:
+            if existing_user is None:
+                send_invitation(form.email.data, new_user=True)
+
+                User.add(form.email.data, form.first_name.data, form.last_name.data, \
                     current_user.get_account(), 'client', invited_by=current_user.get_id(), \
                     confirmed=False, listing=[id])
-                flash("Invitation sent", category='success')
-            except:
-                flash("Error inviting client", category='danger')
-                return render_template('listing/client.html', id=id, form=form)
+            else:
+                send_invitation(form.email.data, new_user=False)
+                User.update(existing_user['_id'], form.email.data, listing=id)
 
+            flash("Invitation sent", category='success')
             return redirect(url_for('listing.listing_steps', id=id))
-        else:
-            ###  NEED TO FIX THIS TO ADD A LISTING TO AN ARRAY FOR THE USER ###
-            flash("User already exists", category='danger')
-            return render_template('listing/client.html', id=id, user=[], form=form)
+        except:
+            flash("Error inviting client", category='danger')
+            return render_template('listing/client.html', id=id, form=form)
     else:
         flash_errors(form)
         return render_template('listing/client.html', id=id, user=[], form=form)
@@ -462,7 +490,7 @@ def edit_client(id, client_id):
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
-            User.update(client_id, form.first_name.data, form.last_name.data, form.email.data, form.cell.data)
+            User.update(client_id, form.email.data, form.first_name.data, form.last_name.data, form.cell.data)
             send_invitation(form.email.data)
             flash("Invitation resent", category='success')
         except:
@@ -476,20 +504,6 @@ def edit_client(id, client_id):
 @listing.route('/listings/<string:id>/clients/delete/<string:client_id>', methods=['GET', 'POST'])
 @login_required
 def delete_client(id, client_id):
-    User.delete(id=client_id)
+    User.delete(id=client_id, context='client', listing=id)
     flash("User removed succesfully", category='success')
     return redirect(url_for('listing.listing_steps', id=id))
-
-''' resend invite - don't think we need this now that we moved resend to edit
-@listing.route('/listings/<string:id>/clients/invite/retry/<string:email>', methods=['GET'])
-@login_required
-@admin_login_required
-def retry_invite_client(id, email):
-    try:
-        send_invitation(email)
-        flash("Invitation sent", category='success')
-    except:
-        flash("Error attempting to resend invite", category='danger')
-        return redirect(url_for('listing.listing_steps', id=id, form=form))
-    return redirect(url_for('listing.listing_steps', id=id))
-'''

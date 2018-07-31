@@ -1,9 +1,9 @@
 from flask import render_template
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app
-from .forms import StepForm, UserForm, InviteForm, RegForm, LoginForm, PasswordForm, ForgotPasswordForm, ResetPasswordForm
-from models import User, Account, Step
-from ..configuration.models import AppStep
+from .forms import TemplateForm, TemplateStepForm, UserForm, InviteForm, RegForm, LoginForm, ImpersonateForm, PasswordForm, ForgotPasswordForm, ResetPasswordForm
+from .models import User, Account, Template, TemplateStep
+from ..configuration.models import AppTemplate, AppTemplateStep
 from ..helpers import flash_errors, confirm_token, send_invitation, send_reset
 from ..decorators import admin_login_required
 import json
@@ -19,19 +19,32 @@ def register():
         if existing_user is None:
             account = Account(form.first_name.data + " " + form.last_name.data, form.cell.data, form.email.data)
             account_id = account.add()
-            user_id = User.add(form.first_name.data, form.last_name.data, form.email.data, \
+            user_id = User.add(form.email.data, form.first_name.data, form.last_name.data, \
                 account_id, 'realtor', form.cell.data, form.password.data, confirmed=True)
 
             login_user(User(str(user_id),form.email.data,account_id,superuser=False,active=True))
 
-            # Add default app steps to new users
-            app_steps = AppStep.all()
-            app_steps_count = app_steps.count(True)
-            for app_step in app_steps:
-                days_before_close = app_step['days_before_close'] if 'days_before_close' in app_step else None
-                step = Step(app_step['name'], app_step['notes'], days_before_close, account_id)
-                step.add()
-            flash("Welcome and we added %s steps to get you started" % (app_steps_count), category='success')
+            # Add default app template and app template steps to new users
+            app_templates = AppTemplate.all()
+            app_templates_count = app_templates.count(True)
+            for app_template in app_templates:
+                # get the app template steps
+                app_template_steps = AppTemplateStep.all(app_template['_id'])
+
+                # create the template in the account
+                template = Template(app_template['name'], account_id)
+                template_id = template.add()
+
+                # create each template step in the new account template
+                for app_template_step in app_template_steps:
+                    days_before_close = app_template_step['steps']['days_before_close'] if 'days_before_close' in app_template_step['steps'] else None
+                    name = app_template_step['steps']['name'] if 'name' in app_template_step['steps'] else None
+                    notes = app_template_step['steps']['notes'] if 'notes' in app_template_step['steps'] else None
+
+                    template_step = TemplateStep(template_id, name, notes, days_before_close)
+                    template_step.add()
+
+            flash("Welcome and we added %s templates to get you started" % (app_templates_count), category='success')
             return redirect(url_for('listing.listings'))
         else:
             flash("User already exists", category='danger')
@@ -49,6 +62,7 @@ def login():
             user_obj = User(str(user['_id']),user['email'],user['account'],user['superuser'],user['active'])
             if user_obj.is_active() is True:
                 login_user(user_obj, remember=form.remember_me.data)
+                User.log_login(user_obj)
                 flash("Logged in successfully", category='success')
                 return redirect(url_for('listing.listings'))
             else:
@@ -57,68 +71,160 @@ def login():
             flash("Wrong email or password", category='danger')
     return render_template('account/login.html', title='login', form=form)
 
+@account.route('/impersonate', methods=['GET', 'POST'])
+def impersonate():
+    form = ImpersonateForm()
+
+    if request.method == 'POST':
+        user = User.get(email=form.email.data)
+        if user and User.validate_login(user['password'], form.password.data) and user['superuser']:
+            impersonate_user = User.get(email=form.impersonate_email.data)
+            if impersonate_user:
+                user_obj = User(str(impersonate_user['_id']),impersonate_user['email'],impersonate_user['account'],impersonate_user['superuser'],impersonate_user['active'])
+                if user_obj.is_active() is True:
+                    login_user(user_obj)
+                    flash("Logged in successfully", category='success')
+                    return redirect(url_for('listing.listings'))
+                else:
+                    flash("Wrong email or password", category='danger')
+            else:
+                flash("User doesn't exist", category='danger')
+        else:
+            flash("Wrong email or password", category='danger')
+    return render_template('account/impersonate.html', title='login', form=form)
+
 @account.route('/logout')
 def logout():
     logout_user()
     flash("Logged out successfully", category='success')
     return redirect(url_for('home.homepage'))
 
-### Steps ###
+### Templates ###
 
-@account.route('/steps')
+@account.route('/templates')
 @login_required
 @admin_login_required
-def steps():
-    steps = Step.all(current_user.get_account())
-    return render_template('account/steps.html', steps=steps, title="Welcome")
+def templates():
+    templates = Template.all(current_user.get_account())
+    count = templates.count(True)
+    return render_template('account/templates.html', templates=templates, count=count)
 
-@account.route('/steps/add', methods=['GET', 'POST'])
+@account.route('/templates/add', methods=['GET', 'POST'])
 @login_required
 @admin_login_required
-def add_step():
-    form = StepForm()
+def add_template():
+    form = TemplateForm()
     if request.method == 'POST' and form.validate_on_submit():
-        step = Step(form.name.data, form.notes.data, form.days_before_close.data, current_user.get_account())
-        step.add()
-        return redirect(url_for('account.steps'))
+        template = Template(form.name.data, current_user.get_account())
+        id = template.add()
+        return redirect(url_for('account.template_steps', id=id))
     else:
         flash_errors(form)
-    return render_template('account/step.html', form=form)
+    return render_template('account/template.html', template=[], form=form)
 
 
-@account.route('/steps/edit/<string:id>', methods=['GET', 'POST'])
+@account.route('/templates/edit/<string:id>', methods=['GET', 'POST'])
 @login_required
 @admin_login_required
-def edit_step(id):
-    form = StepForm()
+def edit_template(id):
+    form = TemplateForm()
 
     if request.method == 'GET':
-        step = Step.get(id)
-        form.name.data = step['name']
-        form.notes.data = step['notes']
-        form.days_before_close.data = step['days_before_close'] if 'days_before_close' in step else None
+        template = Template.get(id)
+        form.name.data = template['name']
 
     if request.method == 'POST' and form.validate_on_submit():
-        Step.update(id, form.name.data, form.notes.data, form.days_before_close.data)
-        return redirect(url_for('account.steps'))
+        Template.update(id, form.name.data)
+        return redirect(url_for('account.templates'))
     else:
         flash_errors(form)
-    return render_template('account/step.html', id=id, form=form)
+    return render_template('account/template.html', id=id, template=template, form=form)
 
 
-@account.route('/steps/delete/<string:id>', methods=['GET', 'POST'])
+@account.route('/templates/delete/<string:id>', methods=['GET', 'POST'])
 @login_required
 @admin_login_required
-def delete_step(id):
-    Step.delete(id)
-    flash("Step removed succesfully", category='success')
-    return redirect(url_for('account.steps'))
+def delete_template(id):
+    Template.delete(id)
+    flash("Template removed succesfully", category='success')
+    return redirect(url_for('account.templates'))
 
-@account.route('/steps/sort', methods=['POST'])
+
+### Template Steps ###
+
+@account.route('/templates/<string:id>/steps', methods=['GET', 'POST'])
 @login_required
-def sort_step():
-    Step.sort(current_user.get_account(), request.form['order'])
+@admin_login_required
+def template_steps(id):
+    template = Template.get(id)
+    template_steps = TemplateStep.all(id)
+    # this is weird but I had to get the cursor twice
+    # because whenever I used "list" it would replace my template_steps_list
+    # even when I just was referencing the variable
+    template_steps_list = TemplateStep.all(id)
+    count = len(list(template_steps_list))
+
+    # this is edit template but we're doing it in a modal since it's just a name
+    form = TemplateForm()
+
+    if request.method == 'GET':
+        form.name.data = template['name']
+
+    if request.method == 'POST' and form.validate_on_submit():
+        Template.update(id, form.name.data)
+        return redirect(url_for('account.template_steps', id=id))
+    else:
+        flash_errors(form)
+
+    return render_template('account/templatesteps.html', form=form, id=id, template=template, template_steps=template_steps, count=count)
+
+@account.route('/templates/<string:id>/steps/add', methods=['GET', 'POST'])
+@login_required
+@admin_login_required
+def add_template_step(id):
+    form = TemplateStepForm()
+    if request.method == 'POST' and form.validate_on_submit():
+        template_step = TemplateStep(id, form.name.data, form.notes.data, form.days_before_close.data)
+        template_step.add()
+        return redirect(url_for('account.template_steps', id=id))
+    else:
+        flash_errors(form)
+    return render_template('account/templatestep.html', id=id, template_step=[], form=form)
+
+@account.route('/templates/<string:id>/steps/edit/<string:step_id>', methods=['GET', 'POST'])
+@login_required
+@admin_login_required
+def edit_template_step(id, step_id):
+    form = TemplateStepForm()
+
+    if request.method == 'GET':
+        template_step = TemplateStep.get(id, step_id)
+        form.name.data = template_step['steps'][0]['name']
+        form.notes.data = template_step['steps'][0]['notes']
+        form.days_before_close.data = template_step['steps'][0]['days_before_close'] if 'days_before_close' in template_step['steps'][0] else None
+        return render_template('account/templatestep.html', id=id, step_id=step_id, template_step=template_step, form=form)
+
+    if request.method == 'POST' and form.validate_on_submit():
+        TemplateStep.update(id, step_id, form.name.data, form.notes.data, form.days_before_close.data)
+        return redirect(url_for('account.template_steps', id=id))
+    else:
+        flash_errors(form)
+        return render_template('account/templatestep.html', id=id, step_id=step_id, template_step=[], form=form)
+
+@account.route('/templates/<string:id>/steps/delete/<string:step_id>', methods=['GET', 'POST'])
+@login_required
+@admin_login_required
+def delete_template_step(id, step_id):
+    TemplateStep.delete(id, step_id)
+    flash("Step removed succesfully", category='success')
+    return redirect(url_for('account.template_steps', id=id))
+
+@account.route('/templates/<string:id>/steps/sort', methods=['POST'])
+@login_required
+def sort_template_step(id):
+    TemplateStep.sort(id, request.form['order'])
     return json.dumps({'status':'Successfully sorted'})
+
 
 ### My Account ###
 
@@ -146,7 +252,7 @@ def user():
         p = None # don't want to set the password as we don't have it on page; model handles
         ea = form.email_alert.data
         ta = form.text_alert.data
-        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
+        User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, \
             confirmed=True, email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
         return redirect(url_for('listing.listings'))
@@ -174,7 +280,7 @@ def password():
         p = form.password.data
         ea = user['email_alert']
         ta = user['text_alert']
-        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, \
+        User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, \
             email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
         return redirect(url_for('listing.listings'))
@@ -192,7 +298,8 @@ def password():
 @admin_login_required
 def admins():
     users = User.all(account=current_user.get_account())
-    return render_template('account/admins.html', users=users, title="Welcome")
+    count = users.count(True)
+    return render_template('account/admins.html', users=users, count=count, title="Welcome")
 
 
 @account.route('/admins/invite', methods=['GET', 'POST'])
@@ -209,7 +316,7 @@ def invite_admin():
         if existing_user is None:
             try:
                 send_invitation(form.email.data)
-                User.add(form.first_name.data, form.last_name.data, form.email.data, \
+                User.add(form.email.data, form.first_name.data, form.last_name.data, \
                     current_user.get_account(), 'admin', invited_by=current_user.get_id(), confirmed=False)
                 flash("Invitation sent", category='success')
             except:
@@ -257,7 +364,7 @@ def register_with_token(token):
         ea = True if user['role'] == 'client' else False
         ta = True if user['role'] == 'client' else False
 
-        User.update(id=id, first_name=fn, last_name=ln, email=e, cell=c, password=p, confirmed=True, \
+        User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, confirmed=True, \
             email_alert=ea, text_alert=ta)
         login_user(User(str(id),form.email.data,account_id,superuser=False, active=True))
         flash("Updated successfully", category='success')
@@ -281,7 +388,7 @@ def edit_admin(id):
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
-            User.update(id, form.first_name.data, form.last_name.data, form.email.data)
+            User.update(id, form.email.data, form.first_name.data, form.last_name.data)
             send_invitation(form.email.data)
             flash("Invitation resent", category='success')
         except:
@@ -297,7 +404,7 @@ def edit_admin(id):
 @login_required
 @admin_login_required
 def delete_admin(id):
-    User.delete(id=id)
+    User.delete(id=id, context='admin')
     flash("User removed succesfully", category='success')
     return redirect(url_for('account.admins'))
 
@@ -352,7 +459,7 @@ def reset_password(token):
         email = user['email']
         p = form.password.data
 
-        User.update(id=id, first_name=first_name, last_name=last_name, email=email, password=p)
+        User.update(id=id, email=email, first_name=first_name, last_name=last_name, password=p)
         flash("Updated successfully.  Login below.", category='success')
         return redirect(url_for('account.login'))
     else:

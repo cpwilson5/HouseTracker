@@ -35,8 +35,8 @@ class Listing(object):
             'account': current_user.get_account(),
             'active': True,
             'steps': [],
-            'create_date': datetime.datetime.now().isoformat(),
-            'update_date': datetime.datetime.now().isoformat()
+            'create_date': datetime.datetime.utcnow(),
+            'update_date': datetime.datetime.utcnow()
         })
 
     @staticmethod
@@ -46,12 +46,22 @@ class Listing(object):
         })
 
     @staticmethod
-    def all(active=True, complete=False, sort='create_date', order=-1):
-        return mongo.db.listings.find({
-            'account': current_user.get_account(),
-            'active': active,
-            'complete_date' : { '$exists': complete }
-        }).sort(sort,order)
+    def all(active=True, complete=False, sort='update_date', order=-1):
+        if complete == False: #this is the default and the listings results
+            return mongo.db.listings.find({
+                'account': current_user.get_account(),
+                'active': active,
+                'complete_date' : { '$exists': complete }
+            }).sort(sort,order)
+
+        if complete == True: #this limits to the last 30 days until we build paging
+            thirty_days_before = (datetime.datetime.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+
+            return mongo.db.listings.find({
+                'account': current_user.get_account(),
+                'active': active,
+                'complete_date' : { '$gte' : thirty_days_before }
+            }).sort(sort,order)
 
     @staticmethod
     def update(id, name, address1, address2, city, state, zip, close_date, photo):
@@ -70,7 +80,7 @@ class Listing(object):
                 'zip': zip,
                 'close_date': close_date,
                 'photo': photo,
-                'update_date': datetime.datetime.now().isoformat()
+                'update_date': datetime.datetime.utcnow()
                 }
         }, upsert=False)
 
@@ -80,7 +90,7 @@ class Listing(object):
             {'_id': ObjectId(id)},
             {'$set': {
                 'info': info,
-                'update_date': datetime.datetime.now().isoformat()
+                'update_date': datetime.datetime.utcnow()
                 }
         }, upsert=False)
 
@@ -90,7 +100,7 @@ class Listing(object):
             {'_id': ObjectId(id)},
             {'$set': {
                 'active': False,
-                'update_date': datetime.datetime.now().isoformat()
+                'update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
@@ -99,9 +109,22 @@ class Listing(object):
         return mongo.db.listings.update_one(
             {'_id': ObjectId(id)},
             {'$set': {
-                'complete_date': datetime.datetime.now().isoformat(),
-                'update_date': datetime.datetime.now().isoformat()
+                'complete_date': datetime.datetime.utcnow(),
+                'update_date': datetime.datetime.utcnow()
             }
+        }, upsert=False)
+
+    @staticmethod
+    def reactivate(id):
+        return mongo.db.listings.update_one(
+            {'_id': ObjectId(id)},
+            {
+                '$unset': {
+                    'complete_date': '',
+                },
+                '$set': {
+                    'update_date': datetime.datetime.utcnow()
+                }
         }, upsert=False)
 
 
@@ -129,7 +152,7 @@ class ListingStep(object):
         return mongo.db.listings.update_one({
             '_id': ObjectId(self.listing_id)
         },{
-            '$set': { 'update_date': datetime.datetime.now().isoformat() },
+            '$set': { 'update_date': datetime.datetime.utcnow() },
             '$inc': {'order': 1}, #increment the listing order count to keep track of # of listing steps
             '$push': {
                 'steps':
@@ -142,8 +165,8 @@ class ListingStep(object):
                     'status': self.status,
                     'active': True,
                     'order': next_order, #set the new listing step to the next number
-                    'create_date': datetime.datetime.now().isoformat(),
-                    'update_date': datetime.datetime.now().isoformat()
+                    'create_date': datetime.datetime.utcnow(),
+                    'update_date': datetime.datetime.utcnow()
                 }
             }
         }, upsert=False)
@@ -183,8 +206,6 @@ class ListingStep(object):
         if attachment is None:
             attachment = ListingStep.get(id, step_id)['steps'][0]['attachment']
 
-        print due_date
-
         return mongo.db.listings.update_one({
             '_id': ObjectId(id),
             'steps._id': ObjectId(step_id)
@@ -195,8 +216,8 @@ class ListingStep(object):
                 'steps.$.attachment': attachment,
                 'steps.$.due_date': due_date,
                 'steps.$.status': status,
-                'steps.$.update_date': datetime.datetime.now().isoformat(),
-                'update_date': datetime.datetime.now().isoformat()
+                'steps.$.update_date': datetime.datetime.utcnow(),
+                'update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
@@ -208,8 +229,8 @@ class ListingStep(object):
         },{
             '$set': {
                 'steps.$.active': False,
-                'steps.$.update_date': datetime.datetime.now().isoformat(),
-                'update_date': datetime.datetime.now().isoformat()
+                'steps.$.update_date': datetime.datetime.utcnow(),
+                'update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 
@@ -220,9 +241,9 @@ class ListingStep(object):
             'steps._id': ObjectId(step_id)
         },{
             '$set': {
-                'steps.$.complete_date': datetime.datetime.now().isoformat(),
-                'steps.$.update_date': datetime.datetime.now().isoformat(),
-                'update_date': datetime.datetime.now().isoformat()
+                'steps.$.complete_date': datetime.datetime.utcnow(),
+                'steps.$.update_date': datetime.datetime.utcnow(),
+                'update_date': datetime.datetime.utcnow()
             }
         }, upsert=False)
 

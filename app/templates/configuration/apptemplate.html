@@ -1,19 +1,22 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
-{% set active_page = "listings" %}
+{% set active_page = "settings" %}
 
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Edit Info</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('configuration.app_templates') }}">Master Templates</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Add Template</li>
   </ol>
 </nav>
 {% endblock %}
 
 {% block header %}
+<div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+  <h1 class="text-uppercase">{{ template.name }}</h1>
+</div>
 {% endblock %}
 
 {% block body %}
@@ -22,14 +25,15 @@
   <!-- form card login with validation feedback -->
   <div class="card card-outline-secondary">
       <div class="card-header">
-          <h3 class="mb-0 d-inline-block">Edit Info</h3>
+          <h3 class="mb-0 d-inline-block">Add Template</h3>
       </div>
       <div class="card-body">
-          <form class="form" role="form" autocomplete="off" novalidate="" method="POST">
+          <form class="form" role="form" autocomplete="off" id="loginForm" novalidate="" method="POST">
               {{ form.hidden_tag() }}
               <div class="form-row mb-3">
                 <div class="col">
-                  {{ form.info (class_="form-control")}}
+                  <label for="inputName">Name</label>
+                  {{ form.name (class_="form-control")}}
                 </div>
               </div>
               <button type="submit" class="btn btn-secondary float-right" id="btnLogin">Save</button>

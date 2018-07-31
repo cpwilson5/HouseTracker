@@ -1,6 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
+{% set active_page = "listings" %}
+
+{% set action = "Add" %}
+{% if id %}
+  {% set action = "Edit" %}
+{% endif %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    {% if action == "Edit" %}<li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>{% endif %}
+    <li class="breadcrumb-item active" aria-current="page">{{ action }} Listing</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block header %}
 {% endblock %}
 
@@ -11,9 +28,9 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0 d-inline-block">Add/Edit Listing</h3>
-            {% if id %}
-            <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_listing', id=id) }}" role="button">Delete</a>
+            <h3 class="mb-0 d-inline-block">{{ action }} Listing</h3>
+            {% if action == "Edit" %}
+            <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
             {% endif %}
         </div>
         <div class="card-body">
@@ -75,7 +92,12 @@
                 <div class="form-group row">
                   <div class="col-lg-12">
                     {% if id %}
-                    <a class="btn btn-outline-secondary" href="{{ url_for('listing.complete_listing', id=id) }}" role="button">Complete</a>
+                    <a class="btn btn-outline-secondary" href="#" role="button" data-toggle="modal" data-target="#completeModal">Complete</a>
+                    {% endif %}
+                    {% if not id %}
+                    <div class="float-left">
+                      {{ form.template (class_="form-control")}}
+                    </div>
                     {% endif %}
                     <input type="submit" class="btn btn-secondary float-right" value="Save">
                   </div>
@@ -84,6 +106,49 @@
         </div>
     </div>
 </div>
-<!-- /form user info -->
+
+<!-- Complete Confirm Modal -->
+<div class="modal fade" id="completeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        By marking this listing complete, it will be removed from your active listings.<br><br>
+        You will be able to retrieve it for 30 days using the status filter on the listings page.<br><br>
+        Click continue to complete the listing.
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-secondary" href="{{ url_for('listing.complete_listing', id=id) }}" role="button">Continue</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        By deleting this listing, you will no longer be able to view or reactivate this listing.<br><br>
+        To close a completed listing, click the "complete" button on the edit page rather than the "delete" button.<br><br>
+        Click delete to remove this listing from your account.
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_listing', id=id) }}" role="button">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

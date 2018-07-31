@@ -1,9 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
+{% set active_page = "team" %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Team</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="display-4">Team Members</h1>
+  <h1 class="text-uppercase">Team</h1>
 </div>
 
 <div class="container">
@@ -32,7 +43,13 @@
         </div>
         {% endif %}
       {% endfor %}
+
+      {% if count == 1 %} <!-- it's 1 because of the realtor -->
+        <p class="font-weight-light font-italic text-center"><br>You're flying solo!<br><br>Add a team member to give admin access to your account</p>
+      {% endif %}
+
     </div>
+
   </div>
 </div>
 

@@ -25,35 +25,36 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         {% if current_user.is_authenticated %}
-        <h5 class="my-0 mr-md-auto font-weight-normal"><a class="nav-link p-1 text-dark" href="{{ url_for('listing.listings') }}">Dashboard</a></h5>
+        <h5 class="d-none d-lg-block my-0 mr-md-auto font-weight-normal"><a class="nav-link p-1 text-dark" href="{{ url_for('listing.listings') }}">House Status</a></h5>
         {% else %}
         <h5 class="my-0 mr-md-auto font-weight-normal"><a class="nav-link p-1 text-dark" href="{{ url_for('home.homepage') }}">House Status</a></h5>
         {% endif %}
         <ul class="navbar-nav ml-md-auto">
           {% if current_user.is_authenticated %}
-          {% if current_user.get_role() != 'client' %}
-          <li class="nav-item">
-            <a class="nav-link p-2 text-dark" href="{{ url_for('listing.listings') }}">Listings</a>
-          </li>
-          {% endif %}
-          <li class="nav-item dropdown ml-2 mr-2">
-            <a class="nav-link dropdown-toggle p-2 text-dark" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
-            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-              {% if current_user.get_role() != 'client' %}
-              <a class="dropdown-item" href="{{ url_for('account.admins') }}">Team Members</a>
-              <a class="dropdown-item" href="{{ url_for('account.steps') }}">Setup Process</a>
-              <div class="dropdown-divider"></div>
-              {% endif %}
-              <a class="dropdown-item" href="{{ url_for('account.user') }}">My Account</a>
-              {% if current_user.is_superuser %}
-              <div class="dropdown-divider"></div>
-              <a class="dropdown-item" href="{{ url_for('configuration.app_steps') }}">App Settings</a>
-              {% endif %}
-            </div>
-          </li>
-          <li class="nav-item ml-2 mr-2">
-            <a class="btn btn-outline-secondary" href="{{ url_for('account.logout') }}">Log out</a>
-          </li>
+            {% if current_user.get_role() != 'client' %}
+            <li class="nav-item {{ 'active' if active_page == 'listings' else '' }}">
+              <a class="nav-link p-2 text-dark" href="{{ url_for('listing.listings') }}">Listings</a>
+            </li>
+            <li class="nav-item ml-lg-2 {{ 'active' if active_page == 'team' else '' }}">
+              <a class="nav-link p-2 text-dark" href="{{ url_for('account.admins') }}">Team</a>
+            </li>
+            <li class="nav-item ml-lg-2 {{ 'active' if active_page == 'templates' else '' }}">
+              <a class="nav-link p-2 text-dark" href="{{ url_for('account.templates') }}">Templates</a>
+            </li>
+            {% endif %}
+            <li class="nav-item dropdown ml-lg-2 mr-lg-2 {{ 'active' if active_page == 'settings' else '' }}">
+              <a class="nav-link dropdown-toggle p-2 text-dark" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Settings</a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{{ url_for('account.user') }}">My Account</a>
+                {% if current_user.is_superuser %}
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="{{ url_for('configuration.app_templates') }}">App Settings</a>
+                {% endif %}
+              </div>
+            </li>
+            <li class="nav-item ml-2 mr-2">
+              <a class="btn btn-outline-secondary" href="{{ url_for('account.logout') }}">Log out</a>
+            </li>
           {% else %}
           <li class="nav-item ml-2 mr-2">
             <a class="nav-link p-2 text-dark" href="{{ url_for('home.features') }}">Features</a>
@@ -72,32 +73,35 @@
       </div>
     </nav>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible text-center" role="alert">
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <!-- <strong>Title</strong> --> {{ message }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+  {% block breadcrumb %}
+  {% endblock %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    <!-- Categories: success (green), info (blue), warning (yellow), danger (red) -->
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible text-center" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <!-- <strong>Title</strong> --> {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
 
   {% block header %}
   {% endblock %}
 
-
-
   {% block body %}
   {% endblock %}
+
 
   <div class="container pt-5">
     <footer class="pt-4 my-md-5 pt-md-5 border-top">
       <div class="row">
         <div class="col-12 col-md">
-          <small class="d-block mb-3 text-muted">&copy; 2017-2018</small>
+          <small class="d-block mb-3 float-right text-muted">&copy; 2018</small>
         </div>
+        <!--
         <div class="col-6 col-md">
           <h5>Features</h5>
           <ul class="list-unstyled text-small">
@@ -127,6 +131,7 @@
             <li><a class="text-muted" href="#">Terms</a></li>
           </ul>
         </div>
+      -->
       </div>
     </footer>
   </div>
