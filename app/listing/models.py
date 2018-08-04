@@ -47,21 +47,25 @@ class Listing(object):
 
     @staticmethod
     def all(active=True, complete=False, sort='update_date', order=-1):
+        get = {
+            'active': active
+        }
+
         if complete == False: #this is the default and the listings results
-            return mongo.db.listings.find({
-                'account': current_user.get_account(),
-                'active': active,
-                'complete_date' : { '$exists': complete }
-            }).sort(sort,order)
+            get['complete_date'] = { '$exists': complete }
+        else: #this limits to the last 30 days until we build paging
+            thirty_days_before = datetime.datetime.today() - datetime.timedelta(days=30)
+            get['complete_date'] = { '$gte' : datetime.datetime(2018, 7, 5) }
 
-        if complete == True: #this limits to the last 30 days until we build paging
-            thirty_days_before = (datetime.datetime.today() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+        if current_user.get_listing() == 'all': # realtor/admin's listings
+            get['account'] = current_user.get_account()
+            return mongo.db.listings.find(get).sort(sort,order)
 
-            return mongo.db.listings.find({
-                'account': current_user.get_account(),
-                'active': active,
-                'complete_date' : { '$gte' : thirty_days_before }
-            }).sort(sort,order)
+        else: # it's a client/partner
+            listings_to_retrieve = current_user.get_listing()
+            listings_to_retrieve = [ObjectId(s) for s in listings_to_retrieve]
+            get['_id'] = { '$in': listings_to_retrieve }
+            return mongo.db.listings.find(get).sort(sort,order)
 
     @staticmethod
     def update(id, name, address1, address2, city, state, zip, close_date, photo):

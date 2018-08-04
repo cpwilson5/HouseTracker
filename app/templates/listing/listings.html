@@ -19,12 +19,14 @@
 
 {% block body %}
 <div class="container">
-  <div class="row">
+  <div class="row mb-4">
     <div class="col">
-      <a class="btn btn-outline-secondary btn-md mb-4" href="{{ url_for('listing.add_listing') }}">+ Add</a>
+      {% if current_user.get_role() != 'client' %}
+        <a class="btn btn-outline-secondary btn-md" href="{{ url_for('listing.add_listing') }}">+ Add</a>
+      {% endif %}
     </div>
     <div class="col-8">
-      {% if completed == False %}
+      {% if completed == False and current_user.get_role() != 'client' %}
       <div class="dropdown1">
         <button class="btn btn-outline-secondary dropdown-toggle float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Sort
@@ -52,16 +54,14 @@
   <div class="card-deck">
   {% for listing in listings %}
     <div class="card mb-4 inline-block">
-      {% if completed == False %}<a href="{{ url_for('listing.listing_steps', id=listing._id) }}" class="card-block clearfix">{% endif %}
+      <a href="{{ url_for('listing.listing_steps', id=listing._id) }}" class="card-block clearfix">
         <div class="card-header">
           <div class="row">
             <div class="col-8 font-weight-bold text-uppercase text-truncate">
               {{ listing.name }}
             </div>
             <div class="col">
-               {% if completed == True %}
-                  <span class="float-right"><a href="{{ url_for('listing.reactivate_listing', id=listing._id) }}" class="btn btn-outline-secondary btn-sm float-right">Reactivate</a></span>
-               {% elif listing.close_date %}
+               {% if listing.close_date %}
                   <span class="text-success float-right">{{ listing.close_date | pretty_date("%b %-d")}}</span>
                {% endif %}
             </div>

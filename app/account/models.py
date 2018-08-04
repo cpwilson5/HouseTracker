@@ -106,7 +106,7 @@ class User(UserMixin):
         if listing:
             mongo.db.users.update_one({
                 '_id': ObjectId(id)},{
-                '$push': {'listing': listing}
+                '$addToSet': {'listing': listing}
             }, upsert=False)
 
         # if existing user is being updated so it shouldn't overwrite

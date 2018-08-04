@@ -114,7 +114,9 @@ def edit_listing(id):
         form.close_time.data = listing['close_date'] if listing['close_date'] and (listing['close_date'].hour != 0 and listing['close_date'] != 0) else None
         photo = listing['photo'] if 'photo' in listing else None
 
-        return render_template('listing/listing.html', id=id, form=form, photo=photo)
+        completed = True if 'complete_date' in listing else False
+
+        return render_template('listing/listing.html', id=id, completed=completed, form=form, photo=photo)
 
     if request.method == 'POST' and form.validate_on_submit():
         if form.photo.data:
