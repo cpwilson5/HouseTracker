@@ -455,16 +455,17 @@ def invite_client(id):
 
     if request.method == 'POST' and form.validate_on_submit():
         existing_user = User.get(email=form.email.data)
+        realtor = User.get(accounts_realtor=current_user.get_account())
 
         try:
             if existing_user is None:
-                send_invitation(form.email.data, new_user=True)
+                send_invitation(form.email.data, realtor=realtor, new_user=True)
 
                 User.add(form.email.data, form.first_name.data, form.last_name.data, \
                     current_user.get_account(), 'client', invited_by=current_user.get_id(), \
                     confirmed=False, listing=[id])
             else:
-                send_invitation(form.email.data, new_user=False)
+                send_invitation(form.email.data, realtor=realtor, new_user=False)
                 User.update(existing_user['_id'], form.email.data, listing=id)
 
             flash("Invitation sent", category='success')
@@ -492,6 +493,7 @@ def edit_client(id, client_id):
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
+            realtor = User.get(accounts_realtor=current_user.get_account())
             User.update(client_id, form.email.data, form.first_name.data, form.last_name.data, form.cell.data)
             send_invitation(form.email.data)
             flash("Invitation resent", category='success')
