@@ -25,15 +25,20 @@ $(document).ready(function(){
 
   $("#sortable").sortable('disable');
 
-  $('#sortorder').on('click',function(){
+  $('#sortorder, #sortordermobile').on('click',function(){
     $("#sortable").sortable('enable');
-    $('#sortorder').hide();
-    $('#saveorder').show();
+    $('#sortorder, #sortordermobile').hide();
+    $('#saveorder, #saveordermobile').show();
+    $(".dragger").show();
+    $("#sortable").wrap( "<div class='card mb-4 pl-4 pr-4 pt-4' style='border-style:dashed; color:gray; border-color:gray;'></div>" );
+    $(".listingstep").hover(function () {
+      $(this).toggleClass("hover");
+    });
   });
 
   $("#sortable").disableSelection();
 
-  $('#saveorder').on('click',function(){
+  $('#saveorder, #saveordermobile').on('click',function(){
     var sortedItems = $sortables.sortable("toArray");
     var sortUrl;
 
@@ -53,8 +58,14 @@ $(document).ready(function(){
     }
 
     $("#sortable").sortable('disable');
-    $('#sortorder').show();
-    $('#saveorder').hide();
+    $('#sortorder, #sortordermobile').show();
+    $('#saveorder, #saveordermobile').hide();
+    $(".dragger").hide();
+    $("#sortable").unwrap();
+    $(".listingstep").hover(function () {
+      $(this).toggleClass("hover");
+    });
+
     $.ajax({
       type: "POST",
       url: sortUrl,
@@ -83,4 +94,12 @@ $(document).ready(function(){
     var templateId = $(event.relatedTarget).data('id');
     $("#deleteTemplate").attr("href", $('#deleteTemplate').attr('href') + templateId);
   });
+});
+
+// handles the show/hide verbiage toggle on listing steps
+$('#showhide, #showhidemobile').click(function(){
+    $(this).toggleClass('ButtonClicked');
+    $(this).text(function(i,old){
+        return old=='Show completed' ?  'Hide completed' : 'Show completed';
+    });
 });

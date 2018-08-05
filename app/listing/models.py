@@ -193,15 +193,18 @@ class ListingStep(object):
         {'steps.$':1})
 
     @staticmethod
-    def all(id, active=True, complete=False):
+    def all(id, active=True, include_complete=True):
+        match = {
+            '_id' : ObjectId(id),
+            'steps.active': active
+        }
+
+        if include_complete == False:
+            match['steps.complete_date'] = { '$exists': False }
+
         return mongo.db.listings.aggregate([
             { '$unwind' : '$steps' },
-            { '$match' : {
-                '_id' : ObjectId(id),
-                'steps.active': active,
-                'steps.complete_date' : { '$exists': complete }
-                }
-            },
+            { '$match' : match },
             { '$sort' : { 'steps.order' : 1 } }
         ])
 

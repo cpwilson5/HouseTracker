@@ -18,33 +18,50 @@
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
   <h1 class="text-uppercase">{{ listing.name}}</h1>
-  <p class="lead">{{days_left}} days until closing</p>
+  {% if days_left > 1 %}<p class="lead">{{days_left}} days until closing</p>
+  {% else %}<p class="lead">{{days_left}} day until closing</p>
+  {% endif %}
 </div>
-
-{% if current_user.get_role() != 'client' %}
-<div class="container">
-  <div class="row">
-    <div class="col-md-8">
-      <a class="btn btn-outline-secondary btn-md mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
-      {% if listing_steps %}
-      <button id="sortorder" class="expander btn btn-outline-secondary btn-md mb-4 ml-2">Sort</a>
-      <button id="saveorder" style="display:none" class="btn btn-outline-secondary btn-md mb-4 ml-2">Save</a>
-      {% endif %}
-    </div>
-  </div>
-</div>
-{% endif %}
 {% endblock %}
 
 {% block body %}
 <div class="container">
+
+  <!-- note the below is duplicated on this page twice.
+  because I wanted it to display in the right column on desktop
+  but on mobile I just wanted the first card in the right column
+  to be at the top -->
+  <!-- THIS IS MOBILE ONLY -->
+  {% if current_user.get_role() != 'client' %}
+  <div class="card mb-2 d-md-none d-lg-none d-xl-none" style="border: none;">
+    <div class="row">
+      <div class="col">
+        <a class="btn btn-outline-secondary btn-block mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
+      </div>
+      <div class="col">
+        {% if listing_steps %}
+        <button id="sortordermobile" class="expander btn btn-outline-secondary btn-block">Sort</button>
+        <button id="saveordermobile" style="display:none; margin-top:0px;" class="btn btn-outline-secondary btn-block">Save</button>
+        {% endif %}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <button id="showhidemobile" class="btn btn-outline-secondary btn-block mb-4" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="completed">Show completed</button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
 
   <div class="row">
     <div class="col-md-8">
       <div id="sortable">
         {% for listing_step in listing_steps %}
 
-        {% if listing_step.steps.status == 'red' %}
+        {% if listing_step.steps.complete_date %}
+          {% set border_color = 'gray '%}
+        {% elif listing_step.steps.status == 'red' %}
           {% set border_color = 'indianred' %}
         {% elif listing_step.steps.status == 'yellow' %}
           {% set border_color = 'khaki' %}
@@ -52,40 +69,45 @@
           {% set border_color = 'seagreen '%}
         {% endif %}
 
-        <div id="{{ listing_step.steps._id }}" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
-          {% if current_user.get_role() != 'client' %}
-          <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
-          {% endif %}
-            <div class="card-header">
-              <div class="row">
-                <div class="col font-weight-bold text-uppercase">
-                  {{ listing_step.steps.name }}
-                </div>
-                <div class="col">
-                  {% if listing_step.steps.due_date %}
-                     {% if listing_step.steps.due_date.strftime('%H:%M:%S') != '00:00:00' %}
-                       <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d at %-I:%M %p") }}</span>
-                     {% else %}
-                       <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d") }}</span>
+          <div {% if listing_step.steps.complete_date %} class="collapse multi-collapse" {% endif %} id="{{ listing_step.steps._id }}">
+          <div id="{{ listing_step.steps._id }}" class="card mb-4 listingstep collapse multi-collapse" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
+
+            {% if current_user.get_role() != 'client' %}
+            <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
+            {% endif %}
+              <div class="card-header">
+                <div class="row">
+                  <div class="col font-weight-bold text-uppercase">
+                    {{ listing_step.steps.name }}
+                  </div>
+                  <div class="col">
+                    {% if listing_step.steps.complete_date %}
+                       <span class="text-success float-right">Completed</span>
+                    {% elif listing_step.steps.due_date %}
+                       {% if listing_step.steps.due_date.strftime('%H:%M:%S') != '00:00:00' %}
+                         <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d at %-I:%M %p") }}</span>
+                       {% else %}
+                         <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d") }}</span>
+                       {% endif %}
                      {% endif %}
-                   {% endif %}
+                  </div>
                 </div>
+               </div>
+              <div class="card-body">
+                <p class="card-text">{{ listing_step.steps.notes }}</p>
               </div>
-             </div>
-            <div class="card-body">
-              <p class="card-text">{{ listing_step.steps.notes }}</p>
-            </div>
-            <div class="card-footer">
-              <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date(convert_to_tz=True)}}</small>
-              {% if listing_step.steps.attachment %}
-                {% if current_user.get_role() != 'client' %}
-                <span class="oi oi-paperclip float-right"></span>
-                {% else %}
-                <a style="color: #000;" class="float-right" href="{{ url_for('listing.get_attachment', attachment=listing_step.steps.attachment) }}"><span class="oi oi-paperclip"></span></a>
+              <div class="card-footer">
+                <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date(convert_to_tz=True)}}</small>
+                {% if listing_step.steps.attachment %}
+                  {% if current_user.get_role() != 'client' %}
+                  <span class="oi oi-paperclip float-right"></span>
+                  {% else %}
+                  <a style="color: #000;" class="float-right" href="{{ url_for('listing.get_attachment', attachment=listing_step.steps.attachment) }}"><span class="oi oi-paperclip"></span></a>
+                  {% endif %}
                 {% endif %}
-              {% endif %}
-            </div>
-          </a>
+              </div>
+            </a>
+          </div>
         </div>
         {% endfor %}
       </div>
@@ -115,7 +137,31 @@
 
     </div>
 
-    <div class="col-sm">
+    <!-- note the below is duplicated on this page twice.
+    because I wanted it to display in the right column on desktop
+    but on mobile I just wanted the first card in the right column
+    to be at the top -->
+    <div class="col">
+      {% if current_user.get_role() != 'client' %}
+      <div class="card mb-4 d-none d-md-block" style="border: none;">
+        <div class="row">
+          <div class="col">
+            <a class="btn btn-outline-secondary btn-block mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
+          </div>
+          <div class="col">
+            {% if listing_steps %}
+            <button id="sortorder" class="expander btn btn-outline-secondary btn-block">Sort</button>
+            <button id="saveorder" style="display:none; margin-top:0px;" class="btn btn-outline-secondary btn-block">Save</button>
+            {% endif %}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button id="showhide" class="btn btn-outline-secondary btn-block" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="completed">Show completed</button>
+          </div>
+        </div>
+      </div>
+      {% endif %}
 
       <div class="card">
         <div class="card-body">
@@ -212,8 +258,8 @@
         </div>
       </div>
 
+      </div>
     </div>
   </div>
-</div>
 
 {% endblock %}

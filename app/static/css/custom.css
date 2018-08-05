@@ -136,3 +136,13 @@ pre {
 .breadcrumb {
   margin-bottom: 0px;
 }
+
+/* Show/hide button when hide is active color it gray */
+.ButtonClicked {
+    background-color:gray;
+    color:white;
+}
+
+.hover {
+  opacity: .5;
+}

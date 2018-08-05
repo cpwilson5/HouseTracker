@@ -219,7 +219,7 @@ def reactivate_listing(id):
 @login_required
 @admin_login_required
 def listing_steps(id):
-    listing_steps = list(ListingStep.all(id, active=True, complete=False))
+    listing_steps = list(ListingStep.all(id, active=True, include_complete=True))
     if not listing_steps:
         listing_steps = []
     users = User.all(listing=id)
@@ -228,12 +228,12 @@ def listing_steps(id):
     realtor = User.get(accounts_realtor=current_user.get_account())
 
     if listing['close_date']:
-        days_left = (listing['close_date'].replace(tzinfo=None) - datetime.datetime.now()).days
+        days_left = (listing['close_date'].date() - datetime.datetime.now().date()).days
         if days_left < 0:
             days_left = 0
     else:
         days_left = "TBD"
-    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, users_count=users_count, title="Welcome")
+    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, users_count=users_count)
 
 @listing.route('/listings/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required
@@ -304,8 +304,9 @@ def edit_listing_step(id, step_id):
         form.time.data = listing_step['steps'][0]['due_date'] if listing_step['steps'][0]['due_date'] and (listing_step['steps'][0]['due_date'].hour != 0 and listing_step['steps'][0]['due_date'] != 0) else None
         form.status.data = listing_step['steps'][0]['status'] if 'status' in listing_step['steps'][0] else 'Red'
         attachment = listing_step['steps'][0]['attachment']
+        completed = listing_step['steps'][0]['complete_date'] if 'complete_date' in listing_step['steps'][0] else False
 
-        return render_template('listing/listingstep.html', form=form, attachment=attachment, id=id, step_id=step_id)
+        return render_template('listing/listingstep.html', form=form, attachment=attachment, id=id, step_id=step_id, completed=completed)
 
     if request.method == 'POST' and form.validate_on_submit():
         if form.attachment.data:
