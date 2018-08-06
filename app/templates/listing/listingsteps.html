@@ -18,8 +18,9 @@
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
   <h1 class="text-uppercase">{{ listing.name}}</h1>
-  {% if days_left > 1 %}<p class="lead">{{days_left}} days until closing</p>
-  {% else %}<p class="lead">{{days_left}} day until closing</p>
+  {% if days_left == 1 %}<p class="lead">{{days_left}} day until closing</p>
+  {% elif days_left > 1 %}<p class="lead">{{days_left}} days until closing</p>
+  {% else %}<p class="lead">No closing date yet</p>
   {% endif %}
 </div>
 {% endblock %}
@@ -42,6 +43,8 @@
         {% if listing_steps %}
         <button id="sortordermobile" class="expander btn btn-outline-secondary btn-block">Sort</button>
         <button id="saveordermobile" style="display:none; margin-top:0px;" class="btn btn-outline-secondary btn-block">Save</button>
+        {% else %}
+        <button class="expander btn btn-outline-secondary disabled btn-block">Sort</button>
         {% endif %}
       </div>
     </div>
@@ -152,6 +155,8 @@
             {% if listing_steps %}
             <button id="sortorder" class="expander btn btn-outline-secondary btn-block">Sort</button>
             <button id="saveorder" style="display:none; margin-top:0px;" class="btn btn-outline-secondary btn-block">Save</button>
+            {% else %}
+            <button class="expander btn btn-outline-secondary disabled btn-block">Sort</button>
             {% endif %}
           </div>
         </div>
@@ -235,6 +240,32 @@
             <p><strong>Email: </strong>{{realtor.email}}<br>
             <p><strong>Cell: </strong>{{realtor.cell}}
           </p>
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+                <h5 class="card-title">Attachments</h5>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              {% set attachments = {'exist': False} %}
+              {% for listing_step in listing_steps %}
+              <div class="list-group mt-2">
+                {% if listing_step.steps.attachment %}
+                  <a href="{{ url_for('listing.get_attachment', attachment=listing_step.steps.attachment) }}" class="list-group-item list-group-item-action">{{ listing_step.steps.name }}</a>
+                  {% if attachments.update({'exist': True}) %} {% endif %}
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% if attachments.exist == False %}
+            <p class="font-weight-light font-italic text-center"><br>No attachments yet!</p>
+          {% endif %}
         </div>
       </div>
 

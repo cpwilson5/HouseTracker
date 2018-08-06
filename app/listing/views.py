@@ -232,7 +232,7 @@ def listing_steps(id):
         if days_left < 0:
             days_left = 0
     else:
-        days_left = "TBD"
+        days_left = -1
     return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, users_count=users_count)
 
 @listing.route('/listings/<string:id>/steps/add', methods=['GET', 'POST'])
