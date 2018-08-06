@@ -137,12 +137,18 @@ pre {
   margin-bottom: 0px;
 }
 
-/* Show/hide button when hide is active color it gray */
-.ButtonClicked {
-    background-color:gray;
-    color:white;
-}
-
+/* hover class for the listing steps page which only gets turned on after jquery button */
 .hover {
   opacity: .5;
+}
+
+/* currently a bug with bootstrap
+that causes the height to be very small
+https://github.com/twbs/bootstrap/issues/23307 */
+input[type="date"] {
+	min-height: 2.5rem;
+}
+
+input[type="date"] {
+	min-height: 2.5rem;
 }
