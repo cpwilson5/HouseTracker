@@ -253,14 +253,14 @@
           <div class="row">
             <div class="col">
               {% set attachments = {'exist': False} %}
-              {% for listing_step in listing_steps %}
               <div class="list-group mt-2">
+              {% for listing_step in listing_steps %}
                 {% if listing_step.steps.attachment %}
                   <a href="{{ url_for('listing.get_attachment', attachment=listing_step.steps.attachment) }}" class="list-group-item list-group-item-action">{{ listing_step.steps.name }}</a>
                   {% if attachments.update({'exist': True}) %} {% endif %}
                 {% endif %}
-              </div>
               {% endfor %}
+              </div>
               {% if attachments.exist == False %}
                 <p class="font-weight-light font-italic text-center"><br>No attachments yet!</p>
               {% endif %}
