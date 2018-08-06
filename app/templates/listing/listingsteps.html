@@ -261,11 +261,11 @@
                 {% endif %}
               </div>
               {% endfor %}
+              {% if attachments.exist == False %}
+                <p class="font-weight-light font-italic text-center"><br>No attachments yet!</p>
+              {% endif %}
             </div>
           </div>
-          {% if attachments.exist == False %}
-            <p class="font-weight-light font-italic text-center"><br>No attachments yet!</p>
-          {% endif %}
         </div>
       </div>
 
