@@ -97,8 +97,10 @@ $(document).ready(function(){
 });
 
 // handles the show/hide verbiage toggle on listing steps
-$('#showhide, #showhidemobile').click(function(){
-    $(this).text(function(i,old){
-        return old=='Show completed' ?  'Hide completed' : 'Show completed';
-    });
+$(document).ready(function(){
+  $('#showhide, #showhidemobile').click(function(){
+      $(this).text(function(i,old){
+          return old=='Show completed' ? 'Hide completed' : 'Show completed';
+      });
+  });
 });
