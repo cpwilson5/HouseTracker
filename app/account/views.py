@@ -253,7 +253,7 @@ def user():
         ea = form.email_alert.data
         ta = form.text_alert.data
         User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, \
-            confirmed=True, email_alert=ea, text_alert=ta)
+            confirmed=True, email_alert=ea, text_alert=ta, update_alerts=True)
         flash("Updated successfully", category='success')
         return redirect(url_for('listing.listings'))
     else:
@@ -315,7 +315,8 @@ def invite_admin():
         existing_user = User.get(email=form.email.data)
         if existing_user is None:
             try:
-                send_invitation(form.email.data)
+                realtor = User.get(accounts_realtor=current_user.get_account())
+                send_invitation(form.email.data, realtor=realtor, new_user=True)
                 User.add(form.email.data, form.first_name.data, form.last_name.data, \
                     current_user.get_account(), 'admin', invited_by=current_user.get_id(), confirmed=False)
                 flash("Invitation sent", category='success')
@@ -354,6 +355,8 @@ def register_with_token(token):
     if request.method == 'POST' and form.validate_on_submit():
         user = User.get(email=form.email.data)
 
+        roles = ("client","partner")
+
         id = user['_id']
         account_id = user['account']
         fn = form.first_name.data
@@ -361,8 +364,8 @@ def register_with_token(token):
         e = form.email.data
         c = form.cell.data
         p = form.password.data
-        ea = True if user['role'] == 'client' else False
-        ta = True if user['role'] == 'client' else False
+        ea = True if user['role'] in roles else False
+        ta = True if user['role'] in roles else False
 
         User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, confirmed=True, \
             email_alert=ea, text_alert=ta)
@@ -388,8 +391,9 @@ def edit_admin(id):
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
+            realtor = User.get(accounts_realtor=current_user.get_account())
             User.update(id, form.email.data, form.first_name.data, form.last_name.data)
-            send_invitation(form.email.data)
+            send_invitation(form.email.data, realtor=realtor, new_user=True)
             flash("Invitation resent", category='success')
         except:
             flash("Error inviting team member", category='danger')

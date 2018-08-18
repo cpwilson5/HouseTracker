@@ -31,7 +31,7 @@
         {% endif %}
         <ul class="navbar-nav ml-md-auto">
           {% if current_user.is_authenticated %}
-            {% if current_user.get_role() != 'client' %}
+            {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
             <li class="nav-item {{ 'active' if active_page == 'listings' else '' }}">
               <a class="nav-link p-2 text-dark" href="{{ url_for('listing.listings') }}">Listings</a>
             </li>

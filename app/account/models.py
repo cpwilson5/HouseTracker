@@ -96,7 +96,7 @@ class User(UserMixin):
 
     @staticmethod
     def update(id, email, first_name=None, last_name=None, cell=None, password=None, confirmed=None, \
-    email_alert=None, text_alert=None, listing=None):
+    email_alert=None, text_alert=None, listing=None, update_alerts=False):
         set = {
             'email': email,
             'update_date': datetime.datetime.utcnow()
@@ -119,9 +119,8 @@ class User(UserMixin):
             set['cell'] = cell
         if confirmed:
             set['confirmed'] = confirmed
-        if email_alert:
+        if update_alerts:
             set['email_alert'] = email_alert
-        if text_alert:
             set['text_alert'] = text_alert
         if password:
             set['password'] = generate_password_hash(password, method='sha256')

@@ -222,8 +222,12 @@ def listing_steps(id):
     listing_steps = list(ListingStep.all(id, active=True, include_complete=True))
     if not listing_steps:
         listing_steps = []
-    users = User.all(listing=id)
-    users_count = users.count(True)
+
+    # have to convert to list so i can iterate over users and pass users to template
+    users = list(User.all(listing=id))
+    clients_count = sum(1 for user in users if user['role']=='client')
+    partners_count = sum(1 for user in users if user['role']=='partner')
+
     listing = Listing.get(id)
     realtor = User.get(accounts_realtor=current_user.get_account())
 
@@ -233,7 +237,7 @@ def listing_steps(id):
             days_left = 0
     else:
         days_left = -1
-    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, users_count=users_count)
+    return render_template('listing/listingsteps.html', id=id, listing_steps=listing_steps, users=users, listing=listing, realtor=realtor, days_left=days_left, partners_count=partners_count, clients_count=clients_count)
 
 @listing.route('/listings/<string:id>/steps/add', methods=['GET', 'POST'])
 @login_required
@@ -445,14 +449,14 @@ def sort_listing_step(id):
     ListingStep.sort(id, request.form['order'])
     return json.dumps({'status':'Successfully sorted'})
 
-### adding a listing user/client ###
-@listing.route('/listings/<string:id>/clients/invite', methods=['GET', 'POST'])
+### adding a listing viewer (client/partner) ###
+@listing.route('/listings/<string:id>/<string:role>/invite', methods=['GET', 'POST'])
 @login_required
-def invite_client(id):
+def invite_viewer(id, role):
     form = InviteForm()
 
     if request.method == 'GET':
-        return render_template('listing/client.html', id=id, user=[], form=form)
+        return render_template('listing/viewer.html', id=id, user=[], user_role=role, form=form)
 
     if request.method == 'POST' and form.validate_on_submit():
         existing_user = User.get(email=form.email.data)
@@ -463,7 +467,7 @@ def invite_client(id):
                 send_invitation(form.email.data, realtor=realtor, new_user=True)
 
                 User.add(form.email.data, form.first_name.data, form.last_name.data, \
-                    current_user.get_account(), 'client', invited_by=current_user.get_id(), \
+                    current_user.get_account(), role, invited_by=current_user.get_id(), \
                     confirmed=False, listing=[id])
             else:
                 send_invitation(form.email.data, realtor=realtor, new_user=False)
@@ -472,43 +476,44 @@ def invite_client(id):
             flash("Invitation sent", category='success')
             return redirect(url_for('listing.listing_steps', id=id))
         except:
-            flash("Error inviting client", category='danger')
-            return render_template('listing/client.html', id=id, form=form)
+            flash("Error inviting viewer", category='danger')
+            return render_template('listing/viewer.html', id=id, form=form)
     else:
         flash_errors(form)
-        return render_template('listing/client.html', id=id, user=[], form=form)
+        return render_template('listing/viewer.html', id=id, user=[], form=form)
 
-@listing.route('/listings/<string:id>/clients/edit/<string:client_id>', methods=['GET', 'POST'])
+@listing.route('/listings/<string:id>/viewers/edit/<string:viewer_id>', methods=['GET', 'POST'])
 @login_required
-def edit_client(id, client_id):
+def edit_viewer(id, viewer_id):
     form = InviteForm()
+    user = User.get(id=viewer_id)
+    user_role = user['role']
 
     if request.method == 'GET':
-        user = User.get(id=client_id)
         form.first_name.data = user['first_name']
         form.last_name.data = user['last_name']
         form.email.data = user['email']
         form.cell.data = user['cell']
 
-        return render_template('listing/client.html', id=id, user=user, form=form)
+        return render_template('listing/viewer.html', id=id, user=user, user_role=user_role, form=form)
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
             realtor = User.get(accounts_realtor=current_user.get_account())
-            User.update(client_id, form.email.data, form.first_name.data, form.last_name.data, form.cell.data)
-            send_invitation(form.email.data)
+            User.update(viewer_id, form.email.data, form.first_name.data, form.last_name.data, form.cell.data)
+            send_invitation(form.email.data, realtor=realtor, new_user=True)
             flash("Invitation resent", category='success')
         except:
-            flash("Error inviting client", category='danger')
-            return render_template('listing/client.html', form=form)
+            flash("Error inviting viewer", category='danger')
+            return render_template('listing/viewer.html', form=form, user=user, user_role=user_role)
 
         return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)
 
-@listing.route('/listings/<string:id>/clients/delete/<string:client_id>', methods=['GET', 'POST'])
+@listing.route('/listings/<string:id>/viewers/delete/<string:viewer_id>', methods=['GET', 'POST'])
 @login_required
-def delete_client(id, client_id):
-    User.delete(id=client_id, context='client', listing=id)
+def delete_viewer(id, viewer_id):
+    User.delete(id=viewer_id, context='viewer', listing=id)
     flash("User removed succesfully", category='success')
     return redirect(url_for('listing.listing_steps', id=id))

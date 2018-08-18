@@ -3,7 +3,7 @@
 {% set active_page = "listings" %}
 
 {% set action = "Add" %}
-{% if user != [] and current_user.get_role() != 'client' %}
+{% if user != [] %}
   {% set action = "Edit" %}
 {% endif %}
 
@@ -12,7 +12,7 @@
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
     <li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ action }} Client</li>
+    <li class="breadcrumb-item active" aria-current="page">{{ action }} {{ user_role.title() }}</li>
   </ol>
 </nav>
 {% endblock %}
@@ -23,9 +23,9 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-          <h3 class="mb-0 d-inline-block">{{ action }} Client</h3>
-            <!-- Don't show delete because it's a new client or client who shouldn't be able to delete -->
-            {% if action == "Edit" and current_user.get_role() != 'client' %}
+          <h3 class="mb-0 d-inline-block">{{ action }} {{ user_role.title() }}</h3>
+            <!-- Don't show delete because it's a new client/partner or client/partner who shouldn't be able to delete -->
+            {% if action == "Edit" and (current_user.get_role() != 'client' and current_user.get_role() != 'partner') %}
               <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
             {% endif %}
         </div>
@@ -35,7 +35,7 @@
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">First name *</label>
                     <div class="col-lg-9">
-                      {% if not user['confirmed'] %}
+                      {% if not user['confirmed'] and current_user.get_role() != 'partner' %}
                       {{ form.first_name(class_="form-control") }}
                       {% else %}
                       {{ form.first_name(class_="form-control", disabled=True) }}
@@ -45,7 +45,7 @@
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Last name *</label>
                     <div class="col-lg-9">
-                      {% if not user['confirmed'] %}
+                      {% if not user['confirmed'] and current_user.get_role() != 'partner' %}
                       {{ form.last_name(class_="form-control") }}
                       {% else %}
                       {{ form.last_name(class_="form-control", disabled=True) }}
@@ -55,14 +55,14 @@
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Email *</label>
                     <div class="col-lg-9">
-                        {% if not user['confirmed'] %}
+                        {% if not user['confirmed'] and current_user.get_role() != 'partner' %}
                         {{ form.email(class_="form-control") }}
                         {% else %}
                         {{ form.email(class_="form-control", disabled=True) }}
                         {% endif %}
                     </div>
                 </div>
-                {% if user['confirmed'] %}
+                {% if user['confirmed'] and current_user.get_role() != 'partner' %}
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Cell</label>
                     <div class="col-lg-9">
@@ -73,7 +73,7 @@
                 <div class="form-group row">
                     <div class="col-lg-12">
                       <!-- Only show "send invitation" if hasn't confirmed email -->
-                      {% if not user['confirmed'] %}
+                      {% if not user['confirmed'] and current_user.get_role() != 'partner' %}
                       <input type="submit" class="btn btn-secondary float-right" value="Send Invitation">
                       {% endif %}
                     </div>
@@ -95,11 +95,11 @@
         </button>
       </div>
       <div class="modal-body">
-        By deleting this client, he/she will no longer be able to access the listing.<br><br>
-        Click delete to remove this client from your listing.
+        By deleting this {{ user_role }}, he/she will no longer be able to access the listing.<br><br>
+        Click delete to remove this {{ user_role }} from your listing.
       </div>
       <div class="modal-footer">
-        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_client', id=id, client_id=user._id) }}" role="button">Delete</a>
+        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_viewer', id=id, viewer_id=user._id) }}" role="button">Delete</a>
       </div>
     </div>
   </div>

@@ -33,8 +33,8 @@
   but on mobile I just wanted the first card in the right column
   to be at the top -->
   <!-- THIS IS MOBILE ONLY -->
-  {% if current_user.get_role() != 'client' %}
   <div class="card mb-2 d-md-none d-lg-none d-xl-none" style="border: none;">
+    {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
     <div class="row">
       <div class="col">
         <a class="btn btn-outline-secondary btn-block mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
@@ -48,14 +48,13 @@
         {% endif %}
       </div>
     </div>
+    {% endif %}
     <div class="row">
       <div class="col">
         <button id="showhidemobile" class="btn btn-outline-secondary btn-block mb-4" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="completed">Show completed</button>
       </div>
     </div>
   </div>
-  {% endif %}
-
 
   <div class="row">
     <div class="col-md-8">
@@ -75,7 +74,7 @@
           <div {% if listing_step.steps.complete_date %} class="collapse multi-collapse" {% endif %} id="{{ listing_step.steps._id }}">
           <div id="{{ listing_step.steps._id }}" class="card mb-4 listingstep collapse multi-collapse" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
 
-            {% if current_user.get_role() != 'client' %}
+            {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
             <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
             {% endif %}
               <div class="card-header">
@@ -102,7 +101,7 @@
               <div class="card-footer">
                 <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date(convert_to_tz=True)}}</small>
                 {% if listing_step.steps.attachment %}
-                  {% if current_user.get_role() != 'client' %}
+                  {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
                   <span class="oi oi-paperclip float-right"></span>
                   {% else %}
                   <a style="color: #000;" class="float-right" href="{{ url_for('listing.get_attachment', attachment=listing_step.steps.attachment) }}"><span class="oi oi-paperclip"></span></a>
@@ -122,7 +121,7 @@
       {% endif %}
 
       <div id="closing" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
-        {% if current_user.get_role() != 'client' %}
+        {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
         <a href="{{ url_for('listing.edit_listing', id=id) }}" class="card-block clearfix">
         {% endif %}
         <div class="card-header">
@@ -145,8 +144,8 @@
     but on mobile I just wanted the first card in the right column
     to be at the top -->
     <div class="col">
-      {% if current_user.get_role() != 'client' %}
       <div class="card mb-4 d-none d-md-block" style="border: none;">
+        {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
         <div class="row">
           <div class="col">
             <a class="btn btn-outline-secondary btn-block mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
@@ -160,13 +159,13 @@
             {% endif %}
           </div>
         </div>
+        {% endif %}
         <div class="row">
           <div class="col">
             <button id="showhide" class="btn btn-outline-secondary btn-block" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false" aria-controls="completed">Show completed</button>
           </div>
         </div>
       </div>
-      {% endif %}
 
       <div class="card">
         <div class="card-body">
@@ -174,7 +173,7 @@
             <div class="col">
                 <h5 class="card-title">Listing Info</h5>
             </div>
-            {% if current_user.get_role() != 'client' %}
+            {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
             <div class="col">
               <a href="{{ url_for('listing.edit_listing', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Edit</a>
             </div>
@@ -204,22 +203,32 @@
             <div class="col">
                 <h5 class="card-title">Clients</h5>
             </div>
+            {% if current_user.get_role() != 'partner' %}
             <div class="col">
-              <a href="{{ url_for('listing.invite_client', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Add</a>
+              <a href="{{ url_for('listing.invite_viewer', id=id, role='client') }}" class="btn btn-outline-secondary btn-sm float-right">Add</a>
             </div>
+            {% endif %}
           </div>
-          {% if users_count > 0 %}
+          {% if clients_count > 0 %}
           <div class="list-group mt-2">
             {% for user in users %}
               {% if user['role'] == 'client' %}
-                <a href="{{ url_for('listing.edit_client', id=id, client_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.first_name }} {{ user.last_name }}
+                <a href="{{ url_for('listing.edit_viewer', id=id, viewer_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.first_name }} {{ user.last_name }}
 
-                {% if user['email_alert'] == True %}
-                  <span class="oi oi-envelope-closed ml-2 float-right" title="email alerts"></span>
-                {% endif %}
+                {% if user['confirmed'] == False %}
+                  <span class="float-right badge badge-secondary">invited</span>
+                {% else %}
+                  {% if user['email_alert'] == True %}
+                    <span class="oi oi-envelope-closed ml-2 float-right" title="email alerts on"></span>
+                  {% else %}
+                    <span class="oi oi-envelope-closed ml-2 float-right" style="color:lightgray;" title="email alerts off"></span>
+                  {% endif %}
 
-                {% if user['text_alert'] == True %}
-                  <span class="oi oi-phone ml-2 float-right" title="text alerts"></span>
+                  {% if user['text_alert'] == True %}
+                    <span class="oi oi-phone ml-2 float-right" title="text alerts on"></span>
+                  {% else  %}
+                    <span class="oi oi-phone ml-2 float-right" style="color:lightgray;" title="text alerts off"></span>
+                  {% endif %}
                 {% endif %}
 
                 </a>
@@ -234,12 +243,64 @@
 
       <div class="card mt-4">
         <div class="card-body">
-          <h5 class="card-title">Realtor Info</h5>
-          <p class="card-text">
-            <p><strong>Name: </strong>{{realtor.first_name}} {{realtor.last_name}}<br>
-            <p><strong>Email: </strong>{{realtor.email}}<br>
-            <p><strong>Cell: </strong>{{realtor.cell}}
-          </p>
+          <div class="row">
+            <div class="col">
+                <h5 class="card-title">Partners</h5>
+            </div>
+            {% if current_user.get_role() != 'partner' %}
+            <div class="col">
+              <a href="{{ url_for('listing.invite_viewer', id=id, role='partner') }}" class="btn btn-outline-secondary btn-sm float-right">Add</a>
+            </div>
+            {% endif %}
+          </div>
+          {% if partners_count > 0 %}
+          <div class="list-group mt-2">
+            {% for user in users %}
+              {% if user['role'] == 'partner' %}
+                <a href="{{ url_for('listing.edit_viewer', id=id, viewer_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.first_name }} {{ user.last_name }}
+
+                {% if user['confirmed'] == False %}
+                  <span class="float-right badge badge-secondary">invited</span>
+                {% else %}
+                  {% if user['email_alert'] == True %}
+                    <span class="oi oi-envelope-closed ml-2 float-right" title="email alerts on"></span>
+                  {% else %}
+                    <span class="oi oi-envelope-closed ml-2 float-right" style="color:lightgray;" title="email alerts off"></span>
+                  {% endif %}
+
+                  {% if user['text_alert'] == True %}
+                    <span class="oi oi-phone ml-2 float-right" title="text alerts on"></span>
+                  {% else  %}
+                    <span class="oi oi-phone ml-2 float-right" style="color:lightgray;" title="text alerts off"></span>
+                  {% endif %}
+                {% endif %}
+
+                </a>
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% else %}
+            <p class="font-weight-light font-italic text-center"><br>No partners added yet</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card mt-4">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12">
+              <h5 class="card-title">Realtor Info</h5>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <ul class="list-unstyled ml-4">
+                  <li class="font-weight-bold">{{realtor.first_name}} {{realtor.last_name}}</li>
+                  <li>{{realtor.email}}</li>
+                  <li>{{realtor.cell}}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
