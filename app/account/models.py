@@ -138,7 +138,7 @@ class User(UserMixin):
                 {'$set': {'active': 'false'}
             }, upsert=False)
 
-        if context == 'client':
+        if context == 'viewer':
             return mongo.db.users.update_one({
                 '_id': ObjectId(id)},{
                 '$pull': {'listing': listing}

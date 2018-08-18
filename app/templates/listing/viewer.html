@@ -99,7 +99,7 @@
         Click delete to remove this {{ user_role }} from your listing.
       </div>
       <div class="modal-footer">
-        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_viewer', id=id, viewer_id=user._id) }}" role="button">Delete</a>
+        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_viewer', id=id, context='viewer', viewer_id=user._id) }}" role="button">Delete</a>
       </div>
     </div>
   </div>
