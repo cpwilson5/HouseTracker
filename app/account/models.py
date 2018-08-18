@@ -46,7 +46,7 @@ class User(UserMixin):
 
     @staticmethod
     def add(email, first_name, last_name, account_id, role, cell=None, password=None, \
-        invited_by=None, confirmed=True, listing='all', email_alert=False, text_alert=False):
+        invited_by=None, confirmed=True, listing='all', email_alert=False, text_alert=False, partner_type=None):
         return mongo.db.users.insert({
             'first_name': first_name,
             'last_name': last_name,
@@ -57,6 +57,7 @@ class User(UserMixin):
             'password': generate_password_hash(password, method='sha256'),
             'email_alert': email_alert,
             'text_alert': text_alert,
+            'partner_type': partner_type,
             'create_date': datetime.datetime.utcnow(),
             'authenticated': False,
             'superuser': False,
@@ -96,7 +97,7 @@ class User(UserMixin):
 
     @staticmethod
     def update(id, email, first_name=None, last_name=None, cell=None, password=None, confirmed=None, \
-    email_alert=None, text_alert=None, listing=None, update_alerts=False):
+    email_alert=None, text_alert=None, listing=None, update_alerts=False, partner_type=None):
         set = {
             'email': email,
             'update_date': datetime.datetime.utcnow()
@@ -119,6 +120,8 @@ class User(UserMixin):
             set['cell'] = cell
         if confirmed:
             set['confirmed'] = confirmed
+        if partner_type:
+            set['partner_type'] = partner_type
         if update_alerts:
             set['email_alert'] = email_alert
             set['text_alert'] = text_alert

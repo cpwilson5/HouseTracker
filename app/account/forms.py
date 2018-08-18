@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, TextAreaField, IntegerField
+from wtforms import StringField, PasswordField, SelectField, BooleanField, TextAreaField, IntegerField
 from wtforms.validators import DataRequired, EqualTo, Email, Length, Regexp, Optional
 
 class LoginForm(FlaskForm):
@@ -52,6 +52,8 @@ class PasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm Password', validators=[DataRequired()])
 
+PARTNER_TYPES = ('Attorney', 'Lender', 'Paralegal', 'Stager')
+
 class InviteForm(FlaskForm):
     """Login form to access writing and settings pages"""
 
@@ -59,6 +61,7 @@ class InviteForm(FlaskForm):
     last_name = StringField('Last Name', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired()])
     cell = StringField('Cell')
+    partner_type = SelectField('Type', choices=[(type, type) for type in PARTNER_TYPES], validators=[Optional()])
 
 class ForgotPasswordForm(FlaskForm):
     """Login form to access writing and settings pages"""

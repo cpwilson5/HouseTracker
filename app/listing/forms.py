@@ -37,9 +37,6 @@ class ListingForm(FlaskForm):
                 result = False
         return result
 
-class InfoForm(FlaskForm):
-    info = TextAreaField('Info', validators=[Optional()])
-
 class ListingStepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     notes = StringField('Notes',widget=TextArea())

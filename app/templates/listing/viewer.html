@@ -70,6 +70,18 @@
                     </div>
                 </div>
                 {% endif %}
+                {% if user_role == 'partner' %}
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label">Type</label>
+                    <div class="col-lg-9">
+                      {% if not user['confirmed'] and current_user.get_role() != 'partner' %}
+                      {{ form.partner_type(class_="form-control") }}
+                      {% else %}
+                      {{ form.partner_type(class_="form-control", disabled=True) }}
+                      {% endif %}
+                    </div>
+                </div>
+                {% endif %}
                 <div class="form-group row">
                     <div class="col-lg-12">
                       <!-- Only show "send invitation" if hasn't confirmed email -->

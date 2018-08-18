@@ -260,21 +260,22 @@
                 <a href="{{ url_for('listing.edit_viewer', id=id, viewer_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.first_name }} {{ user.last_name }}
 
                 {% if user['confirmed'] == False %}
-                  <span class="float-right badge badge-secondary">invited</span>
+                  <span class="float-right badge badge-secondary mt-2">invited</span>
                 {% else %}
                   {% if user['email_alert'] == True %}
-                    <span class="oi oi-envelope-closed ml-2 float-right" title="email alerts on"></span>
+                    <span class="oi oi-envelope-closed ml-2 mt-2 float-right" title="email alerts on"></span>
                   {% else %}
-                    <span class="oi oi-envelope-closed ml-2 float-right" style="color:lightgray;" title="email alerts off"></span>
+                    <span class="oi oi-envelope-closed ml-2 mt-2 float-right" style="color:lightgray;" title="email alerts off"></span>
                   {% endif %}
 
                   {% if user['text_alert'] == True %}
-                    <span class="oi oi-phone ml-2 float-right" title="text alerts on"></span>
+                    <span class="oi oi-phone ml-2 mt-2 float-right" title="text alerts on"></span>
                   {% else  %}
-                    <span class="oi oi-phone ml-2 float-right" style="color:lightgray;" title="text alerts off"></span>
+                    <span class="oi oi-phone ml-2 mt-2 float-right" style="color:lightgray;" title="text alerts off"></span>
                   {% endif %}
                 {% endif %}
-
+                <br>
+                <span class="small text-lowercase">{{ user['partner_type'] }}</span>
                 </a>
               {% endif %}
             {% endfor %}
@@ -327,26 +328,6 @@
               {% endif %}
             </div>
           </div>
-        </div>
-      </div>
-
-      <div class="card mt-4">
-        <div class="card-body">
-          <div class="row">
-            <div class="col">
-                <h5 class="card-title">Contacts/Info</h5>
-            </div>
-            <div class="col">
-              <a href="{{ url_for('listing.edit_info', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Edit</a>
-            </div>
-          </div>
-          {% if listing.info %}
-          <p class="card-text">
-            <pre>{{ listing.info }}</pre>
-          </p>
-          {% else %}
-          <p class="font-weight-light font-italic text-center"><br>Quick spot to give any extra details (contacts, information, etc) about the listing</p>
-          {% endif %}
         </div>
       </div>
 

@@ -2,7 +2,7 @@ from flask import render_template
 from flask_login import login_required, current_user
 from flask import request, redirect, render_template, url_for, flash, current_app as app
 from flask_pymongo import PyMongo
-from .forms import ListingForm, ListingStepForm, InfoForm
+from .forms import ListingForm, ListingStepForm
 from ..account.forms import InviteForm
 from .models import Listing, ListingStep
 from ..account.models import User, Template, TemplateStep, Account
@@ -167,24 +167,6 @@ def edit_listing(id):
     else:
         flash_errors(form)
         return render_template('listing/listing.html', id=id, form=form)
-
-@listing.route('/listings/<string:id>/info', methods=['GET', 'POST'])
-@login_required
-def edit_info(id):
-    form = InfoForm()
-    listing = Listing.get(id)
-
-    if request.method == 'GET':
-        form.info.data = listing['info'] if 'info' in listing else None
-
-    if request.method == 'POST' and form.validate_on_submit():
-        info = form.info.data
-        Listing.info_update(id, info=info) ### this should be on a listing edit method in the model, not a new method
-        flash("Updated listing", category='success')
-        return redirect(url_for('listing.listing_steps', id=id))
-    else:
-        flash_errors(form)
-    return render_template('listing/info.html', id=id, form=form)
 
 @listing.route('/photo/<string:photo>', methods=['GET'])
 @login_required
@@ -468,7 +450,7 @@ def invite_viewer(id, role):
 
                 User.add(form.email.data, form.first_name.data, form.last_name.data, \
                     current_user.get_account(), role, invited_by=current_user.get_id(), \
-                    confirmed=False, listing=[id])
+                    confirmed=False, listing=[id], partner_type=form.partner_type.data)
             else:
                 send_invitation(form.email.data, realtor=realtor, new_user=False)
                 User.update(existing_user['_id'], form.email.data, listing=id)
@@ -494,13 +476,15 @@ def edit_viewer(id, viewer_id):
         form.last_name.data = user['last_name']
         form.email.data = user['email']
         form.cell.data = user['cell']
+        form.partner_type.data = user['partner_type'] if 'partner_type' in user else None
 
         return render_template('listing/viewer.html', id=id, user=user, user_role=user_role, form=form)
 
     if request.method == 'POST' and form.validate_on_submit():
         try:
             realtor = User.get(accounts_realtor=current_user.get_account())
-            User.update(viewer_id, form.email.data, form.first_name.data, form.last_name.data, form.cell.data)
+            print(form.partner_type.data)
+            User.update(viewer_id, form.email.data, form.first_name.data, form.last_name.data, form.cell.data, partner_type=form.partner_type.data)
             send_invitation(form.email.data, realtor=realtor, new_user=True)
             flash("Invitation resent", category='success')
         except:
@@ -510,6 +494,7 @@ def edit_viewer(id, viewer_id):
         return redirect(url_for('listing.listing_steps', id=id))
     else:
         flash_errors(form)
+        return render_template('listing/viewer.html', id=id, user=[], user_role=user_role, form=form)
 
 @listing.route('/listings/<string:id>/viewers/delete/<string:viewer_id>', methods=['GET', 'POST'])
 @login_required
