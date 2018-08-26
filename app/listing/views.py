@@ -83,7 +83,7 @@ def add_listing():
                 else:
                     due_date_time = None
             else:
-                due_date = None
+                due_date_time = None
 
             name = template_step['steps']['name'] if 'name' in template_step['steps'] else None
             notes = template_step['steps']['notes'] if 'notes' in template_step['steps'] else None
