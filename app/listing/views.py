@@ -448,9 +448,17 @@ def invite_viewer(id, role):
             if existing_user is None:
                 send_invitation(form.email.data, realtor=realtor, new_user=True)
 
+                if role == 'partner': # it's a partner
+                    text_alert = False
+                    email_alert = False
+                else: # it's a client
+                    text_alert = False ## Update this line to True when we buy Twilio
+                    email_alert = True
+
                 User.add(form.email.data, form.first_name.data, form.last_name.data, \
                     current_user.get_account(), role, invited_by=current_user.get_id(), \
-                    confirmed=False, listing=[id], partner_type=form.partner_type.data)
+                    confirmed=False, listing=[id], email_alert=email_alert, text_alert=text_alert, \
+                    partner_type=form.partner_type.data)
             else:
                 send_invitation(form.email.data, realtor=realtor, new_user=False)
                 User.update(existing_user['_id'], form.email.data, listing=id)

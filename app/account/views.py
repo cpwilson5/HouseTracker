@@ -369,11 +369,12 @@ def register_with_token(token):
 
         User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, confirmed=True, \
             email_alert=ea, text_alert=ta)
-        login_user(User(str(id),form.email.data,account_id,superuser=False, active=True))
+        login_user(User(str(id),form.email.data, account_id, superuser=False, active=True))
         flash("Updated successfully", category='success')
         return redirect(url_for('listing.listings'))
     else:
         flash_errors(form)
+        return render_template('account/register.html', token=token, form=form)
 
 @account.route('/admins/edit/<string:id>', methods=['GET', 'POST'])
 @login_required

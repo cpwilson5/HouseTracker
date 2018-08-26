@@ -9,40 +9,44 @@
   <!-- form card login with validation feedback -->
   <div class="card card-outline-secondary">
       <div class="card-header">
-          <h3 class="mb-0">Realtor Sign up</h3>
+          <h3 class="mb-0">Sign up</h3>
       </div>
       <div class="card-body">
           <form class="form" role="form" autocomplete="off" id="loginForm" novalidate="" method="POST">
               {{ form.hidden_tag() }}
               <div class="form-group row">
                 <div class="col">
-                    {{ form.first_name (class="form-control", placeholder="First name")}}
+                  {{ form.first_name (class="form-control", placeholder="First name")}}
                 </div>
               </div>
               <div class="form-group row">
                 <div class="col">
-                    {{ form.last_name (class_="form-control", placeholder="Last name")}}
+                  {{ form.last_name (class_="form-control", placeholder="Last name")}}
                 </div>
               </div>
               <div class="form-group row">
                 <div class="col">
-                    {{ form.email (class="form-control", placeholder="Email")}}
+                  {% if not form.email.data %}
+                    {{ form.email (class="form-control", placeholder="Email") }}
+                  {% else %}
+                    {{ form.email (class="form-control", placeholder="Email", readonly="readonly") }}
+                  {% endif %}
                 </div>
               </div>
               <div class="form-group row">
                 <div class="col">
-                    {{ form.cell (class_="form-control", placeholder="Cell phone")}}
+                  {{ form.cell (class_="form-control", placeholder="Cell phone")}}
                 </div>
               </div>
               <hr class="mb-3">
               <div class="form-group row">
                 <div class="col">
-                    {{ form.password (class="form-control", placeholder="Password")}}
+                  {{ form.password (class="form-control", placeholder="Password")}}
                 </div>
               </div>
               <div class="form-group row">
                 <div class="col">
-                    {{ form.confirm (class_="form-control", placeholder="Confirm password")}}
+                  {{ form.confirm (class_="form-control", placeholder="Confirm password")}}
                 </div>
               </div>
               <button type="submit" class="btn btn-secondary btn-lg float-right" id="btnSignUp">Sign Up</button>
