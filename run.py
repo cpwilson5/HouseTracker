@@ -11,6 +11,23 @@ if __name__ == '__main__':
 """ native web server - uses the config.py file """
 """ below should automatically happen now when you cd into housetracker"""
 
+""" heroku local - uses the .env file """
+"""
+cd housetracker
+source venv/bin/activate
+heroku local
+heroku open
+"""
+
+""" deploy to prod """
+"""
+cd housetracker
+source venv/bin/activate
+git push heroku master
+heroku ps:scale web=1
+heroku open
+"""
+
 """
 cd housetracker
 source venv/bin/activate
@@ -25,19 +42,4 @@ flask run
 cd housetracker
 source venv/bin/activate
 gunicorn run:app
-"""
-
-""" heroku local - uses the .env file """
-"""
-cd housetracker
-source venv/bin/activate
-"""
-
-""" deploy to prod """
-"""
-cd housetracker
-source venv/bin/activate
-git push heroku master
-heroku ps:scale web=1
-heroku open
 """
