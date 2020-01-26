@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
 """ heroku local - uses the .env file """
 """
-cd housetracker
+cd crm
 source venv/bin/activate
 heroku local
 heroku open
