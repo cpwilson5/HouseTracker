@@ -63,7 +63,7 @@ class AppTemplateStep(object):
             '_id': ObjectId(self.template_id)
         },{
             '$set': { 'update_date': datetime.datetime.utcnow() },
-            '$inc': {'order': 1}, #increment the listing order count to keep track of # of listing steps
+            '$inc': {'order': 1}, #increment the project order count to keep track of # of project steps
             '$push': {
                 'steps':
                 {
@@ -72,7 +72,7 @@ class AppTemplateStep(object):
                     'notes': self.notes,
                     'days_before_close': self.days_before_close,
                     'active': True,
-                    'order': next_order, #set the new listing step to the next number
+                    'order': next_order, #set the new project step to the next number
                     'create_date': datetime.datetime.utcnow(),
                     'update_date': datetime.datetime.utcnow()
                 }

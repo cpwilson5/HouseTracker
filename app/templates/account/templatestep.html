@@ -11,7 +11,7 @@
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.projects') }}">Home</a></li>
     <li class="breadcrumb-item"><a href="{{ url_for('account.templates') }}">Templates</a></li>
     <li class="breadcrumb-item"><a href="{{ url_for('account.template_steps', id=id) }}">Template</a></li>
     <li class="breadcrumb-item active" aria-current="page">{{ action }} Step</li>
@@ -72,7 +72,7 @@
         </button>
       </div>
       <div class="modal-body">
-        By deleting this step, this step will no longer be added to new listings that are created when using this template.<br><br>
+        By deleting this step, this step will no longer be added to new projects that are created when using this template.<br><br>
         Click delete to remove this step.
       </div>
       <div class="modal-footer">

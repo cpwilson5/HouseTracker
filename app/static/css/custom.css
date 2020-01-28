@@ -137,7 +137,7 @@ pre {
   margin-bottom: 0px;
 }
 
-/* hover class for the listing steps page which only gets turned on after jquery button */
+/* hover class for the project steps page which only gets turned on after jquery button */
 .hover {
   opacity: .5;
 }

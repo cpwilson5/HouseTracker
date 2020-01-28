@@ -31,7 +31,7 @@ $(document).ready(function(){
     $('#saveorder, #saveordermobile').show();
     $(".dragger").show();
     $("#sortable").wrap( "<div class='card mb-4 pl-4 pr-4 pt-4' style='border-style:dashed; color:gray; border-color:gray;'></div>" );
-    $(".listingstep").hover(function () {
+    $(".projectstep").hover(function () {
       $(this).toggleClass("hover");
     });
   });
@@ -52,9 +52,9 @@ $(document).ready(function(){
       sortUrl = "/templates/" + template_id + "/steps/sort";
     }
 
-    if (window.location.pathname.split( '/' )[1] == 'listings') {
-      var listing_id = window.location.pathname.split( '/' )[2];
-      sortUrl = "/listings/" + listing_id + "/steps/sort";
+    if (window.location.pathname.split( '/' )[1] == 'projects') {
+      var project_id = window.location.pathname.split( '/' )[2];
+      sortUrl = "/projects/" + project_id + "/steps/sort";
     }
 
     $("#sortable").sortable('disable');
@@ -62,7 +62,7 @@ $(document).ready(function(){
     $('#saveorder, #saveordermobile').hide();
     $(".dragger").hide();
     $("#sortable").unwrap();
-    $(".listingstep").hover(function () {
+    $(".projectstep").hover(function () {
       $(this).toggleClass("hover");
     });
 
@@ -76,7 +76,7 @@ $(document).ready(function(){
   });
 });
 
-// toggles the browse button on listing photo edit
+// toggles the browse button on project photo edit
 $(document).ready(function(){
     $(".edit_photo").click(function(){
         $("#browse").toggle();
@@ -96,7 +96,7 @@ $(document).ready(function(){
   });
 });
 
-// handles the show/hide verbiage toggle on listing steps
+// handles the show/hide verbiage toggle on project steps
 $(document).ready(function(){
   $('#showhide, #showhidemobile').click(function(){
       $(this).text(function(i,old){

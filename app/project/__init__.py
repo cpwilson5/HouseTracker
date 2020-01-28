@@ -4,12 +4,12 @@ import datetime
 import pytz
 from pytz import timezone
 
-listing = Blueprint('listing', __name__)
+project = Blueprint('project', __name__)
 
 from . import views
 
 ### https://www.michaelcho.me/article/custom-jinja-template-filters-in-flask ###
-@listing.app_template_filter()
+@project.app_template_filter()
 def pretty_date(value, format="%a, %b %-d at %-I:%M %p EST", convert_to_tz=False):
     if isinstance(value, datetime.date): # if it's a date time then just set the value (due_date)
         obj = value # else assume it's already datetime

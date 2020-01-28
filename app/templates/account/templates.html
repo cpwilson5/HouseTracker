@@ -9,7 +9,7 @@
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.projects') }}">Home</a></li>
     <li class="breadcrumb-item active" aria-current="page">Templates</li>
   </ol>
 </nav>
@@ -49,7 +49,7 @@
       </div>
 
       {% if count == 0 %}
-        <p class="font-weight-light font-italic text-center">No templates yet!<br><br>Add a template so we can create steps automatically for your listings.</p>
+        <p class="font-weight-light font-italic text-center">No templates yet!<br><br>Add a template so we can create steps automatically for your projects.</p>
       {% endif %}
 
     </div>
@@ -67,7 +67,7 @@
         </button>
       </div>
       <div class="modal-body">
-        By deleting this template, this template will no longer be available to be used for new listings.<br><br>
+        By deleting this template, this template will no longer be available to be used for new projects.<br><br>
         Click delete to remove this template.
       </div>
       <div class="modal-footer">

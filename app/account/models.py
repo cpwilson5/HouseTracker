@@ -10,14 +10,14 @@ import datetime
 '''https://runningcodes.net/flask-login-and-mongodb/'''
 
 class User(UserMixin):
-    def __init__(self, id=None, email=None, account=None, superuser=False, active=False, role=None, listing=None):
+    def __init__(self, id=None, email=None, account=None, superuser=False, active=False, role=None, project=None):
         self.id = id
         self.email = email
         self.account = account
         self.superuser = superuser
         self.active = active
         self.role = role
-        self.listing = listing
+        self.project = project
 
     def is_authenticated(self):
         return True
@@ -37,8 +37,8 @@ class User(UserMixin):
     def get_role(self):
         return self.role
 
-    def get_listing(self):
-        return self.listing
+    def get_project(self):
+        return self.project
 
     @property
     def is_superuser(self):
@@ -46,7 +46,7 @@ class User(UserMixin):
 
     @staticmethod
     def add(email, first_name, last_name, account_id, role, cell=None, password=None, \
-        invited_by=None, confirmed=True, listing='all', email_alert=False, text_alert=False, partner_type=None):
+        invited_by=None, confirmed=True, project='all', email_alert=False, text_alert=False, partner_type=None):
         return mongo.db.users.insert({
             'first_name': first_name,
             'last_name': last_name,
@@ -64,7 +64,7 @@ class User(UserMixin):
             'invited_by': invited_by,
             'active': True,
             'confirmed': confirmed,
-            'listing': listing,
+            'project': project,
             'create_date': datetime.datetime.utcnow(),
             'update_date': datetime.datetime.utcnow()
         })
@@ -81,11 +81,11 @@ class User(UserMixin):
         return mongo.db.users.find_one(find_by)
 
     @staticmethod
-    def all(account=None, listing=None, email_alert=None, text_alert=None):
+    def all(account=None, project=None, email_alert=None, text_alert=None):
         if account:
             find_by = {'account': account, 'active': True}
         else:
-            find_by = {'listing': listing, 'active': True}
+            find_by = {'project': project, 'active': True}
 
         if email_alert:
             find_by['email_alert'] = True
@@ -97,17 +97,17 @@ class User(UserMixin):
 
     @staticmethod
     def update(id, email, first_name=None, last_name=None, cell=None, password=None, confirmed=None, \
-    email_alert=None, text_alert=None, listing=None, update_alerts=False, partner_type=None):
+    email_alert=None, text_alert=None, project=None, update_alerts=False, partner_type=None):
         set = {
             'email': email,
             'update_date': datetime.datetime.utcnow()
         }
 
-        # need to append to listing array as the client/partner already has at least one
-        if listing:
+        # need to append to project array as the client/partner already has at least one
+        if project:
             mongo.db.users.update_one({
                 '_id': ObjectId(id)},{
-                '$addToSet': {'listing': listing}
+                '$addToSet': {'project': project}
             }, upsert=False)
 
         # if existing user is being updated so it shouldn't overwrite
@@ -134,7 +134,7 @@ class User(UserMixin):
         }, upsert=False)
 
     @staticmethod
-    def delete(id, context, listing=None):
+    def delete(id, context, project=None):
         if context == 'admin':
             return mongo.db.users.update_one(
                 {'_id': ObjectId(id)},
@@ -144,7 +144,7 @@ class User(UserMixin):
         if context == 'viewer':
             return mongo.db.users.update_one({
                 '_id': ObjectId(id)},{
-                '$pull': {'listing': listing}
+                '$pull': {'project': project}
             }, upsert=False)
 
     @staticmethod
@@ -165,7 +165,7 @@ def load_user(id):
     users = mongo.db.users.find_one({'_id': ObjectId(id)})
     if not users:
         return None
-    return User(str(users['_id']), users['email'], users['account'], users['superuser'], users['active'], users['role'], users['listing'])
+    return User(str(users['_id']), users['email'], users['account'], users['superuser'], users['active'], users['role'], users['project'])
 
 
 class Account(object):
@@ -244,7 +244,7 @@ class TemplateStep(object):
             '_id': ObjectId(self.template_id)
         },{
             '$set': { 'update_date': datetime.datetime.utcnow() },
-            '$inc': {'order': 1}, #increment the listing order count to keep track of # of listing steps
+            '$inc': {'order': 1}, #increment the project order count to keep track of # of project steps
             '$push': {
                 'steps':
                 {
@@ -253,7 +253,7 @@ class TemplateStep(object):
                     'notes': self.notes,
                     'days_before_close': self.days_before_close,
                     'active': True,
-                    'order': next_order, #set the new listing step to the next number
+                    'order': next_order, #set the new project step to the next number
                     'create_date': datetime.datetime.utcnow(),
                     'update_date': datetime.datetime.utcnow()
                 }

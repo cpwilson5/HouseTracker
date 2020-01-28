@@ -41,7 +41,7 @@ def create_app(config_name):  ## config_name is legacy from when using the local
     from .configuration import configuration as configuration_blueprint
     app.register_blueprint(configuration_blueprint)
 
-    from .listing import listing as listing_blueprint
-    app.register_blueprint(listing_blueprint)
+    from .project import project as project_blueprint
+    app.register_blueprint(project_blueprint)
 
     return app

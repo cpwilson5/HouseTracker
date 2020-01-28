@@ -45,7 +45,7 @@ def register():
                     template_step.add()
 
             flash("Welcome and we added %s templates to get you started" % (app_templates_count), category='success')
-            return redirect(url_for('listing.listings'))
+            return redirect(url_for('project.projects'))
         else:
             flash("User already exists", category='danger')
     else:
@@ -64,7 +64,7 @@ def login():
                 login_user(user_obj, remember=form.remember_me.data)
                 User.log_login(user_obj)
                 flash("Logged in successfully", category='success')
-                return redirect(url_for('listing.listings'))
+                return redirect(url_for('project.projects'))
             else:
                 flash("Wrong email or password", category='danger')
         else:
@@ -84,7 +84,7 @@ def impersonate():
                 if user_obj.is_active() is True:
                     login_user(user_obj)
                     flash("Logged in successfully", category='success')
-                    return redirect(url_for('listing.listings'))
+                    return redirect(url_for('project.projects'))
                 else:
                     flash("Wrong email or password", category='danger')
             else:
@@ -255,7 +255,7 @@ def user():
         User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, \
             confirmed=True, email_alert=ea, text_alert=ta, update_alerts=True)
         flash("Updated successfully", category='success')
-        return redirect(url_for('listing.listings'))
+        return redirect(url_for('project.projects'))
     else:
         flash_errors(form)
 
@@ -283,7 +283,7 @@ def password():
         User.update(id=id, email=e, first_name=fn, last_name=ln, cell=c, password=p, \
             email_alert=ea, text_alert=ta)
         flash("Updated successfully", category='success')
-        return redirect(url_for('listing.listings'))
+        return redirect(url_for('project.projects'))
     else:
         flash_errors(form)
 
@@ -371,7 +371,7 @@ def register_with_token(token):
             email_alert=ea, text_alert=ta)
         login_user(User(str(id),form.email.data, account_id, superuser=False, active=True))
         flash("Updated successfully", category='success')
-        return redirect(url_for('listing.listings'))
+        return redirect(url_for('project.projects'))
     else:
         flash_errors(form)
         return render_template('account/register.html', token=token, form=form)

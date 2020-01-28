@@ -16,7 +16,7 @@ STATE_ABBREV = ('AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
                 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
                 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI', 'WV', 'WY')
 
-class ListingForm(FlaskForm):
+class ProjectForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     address1 = StringField('Address1', validators=[DataRequired()])
     address2 = StringField('Address2')
@@ -37,7 +37,7 @@ class ListingForm(FlaskForm):
                 result = False
         return result
 
-class ListingStepForm(FlaskForm):
+class ProjectStepForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     notes = StringField('Notes',widget=TextArea())
     due_date = DateField('Due Date', validators=[Optional()])

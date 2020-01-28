@@ -8,7 +8,7 @@
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.projects') }}">Home</a></li>
     <li class="breadcrumb-item"><a href="{{ url_for('account.templates') }}">Templates</a></li>
     <li class="breadcrumb-item active" aria-current="page">Template</li>
   </ol>
@@ -79,7 +79,7 @@
       </div>
 
       {% else %} <!-- count == 0 -->
-        <p class="font-weight-light font-italic text-center">We're getting closer to making your life easier!<br><br>Let's get steps added so we can create it automatically for your new listings.</p>
+        <p class="font-weight-light font-italic text-center">We're getting closer to making your life easier!<br><br>Let's get steps added so we can create it automatically for your new projects.</p>
       {% endif %}
 
     </div>

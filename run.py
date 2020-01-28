@@ -8,9 +8,6 @@ app = create_app(config_name)
 if __name__ == '__main__':
     app.run()
 
-""" native web server - uses the config.py file """
-""" below should automatically happen now when you cd into crm"""
-
 """ heroku local - uses the .env file """
 """
 cd crm
@@ -27,6 +24,11 @@ git push heroku master
 heroku ps:scale web=1
 heroku open
 """
+
+""" ---- use above ---- """
+
+""" native web server - uses the config.py file """
+""" below should automatically happen now when you cd into crm"""
 
 """
 cd crm
