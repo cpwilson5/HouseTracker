@@ -1,7 +1,7 @@
 <!-- javascript sort will require a csrf token so need to set it here -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
-{% set active_page = "listings" %}
+{% set active_page = "projects" %}
 
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
@@ -9,15 +9,15 @@
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Listing</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.projects') }}">Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Project</li>
   </ol>
 </nav>
 {% endblock %}
 
 {% block header %}
 <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-  <h1 class="text-uppercase">{{ listing.name}}</h1>
+  <h1 class="text-uppercase">{{ project.name}}</h1>
   {% if days_left == 1 %}<p class="lead">{{days_left}} day until closing</p>
   {% elif days_left > 1 %}<p class="lead">{{days_left}} days until closing</p>
   {% else %}<p class="lead">No closing date yet</p>
@@ -37,10 +37,10 @@
     {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
     <div class="row">
       <div class="col">
-        <a class="btn btn-outline-secondary btn-block mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
+        <a class="btn btn-outline-secondary btn-block mb-4" href="{{ url_for('project.add_project_step', id=id) }}">+ Add</a>
       </div>
       <div class="col">
-        {% if listing_steps %}
+        {% if project_steps %}
         <button id="sortordermobile" class="expander btn btn-outline-secondary btn-block">Sort</button>
         <button id="saveordermobile" style="display:none; margin-top:0px;" class="btn btn-outline-secondary btn-block">Save</button>
         {% else %}
@@ -59,52 +59,52 @@
   <div class="row">
     <div class="col-md-8">
       <div id="sortable">
-        {% for listing_step in listing_steps %}
+        {% for project_step in project_steps %}
 
-        {% if listing_step.steps.complete_date %}
+        {% if project_step.steps.complete_date %}
           {% set border_color = 'gray '%}
-        {% elif listing_step.steps.status == 'red' %}
+        {% elif project_step.steps.status == 'red' %}
           {% set border_color = 'indianred' %}
-        {% elif listing_step.steps.status == 'yellow' %}
+        {% elif project_step.steps.status == 'yellow' %}
           {% set border_color = 'khaki' %}
         {% else %}
           {% set border_color = 'seagreen '%}
         {% endif %}
 
-          <div {% if listing_step.steps.complete_date %} class="collapse multi-collapse" {% endif %} id="{{ listing_step.steps._id }}">
-          <div id="{{ listing_step.steps._id }}" class="card mb-4 listingstep collapse multi-collapse" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
+          <div {% if project_step.steps.complete_date %} class="collapse multi-collapse" {% endif %} id="{{ project_step.steps._id }}">
+          <div id="{{ project_step.steps._id }}" class="card mb-4 projectstep collapse multi-collapse" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
 
             {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
-            <a href="{{ url_for('listing.edit_listing_step', id=id, step_id=listing_step.steps._id) }}" class="card-block clearfix">
+            <a href="{{ url_for('project.edit_project_step', id=id, step_id=project_step.steps._id) }}" class="card-block clearfix">
             {% endif %}
               <div class="card-header">
                 <div class="row">
                   <div class="col font-weight-bold text-uppercase">
-                    {{ listing_step.steps.name }}
+                    {{ project_step.steps.name }}
                   </div>
                   <div class="col">
-                    {% if listing_step.steps.complete_date %}
+                    {% if project_step.steps.complete_date %}
                        <span class="text-success float-right">Completed</span>
-                    {% elif listing_step.steps.due_date %}
-                       {% if listing_step.steps.due_date.strftime('%H:%M:%S') != '00:00:00' %}
-                         <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d at %-I:%M %p") }}</span>
+                    {% elif project_step.steps.due_date %}
+                       {% if project_step.steps.due_date.strftime('%H:%M:%S') != '00:00:00' %}
+                         <span class="text-success float-right">{{ project_step.steps.due_date | pretty_date("%a, %-m/%-d at %-I:%M %p") }}</span>
                        {% else %}
-                         <span class="text-success float-right">{{ listing_step.steps.due_date | pretty_date("%a, %-m/%-d") }}</span>
+                         <span class="text-success float-right">{{ project_step.steps.due_date | pretty_date("%a, %-m/%-d") }}</span>
                        {% endif %}
                      {% endif %}
                   </div>
                 </div>
                </div>
               <div class="card-body">
-                <p class="card-text">{{ listing_step.steps.notes }}</p>
+                <p class="card-text">{{ project_step.steps.notes }}</p>
               </div>
               <div class="card-footer">
-                <small class="text-muted">Last updated {{ listing_step.steps.update_date | pretty_date(convert_to_tz=True)}}</small>
-                {% if listing_step.steps.attachment %}
+                <small class="text-muted">Last updated {{ project_step.steps.update_date | pretty_date(convert_to_tz=True)}}</small>
+                {% if project_step.steps.attachment %}
                   {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
                   <span class="oi oi-paperclip float-right"></span>
                   {% else %}
-                  <a style="color: #000;" class="float-right" href="{{ url_for('listing.get_attachment', attachment=listing_step.steps.attachment) }}"><span class="oi oi-paperclip"></span></a>
+                  <a style="color: #000;" class="float-right" href="{{ url_for('project.get_attachment', attachment=project_step.steps.attachment) }}"><span class="oi oi-paperclip"></span></a>
                   {% endif %}
                 {% endif %}
               </div>
@@ -114,7 +114,7 @@
         {% endfor %}
       </div>
 
-      {% if listing.close_date %}
+      {% if project.close_date %}
         {% set border_color = 'seagreen' %}
       {% else %}
         {% set border_color = 'indianred '%}
@@ -122,17 +122,17 @@
 
       <div id="closing" class="card mb-4" style="border-left-width:10px; border-color: lightgray lightgray lightgray {{border_color}};">
         {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
-        <a href="{{ url_for('listing.edit_listing', id=id) }}" class="card-block clearfix">
+        <a href="{{ url_for('project.edit_project', id=id) }}" class="card-block clearfix">
         {% endif %}
         <div class="card-header">
            <span class="font-weight-bold text-uppercase">Closing</span>
-           <span class="text-success float-right">{{ listing.close_date | pretty_date("%A, %B %-d") if listing.close_date else "TBD"}}</span>
+           <span class="text-success float-right">{{ project.close_date | pretty_date("%A, %B %-d") if project.close_date else "TBD"}}</span>
          </div>
           <div class="card-body">
-            <p class="card-text">You're expected closing date is {{ listing.close_date | pretty_date("%A, %B %-d") if listing.close_date else "TBD"}}</p>
+            <p class="card-text">You're expected closing date is {{ project.close_date | pretty_date("%A, %B %-d") if project.close_date else "TBD"}}</p>
           </div>
           <div class="card-footer">
-            <small class="text-muted">Last updated {{ listing.update_date | pretty_date }}</small>
+            <small class="text-muted">Last updated {{ project.update_date | pretty_date }}</small>
           </div>
         </a>
       </div>
@@ -148,10 +148,10 @@
         {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
         <div class="row">
           <div class="col">
-            <a class="btn btn-outline-secondary btn-block mb-4" href="{{ url_for('listing.add_listing_step', id=id) }}">+ Add</a>
+            <a class="btn btn-outline-secondary btn-block mb-4" href="{{ url_for('project.add_project_step', id=id) }}">+ Add</a>
           </div>
           <div class="col">
-            {% if listing_steps %}
+            {% if project_steps %}
             <button id="sortorder" class="expander btn btn-outline-secondary btn-block">Sort</button>
             <button id="saveorder" style="display:none; margin-top:0px;" class="btn btn-outline-secondary btn-block">Save</button>
             {% else %}
@@ -171,28 +171,28 @@
         <div class="card-body">
           <div class="row">
             <div class="col">
-                <h5 class="card-title">Listing Info</h5>
+                <h5 class="card-title">Project Info</h5>
             </div>
             {% if current_user.get_role() != 'client' and current_user.get_role() != 'partner' %}
             <div class="col">
-              <a href="{{ url_for('listing.edit_listing', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Edit</a>
+              <a href="{{ url_for('project.edit_project', id=id) }}" class="btn btn-outline-secondary btn-sm float-right">Edit</a>
             </div>
             {% endif %}
           </div>
           <div class="row align-items-center justify-content-center mt-2">
-            <span class="text-success text-uppercase"><strong>Closing: {{ listing.close_date | pretty_date("%A, %b %-d") if listing.close_date else "TBD"}}</strong></span>
+            <span class="text-success text-uppercase"><strong>Closing: {{ project.close_date | pretty_date("%A, %b %-d") if project.close_date else "TBD"}}</strong></span>
           </div>
-          {% if listing.photo %}
-            <img src="{{ url_for('listing.get_photo', photo=listing.photo) }}" class="w-100 img-thumbnail rounded mx-auto d-block mt-3 mb-3">
+          {% if project.photo %}
+            <img src="{{ url_for('project.get_photo', photo=project.photo) }}" class="w-100 img-thumbnail rounded mx-auto d-block mt-3 mb-3">
           {% else %}
-            <img src="{{ url_for('listing.get_photo', photo="placeholder.jpg") }}" class="w-100 img-thumbnail rounded mx-auto d-block mt-3 mb-3">
+            <img src="{{ url_for('project.get_photo', photo="placeholder.jpg") }}" class="w-100 img-thumbnail rounded mx-auto d-block mt-3 mb-3">
           {% endif %}
           <p class="card-text">
-            {{ listing.address1 }}<br>
-            {% if listing.address2 %}
-              {{ listing.address2 }}<br>
+            {{ project.address1 }}<br>
+            {% if project.address2 %}
+              {{ project.address2 }}<br>
             {% endif %}
-            {{ listing.city }}, {{ listing.state }} {{ listing.zip }}
+            {{ project.city }}, {{ project.state }} {{ project.zip }}
           </p>
         </div>
       </div>
@@ -205,7 +205,7 @@
             </div>
             {% if current_user.get_role() != 'partner' %}
             <div class="col">
-              <a href="{{ url_for('listing.invite_viewer', id=id, role='client') }}" class="btn btn-outline-secondary btn-sm float-right">Add</a>
+              <a href="{{ url_for('project.invite_viewer', id=id, role='client') }}" class="btn btn-outline-secondary btn-sm float-right">Add</a>
             </div>
             {% endif %}
           </div>
@@ -213,7 +213,7 @@
           <div class="list-group mt-2">
             {% for user in users %}
               {% if user['role'] == 'client' %}
-                <a href="{{ url_for('listing.edit_viewer', id=id, viewer_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.first_name }} {{ user.last_name }}
+                <a href="{{ url_for('project.edit_viewer', id=id, viewer_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.first_name }} {{ user.last_name }}
 
                 {% if user['confirmed'] == False %}
                   <span class="float-right badge badge-secondary">invited</span>
@@ -249,7 +249,7 @@
             </div>
             {% if current_user.get_role() != 'partner' %}
             <div class="col">
-              <a href="{{ url_for('listing.invite_viewer', id=id, role='partner') }}" class="btn btn-outline-secondary btn-sm float-right">Add</a>
+              <a href="{{ url_for('project.invite_viewer', id=id, role='partner') }}" class="btn btn-outline-secondary btn-sm float-right">Add</a>
             </div>
             {% endif %}
           </div>
@@ -257,7 +257,7 @@
           <div class="list-group mt-2">
             {% for user in users %}
               {% if user['role'] == 'partner' %}
-                <a href="{{ url_for('listing.edit_viewer', id=id, viewer_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.first_name }} {{ user.last_name }}
+                <a href="{{ url_for('project.edit_viewer', id=id, viewer_id=user._id) }}" class="list-group-item list-group-item-action">{{ user.first_name }} {{ user.last_name }}
 
                 {% if user['confirmed'] == False %}
                   <span class="float-right badge badge-secondary mt-2">invited</span>
@@ -316,9 +316,9 @@
             <div class="col">
               {% set attachments = {'exist': False} %}
               <div class="list-group mt-2">
-              {% for listing_step in listing_steps %}
-                {% if listing_step.steps.attachment %}
-                  <a href="{{ url_for('listing.get_attachment', attachment=listing_step.steps.attachment) }}" class="list-group-item list-group-item-action">{{ listing_step.steps.name }}</a>
+              {% for project_step in project_steps %}
+                {% if project_step.steps.attachment %}
+                  <a href="{{ url_for('project.get_attachment', attachment=project_step.steps.attachment) }}" class="list-group-item list-group-item-action">{{ project_step.steps.name }}</a>
                   {% if attachments.update({'exist': True}) %} {% endif %}
                 {% endif %}
               {% endfor %}

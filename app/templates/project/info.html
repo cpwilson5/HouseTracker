@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
-{% set active_page = "listings" %}
+{% set active_page = "projects" %}
 
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.projects') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.project_steps', id=id) }}">Project</a></li>
     <li class="breadcrumb-item active" aria-current="page">Edit Info</li>
   </ol>
 </nav>

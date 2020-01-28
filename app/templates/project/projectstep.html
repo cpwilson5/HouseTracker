@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
-{% set active_page = "listings" %}
+{% set active_page = "projects" %}
 
 {% set action = "Add" %}
-{% if listing_step != [] %}
+{% if project_step != [] %}
   {% set action = "Edit" %}
 {% endif %}
 
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>
-    <li class="breadcrumb-item active" aria-current="page">{{ action }} Listing Step</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.projects') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.project_steps', id=id) }}">Project</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ action }} Project Step</li>
   </ol>
 </nav>
 {% endblock %}
@@ -28,7 +28,7 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0 d-inline-block">{{action }} Listing Step</h3>
+            <h3 class="mb-0 d-inline-block">{{action }} Project Step</h3>
             {% if action == "Edit" %}
             <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
             {% endif %}
@@ -64,7 +64,7 @@
                   {% if attachment %}
                   <div class="col-md-9 mb-3">
                     <label class="form-control-label">Attachment</label><br>
-                    <a class="btn btn-outline-secondary" href="{{ url_for('listing.get_attachment', attachment=attachment) }}" role="button">View Attachment</a>
+                    <a class="btn btn-outline-secondary" href="{{ url_for('project.get_attachment', attachment=attachment) }}" role="button">View Attachment</a>
                     &nbsp;&nbsp;&nbsp; or &nbsp;&nbsp;&nbsp;
                     <a href="#" class="text-secondary"><span class="edit_photo" title="Edit Photo">Upload New</span></a>
                     <div id="browse" style="display:none;" class="mt-3">{{ form.attachment(class_="form-control") }}</div>
@@ -101,11 +101,11 @@
         </button>
       </div>
       <div class="modal-body">
-        By marking this step complete, it will be hidden from the listing.<br><br>
+        By marking this step complete, it will be hidden from the project.<br><br>
         Click continue to complete the step.
       </div>
       <div class="modal-footer">
-        <a class="btn btn-outline-secondary" href="{{ url_for('listing.complete_listing_step', id=id, step_id=step_id) }}" role="button">Continue</a>
+        <a class="btn btn-outline-secondary" href="{{ url_for('project.complete_project_step', id=id, step_id=step_id) }}" role="button">Continue</a>
       </div>
     </div>
   </div>
@@ -122,12 +122,12 @@
         </button>
       </div>
       <div class="modal-body">
-        By deleting this listing step, you will remove this step from the listing.<br><br>
-        To complete a listing step, click the "complete" button on the edit page rather than the "delete" button.<br><br>
-        Click delete to remove this step from your listing.
+        By deleting this project step, you will remove this step from the project.<br><br>
+        To complete a project step, click the "complete" button on the edit page rather than the "delete" button.<br><br>
+        Click delete to remove this step from your project.
       </div>
       <div class="modal-footer">
-        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_listing_step', id=id, step_id=step_id) }}" role="button">Delete</a>
+        <a class="btn btn-outline-danger float-right" href="{{ url_for('project.delete_project_step', id=id, step_id=step_id) }}" role="button">Delete</a>
       </div>
     </div>
   </div>

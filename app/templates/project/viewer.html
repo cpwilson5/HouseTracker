@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% set active_page = "listings" %}
+{% set active_page = "projects" %}
 
 {% set action = "Add" %}
 {% if user != [] %}
@@ -10,8 +10,8 @@
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.projects') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.project_steps', id=id) }}">Project</a></li>
     <li class="breadcrumb-item active" aria-current="page">{{ action }} {{ user_role.title() }}</li>
   </ol>
 </nav>
@@ -107,11 +107,11 @@
         </button>
       </div>
       <div class="modal-body">
-        By deleting this {{ user_role }}, he/she will no longer be able to access the listing.<br><br>
-        Click delete to remove this {{ user_role }} from your listing.
+        By deleting this {{ user_role }}, he/she will no longer be able to access the project.<br><br>
+        Click delete to remove this {{ user_role }} from your project.
       </div>
       <div class="modal-footer">
-        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_viewer', id=id, context='viewer', viewer_id=user._id) }}" role="button">Delete</a>
+        <a class="btn btn-outline-danger float-right" href="{{ url_for('project.delete_viewer', id=id, context='viewer', viewer_id=user._id) }}" role="button">Delete</a>
       </div>
     </div>
   </div>

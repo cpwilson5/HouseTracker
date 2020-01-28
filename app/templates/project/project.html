@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Home{% endblock %}
 
-{% set active_page = "listings" %}
+{% set active_page = "projects" %}
 
 {% set action = "Add" %}
 {% if id %}
@@ -11,9 +11,9 @@
 {% block breadcrumb %}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('listing.listings') }}">Home</a></li>
-    {% if action == "Edit" %}<li class="breadcrumb-item"><a href="{{ url_for('listing.listing_steps', id=id) }}">Listing</a></li>{% endif %}
-    <li class="breadcrumb-item active" aria-current="page">{{ action }} Listing</li>
+    <li class="breadcrumb-item"><a href="{{ url_for('project.projects') }}">Home</a></li>
+    {% if action == "Edit" %}<li class="breadcrumb-item"><a href="{{ url_for('project.project_steps', id=id) }}">Project</a></li>{% endif %}
+    <li class="breadcrumb-item active" aria-current="page">{{ action }} Project</li>
   </ol>
 </nav>
 {% endblock %}
@@ -28,7 +28,7 @@
     <!-- form user info -->
     <div class="card card-outline-secondary">
         <div class="card-header">
-            <h3 class="mb-0 d-inline-block">{{ action }} Listing</h3>
+            <h3 class="mb-0 d-inline-block">{{ action }} Project</h3>
             {% if action == "Edit" %}
             <a class="btn btn-outline-danger float-right" href="#" role="button" data-toggle="modal" data-target="#deleteModal">Delete</a>
             {% endif %}
@@ -42,9 +42,9 @@
                   <div class="house-pic col-8 mb-3 text-center">
 
                   {% if photo %}
-                    <img src="{{ url_for('listing.get_photo', photo=photo) }}" class="w-100 img-thumbnail rounded mx-auto d-block">
+                    <img src="{{ url_for('project.get_photo', photo=photo) }}" class="w-100 img-thumbnail rounded mx-auto d-block">
                   {% else %}
-                    <img src="{{ url_for('listing.get_photo', photo="placeholder.jpg") }}" class="w-100 img-thumbnail rounded mx-auto d-block">
+                    <img src="{{ url_for('project.get_photo', photo="placeholder.jpg") }}" class="w-100 img-thumbnail rounded mx-auto d-block">
                   {% endif %}
 
                     <div class="edit"><a><span class="oi oi-pencil edit_photo" title="Edit Photo"></span></a></div>
@@ -120,12 +120,12 @@
         </button>
       </div>
       <div class="modal-body">
-        By marking this listing complete, it will be removed from your active listings.<br><br>
-        You will be able to retrieve it for 30 days using the status filter on the listings page.<br><br>
-        Click continue to complete the listing.
+        By marking this project complete, it will be removed from your active projects.<br><br>
+        You will be able to retrieve it for 30 days using the status filter on the projects page.<br><br>
+        Click continue to complete the project.
       </div>
       <div class="modal-footer">
-        <a class="btn btn-outline-secondary" href="{{ url_for('listing.complete_listing', id=id) }}" role="button">Continue</a>
+        <a class="btn btn-outline-secondary" href="{{ url_for('project.complete_project', id=id) }}" role="button">Continue</a>
       </div>
     </div>
   </div>
@@ -142,12 +142,12 @@
         </button>
       </div>
       <div class="modal-body">
-        By deleting this listing, you will no longer be able to view or reactivate this listing.<br><br>
-        To close a completed listing, click the "complete" button on the edit page rather than the "delete" button.<br><br>
-        Click delete to remove this listing from your account.
+        By deleting this project, you will no longer be able to view or reactivate this project.<br><br>
+        To close a completed project, click the "complete" button on the edit page rather than the "delete" button.<br><br>
+        Click delete to remove this project from your account.
       </div>
       <div class="modal-footer">
-        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.delete_listing', id=id) }}" role="button">Delete</a>
+        <a class="btn btn-outline-danger float-right" href="{{ url_for('project.delete_project', id=id) }}" role="button">Delete</a>
       </div>
     </div>
   </div>
@@ -164,11 +164,11 @@
         </button>
       </div>
       <div class="modal-body">
-        By reactivating this listing, this listing will be moved to your active listings page.<br><br>
-        Click reactivate to make this listing active again.
+        By reactivating this project, this project will be moved to your active projects page.<br><br>
+        Click reactivate to make this project active again.
       </div>
       <div class="modal-footer">
-        <a class="btn btn-outline-danger float-right" href="{{ url_for('listing.reactivate_listing', id=id) }}" role="button">Reactivate</a>
+        <a class="btn btn-outline-danger float-right" href="{{ url_for('project.reactivate_project', id=id) }}" role="button">Reactivate</a>
       </div>
     </div>
   </div>
