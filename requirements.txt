@@ -18,7 +18,7 @@ idna==2.8
 infinity==1.4
 intervals==0.8.1
 itsdangerous==1.1.0
-Jinja2==2.10.3
+Jinja2==2.11.3
 MarkupSafe==1.1.1
 prettytable==0.7.2
 PTable==0.9.2
