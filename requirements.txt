@@ -31,7 +31,7 @@ requests==2.22.0
 six==1.14.0
 tabulate==0.8.6
 twilio==6.35.3
-urllib3==1.25.6
+urllib3==1.25.8
 validators==0.14.2
 Werkzeug==0.16.0
 WTForms==2.2.1
